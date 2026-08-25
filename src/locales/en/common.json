@@ -1,0 +1,61 @@
+{
+  "brand": "Mansoura Distinguished Languages School 2",
+  "brandShort": "MDLS 2",
+  "nav": {
+    "home": "Home",
+    "topStudents": "Top students",
+    "achievements": "Achievements",
+    "events": "Events",
+    "blog": "Blog",
+    "contact": "Contact",
+    "login": "Log in"
+  },
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "hero": {
+    "eyebrow": "The best school for your children",
+    "title": "Where curiosity meets excellence",
+    "subtitle": "A bilingual learning community preparing students for a confident future.",
+    "ctaPrimary": "Explore achievements",
+    "ctaSecondary": "Contact us"
+  },
+  "topStudents": {
+    "title": "Top students",
+    "body": "We celebrate our outstanding students who achieved the highest results across every stage."
+  },
+  "achievements": {
+    "title": "Our achievements",
+    "body": "Highlights of academic excellence, activities, and awards earned by our school community."
+  },
+  "events": {
+    "title": "Events",
+    "body": "Stay up to date with school celebrations, activities, and events throughout the year."
+  },
+  "blog": {
+    "title": "Blog",
+    "body": "Articles, news, and educational insights from Mansoura Distinguished Languages School 2."
+  },
+  "contact": {
+    "title": "Get in touch",
+    "body": "Have a question about admissions or school life? We would love to hear from you.",
+    "form": {
+      "name": "Full name",
+      "email": "Email",
+      "message": "Message",
+      "submit": "Send message"
+    }
+  },
+  "login": {
+    "title": "Log in",
+    "body": "Sign in to your account to continue.",
+    "email": "Email",
+    "password": "Password",
+    "success": "Logged in successfully"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}
