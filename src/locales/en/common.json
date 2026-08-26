@@ -283,5 +283,123 @@
       "minLength": "At least 8 characters",
       "uppercase": "Contains an uppercase letter"
     }
+  },
+  "profile": {
+    "title": "Student profile",
+    "toggleMenu": "Toggle menu",
+    "studentName": "Mahdi Saeed",
+    "studentInitials": "MS",
+    "studentGrade": "Primary — Grade 2",
+    "logout": "Log out",
+    "nav": {
+      "personal": "Personal information",
+      "results": "Results",
+      "schedule": "School schedule",
+      "statistics": "Statistics",
+      "settings": "Settings",
+      "more": "More",
+      "callParent": "Call parent",
+      "behavior": "Student behavior evaluation",
+      "complaints": "Complaints"
+    },
+    "personal": {
+      "title": "Personal information",
+      "hint": "Mock student data for the profile dashboard preview.",
+      "fields": {
+        "nationalId": {
+          "label": "National ID",
+          "value": "30101011234567"
+        },
+        "studentCode": {
+          "label": "Student code",
+          "value": "234455"
+        },
+        "phone": {
+          "label": "Phone number",
+          "value": "01034678890"
+        },
+        "religion": {
+          "label": "Religion",
+          "value": "Muslim"
+        },
+        "registrationStatus": {
+          "label": "Registration status",
+          "value": "Active"
+        },
+        "classNumber": {
+          "label": "Class number",
+          "value": "2 / A"
+        },
+        "transfers": {
+          "label": "Transfers",
+          "value": "None"
+        },
+        "fees": {
+          "label": "Fees",
+          "value": "Paid"
+        },
+        "paymentVoucher": {
+          "label": "Payment voucher",
+          "value": "INV-88421"
+        },
+        "paymentDate": {
+          "label": "Payment date",
+          "value": "12 Jan 2026"
+        },
+        "paymentAmount": {
+          "label": "Payment amount",
+          "value": "4,500 EGP"
+        },
+        "fatherNationalId": {
+          "label": "Father national ID",
+          "value": "27001011234567"
+        },
+        "fatherAddress": {
+          "label": "Father address",
+          "value": "Mansoura, Egypt"
+        },
+        "fatherJob": {
+          "label": "Father job",
+          "value": "Engineer"
+        },
+        "fatherPhone": {
+          "label": "Father phone",
+          "value": "01011223344"
+        }
+      }
+    },
+    "placeholders": {
+      "results": "Student results will appear here.",
+      "schedule": "The school schedule will appear here.",
+      "statistics": "Student statistics will appear here.",
+      "settings": "Profile settings will appear here.",
+      "callParent": "Parent contact options will appear here.",
+      "behavior": "Behavior evaluation records will appear here.",
+      "complaints": "Complaints and requests will appear here."
+    },
+    "statistics": {
+      "chartTitle": "Student evaluation",
+      "assignments": "Assignments",
+      "tests": "Tests",
+      "cards": {
+        "attendance": {
+          "label": "Attendance rate",
+          "value": "84%",
+          "hint": "(74 sessions)"
+        },
+        "callups": {
+          "label": "Number of call-ups",
+          "value": "2"
+        },
+        "tests": {
+          "label": "Completed tests",
+          "value": "9"
+        },
+        "absences": {
+          "label": "Number of absences",
+          "value": "7"
+        }
+      }
+    }
   }
 }

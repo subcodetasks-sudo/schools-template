@@ -12,6 +12,10 @@ import { ContactPage } from '@/features/contact/ContactPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
+import { ProfileLayout } from '@/features/profile/ProfileLayout'
+import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
+import { ProfilePlaceholderPage } from '@/features/profile/ProfilePlaceholderPage'
+import { StatisticsPage } from '@/features/profile/StatisticsPage'
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +34,71 @@ export const router = createBrowserRouter([
       { path: 'terms-of-applying', element: <TermsOfApplyingPage /> },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
+      {
+        path: 'profile',
+        element: <ProfileLayout />,
+        children: [
+          { index: true, element: <PersonalInfoPage /> },
+          {
+            path: 'results',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.results"
+                bodyKey="profile.placeholders.results"
+              />
+            ),
+          },
+          {
+            path: 'schedule',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.schedule"
+                bodyKey="profile.placeholders.schedule"
+              />
+            ),
+          },
+          {
+            path: 'statistics',
+            element: <StatisticsPage />,
+          },
+          {
+            path: 'settings',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.settings"
+                bodyKey="profile.placeholders.settings"
+              />
+            ),
+          },
+          {
+            path: 'call-parent',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.callParent"
+                bodyKey="profile.placeholders.callParent"
+              />
+            ),
+          },
+          {
+            path: 'behavior',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.behavior"
+                bodyKey="profile.placeholders.behavior"
+              />
+            ),
+          },
+          {
+            path: 'complaints',
+            element: (
+              <ProfilePlaceholderPage
+                titleKey="profile.nav.complaints"
+                bodyKey="profile.placeholders.complaints"
+              />
+            ),
+          },
+        ],
+      },
     ],
   },
 ])

@@ -82,7 +82,7 @@ export function RegisterPage() {
 
   return (
     <AuthShell panelTitle={t('register.title')} panelBody={t('register.panelBody')}>
-      <h1 className="mb-8 text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl">
+      <h1 className="mb-8 text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl text-center">
         {t('register.title')}
       </h1>
 

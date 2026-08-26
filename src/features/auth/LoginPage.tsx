@@ -36,7 +36,7 @@ export function LoginPage() {
 
   return (
     <AuthShell panelTitle={t('login.title')} panelBody={t('login.panelBody')}>
-      <h1 className="text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl">
+      <h1 className="text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl text-center">
         {t('login.title')}
       </h1>
 

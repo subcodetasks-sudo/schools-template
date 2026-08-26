@@ -283,5 +283,123 @@
       "minLength": "8 حروف على الأقل",
       "uppercase": "تحتوي على حرف كبير"
     }
+  },
+  "profile": {
+    "title": "ملف الطالب",
+    "toggleMenu": "فتح القائمة",
+    "studentName": "مهدي سعيد",
+    "studentInitials": "مس",
+    "studentGrade": "الصف الثاني الابتدائي",
+    "logout": "تسجيل خروج",
+    "nav": {
+      "personal": "البيانات الشخصية",
+      "results": "النتائج",
+      "schedule": "الجدول الدراسي",
+      "statistics": "الإحصائيات",
+      "settings": "الإعدادات",
+      "more": "المزيد",
+      "callParent": "الاتصال بولي الأمر",
+      "behavior": "تقييم سلوك الطالب",
+      "complaints": "الشكاوى"
+    },
+    "personal": {
+      "title": "البيانات الشخصية",
+      "hint": "بيانات تجريبية لعرض لوحة ملف الطالب.",
+      "fields": {
+        "nationalId": {
+          "label": "الرقم القومي",
+          "value": "30101011234567"
+        },
+        "studentCode": {
+          "label": "كود الطالب",
+          "value": "234455"
+        },
+        "phone": {
+          "label": "رقم الهاتف",
+          "value": "01034678890"
+        },
+        "religion": {
+          "label": "الديانة",
+          "value": "مسلم"
+        },
+        "registrationStatus": {
+          "label": "حالة التسجيل",
+          "value": "نشط"
+        },
+        "classNumber": {
+          "label": "رقم الفصل",
+          "value": "2 / أ"
+        },
+        "transfers": {
+          "label": "التحويلات",
+          "value": "لا يوجد"
+        },
+        "fees": {
+          "label": "المصروفات",
+          "value": "مدفوعة"
+        },
+        "paymentVoucher": {
+          "label": "إيصال الدفع",
+          "value": "INV-88421"
+        },
+        "paymentDate": {
+          "label": "تاريخ الدفع",
+          "value": "12 يناير 2026"
+        },
+        "paymentAmount": {
+          "label": "مبلغ الدفع",
+          "value": "4500 جنيه"
+        },
+        "fatherNationalId": {
+          "label": "الرقم القومي لولي الأمر",
+          "value": "27001011234567"
+        },
+        "fatherAddress": {
+          "label": "عنوان ولي الأمر",
+          "value": "المنصورة، مصر"
+        },
+        "fatherJob": {
+          "label": "وظيفة ولي الأمر",
+          "value": "مهندس"
+        },
+        "fatherPhone": {
+          "label": "هاتف ولي الأمر",
+          "value": "01011223344"
+        }
+      }
+    },
+    "placeholders": {
+      "results": "ستظهر نتائج الطالب هنا.",
+      "schedule": "سيظهر الجدول الدراسي هنا.",
+      "statistics": "ستظهر إحصائيات الطالب هنا.",
+      "settings": "ستظهر إعدادات الملف هنا.",
+      "callParent": "ستظهر خيارات الاتصال بولي الأمر هنا.",
+      "behavior": "ستظهر سجلات تقييم السلوك هنا.",
+      "complaints": "ستظهر الشكاوى والطلبات هنا."
+    },
+    "statistics": {
+      "chartTitle": "تقييم الطالب",
+      "assignments": "الواجبات",
+      "tests": "الاختبارات",
+      "cards": {
+        "attendance": {
+          "label": "معدل الحضور",
+          "value": "84%",
+          "hint": "(74 حصة)"
+        },
+        "callups": {
+          "label": "عدد الاستدعاءات",
+          "value": "2"
+        },
+        "tests": {
+          "label": "اختبارات مكتملة",
+          "value": "9"
+        },
+        "absences": {
+          "label": "عدد الغيابات",
+          "value": "7"
+        }
+      }
+    }
   }
 }
