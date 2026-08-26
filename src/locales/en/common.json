@@ -1,6 +1,7 @@
 {
   "brand": "Mansoura Distinguished Languages School 2",
   "brandShort": "MDLS 2",
+  "viewAll": "View all",
   "nav": {
     "home": "Home",
     "topStudents": "Top students",
@@ -17,6 +18,8 @@
   },
   "hero": {
     "eyebrow": "The best school for your children",
+    "brandLine1": "Mansoura Distinguished",
+    "brandLine2": "Languages School 2",
     "title": "Where curiosity meets excellence",
     "subtitle": "A bilingual learning community preparing students for a confident future.",
     "ctaPrimary": "Explore achievements",
@@ -24,28 +27,173 @@
   },
   "topStudents": {
     "title": "Top students",
-    "body": "We celebrate our outstanding students who achieved the highest results across every stage."
+    "accent": "Top",
+    "body": "We celebrate our outstanding students who achieved the highest results across every stage.",
+    "stages": {
+      "primary": "Primary",
+      "prep": "Preparatory",
+      "secondary": "Secondary"
+    },
+    "students": {
+      "s1": "Mazen Saeed Rizk",
+      "s2": "Shady Saeed Salem",
+      "s3": "Soha Abdelsalam Saad",
+      "s4": "Radwan Ali Fattouh"
+    }
   },
   "achievements": {
-    "title": "Our achievements",
-    "body": "Highlights of academic excellence, activities, and awards earned by our school community."
+    "title": "Achievements of our school",
+    "accent": "Achievements",
+    "body": "Highlights of academic excellence, activities, and awards earned by our school community.",
+    "items": {
+      "campusAward": {
+        "title": "Named among the nation's most advanced schools",
+        "body": "A national distinction that reflects our commitment to quality teaching, modern facilities, and student success."
+      },
+      "artTalents": {
+        "title": "Nurturing drawing talent",
+        "body": "Art workshops that help students express themselves, build fine skills, and take pride in their creative work."
+      },
+      "nationalEvents": {
+        "title": "Students taking part in national celebrations",
+        "body": "School events that connect children with their heritage and build a sense of belonging and community."
+      },
+      "campusEnvironment": {
+        "title": "A distinguished campus and modern facilities",
+        "body": "A welcoming learning environment with open grounds and spaces designed for growth, play, and study."
+      },
+      "creativePrograms": {
+        "title": "Programs that grow creativity and art skills",
+        "body": "Structured activities that encourage imagination and give every student a chance to discover their talents."
+      },
+      "studentLife": {
+        "title": "Student activities that enrich school life",
+        "body": "Performances, gatherings, and cultural days that make school a lively place beyond the classroom."
+      }
+    }
   },
   "events": {
-    "title": "Events",
-    "body": "Stay up to date with school celebrations, activities, and events throughout the year."
+    "title": "Periodic events",
+    "accent": "Periodic",
+    "body": "Stay up to date with school celebrations, activities, and events throughout the year.",
+    "items": {
+      "theater": {
+        "title": "Purposeful school plays for the nation and community",
+        "body": "Students take the stage with creative performances that celebrate belonging, teamwork, and shared values."
+      },
+      "community": {
+        "title": "Community iftar and charitable giving",
+        "body": "Families and students come together to share meals and support people in need across our community."
+      },
+      "childrensDay": {
+        "title": "Children's Day celebration",
+        "body": "A joyful day of dance, music, and student performances that puts childhood and creativity at the center."
+      },
+      "swimming": {
+        "title": "School swimming championship",
+        "body": "Athletes compete with spirit and discipline in a sports day that builds confidence and healthy habits."
+      },
+      "campusVisit": {
+        "title": "Official visit to the school sports field",
+        "body": "Guests tour campus facilities and celebrate the spaces where students train, play, and grow."
+      },
+      "readingWeek": {
+        "title": "Reading week and cultural performances",
+        "body": "Students share stories on stage and celebrate the joy of reading through creative school shows."
+      },
+      "sportsDay": {
+        "title": "Annual school sports day",
+        "body": "A full day of races, team games, and cheering that builds sportsmanship and school spirit."
+      }
+    }
   },
   "blog": {
-    "title": "Blog",
-    "body": "Articles, news, and educational insights from Mansoura Distinguished Languages School 2."
+    "title": "School blog",
+    "accent": "School",
+    "body": "Articles, news, and educational insights from Mansoura Distinguished Languages School 2.",
+    "readMore": "Read more",
+    "by": "By:",
+    "author": "Eng. Souad Abdel Salam",
+    "authorRole": "School editorial team",
+    "items": {
+      "learningHabits": {
+        "title": "Building strong learning habits at home",
+        "body": "Simple routines that help students stay curious, focused, and confident throughout the school year."
+      },
+      "creativeClassroom": {
+        "title": "Creativity in every classroom",
+        "body": "How art, performance, and hands-on projects help children express ideas and grow together."
+      },
+      "sportsSpirit": {
+        "title": "Why sports matter for student growth",
+        "body": "From teamwork to discipline, school athletics shape character as much as they build fitness."
+      },
+      "communityCare": {
+        "title": "Serving our community with kindness",
+        "body": "Stories from school initiatives that bring families together and support people in need."
+      },
+      "campusLife": {
+        "title": "A day in campus life",
+        "body": "Moments from classrooms, play, and gatherings that make our school feel like a second home."
+      },
+      "stageTalent": {
+        "title": "Talent on every stage",
+        "body": "How school performances help students build confidence, teamwork, and a love for the arts."
+      }
+    }
+  },
+  "applyCta": {
+    "title": "It's time to apply and learn for your children",
+    "body": "Join a bilingual learning community where curiosity meets excellence, and every student is prepared for a confident future.",
+    "cta": "Start applying"
+  },
+  "termsOfApplying": {
+    "title": "Terms of applying",
+    "body": "Review the admission requirements and application terms before starting your child's enrollment.",
+    "heroTitle": "Mansoura Distinguished Languages School 2",
+    "heroSubtitle": "MDLS 2",
+    "subtitle": "Mansoura, Dakahlia Governorate",
+    "paragraph1": "The school follows a modern educational approach that combines academic excellence, activities, and character building in a safe and motivating environment.",
+    "paragraph2": "Admissions are open according to age requirements and available seats in each stage, with priority for students who complete the required documents and placement steps.",
+    "paragraph3": "Our admissions team supports parents through each step to ensure a smooth and transparent application process from inquiry to enrollment.",
+    "ctaPrimary": "Call the school",
+    "ctaSecondary": "Other ways to contact"
+  },
+  "detail": {
+    "blog": "Article details",
+    "event": "Event details",
+    "achievement": "Achievement details",
+    "eventDate": "Event date: {{date}}",
+    "achievementMeta": "A proud milestone from our school community",
+    "sections": {
+      "overview": "Overview",
+      "highlights": "Key highlights",
+      "more": "What to take away",
+      "agenda": "Event agenda",
+      "notes": "Important notes",
+      "story": "The story behind it",
+      "impact": "Impact on our school"
+    },
+    "blogHighlights": "This article shares practical ideas from our teachers and school community to help families support learning with confidence and care.",
+    "blogMore": "We invite parents and students to apply these ideas at home and stay connected with school activities throughout the year.",
+    "eventAgenda": "The program includes welcoming remarks, student activities, and shared moments that celebrate learning, teamwork, and school spirit.",
+    "eventNotes": "Families are welcome to attend. Please arrive a few minutes early and follow the guidance of school staff during the event.",
+    "achievementStory": "This recognition reflects months of commitment from students, teachers, and families working together toward a clear shared goal.",
+    "achievementImpact": "It strengthens our culture of excellence and inspires more students to take part in activities that build skills, character, and pride."
   },
   "contact": {
     "title": "Get in touch",
     "body": "Have a question about admissions or school life? We would love to hear from you.",
+    "infoTitle": "Contact information",
+    "formTitle": "Send a message",
+    "hoursLabel": "Working hours",
+    "hours": "Sunday – Thursday, 8:00 AM – 3:00 PM",
     "form": {
       "name": "Full name",
       "email": "Email",
       "message": "Message",
-      "submit": "Send message"
+      "submit": "Send message",
+      "success": "Your message was sent successfully"
     }
   },
   "login": {
@@ -55,7 +203,31 @@
     "password": "Password",
     "success": "Logged in successfully"
   },
+  "pagination": {
+    "label": "Pagination",
+    "prev": "Previous page",
+    "next": "Next page",
+    "page": "Page {{page}}"
+  },
   "footer": {
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "importantLinks": "Important links",
+    "contactTitle": "Contact us",
+    "subscribe": "Subscribe",
+    "emailPlaceholder": "Your email",
+    "subscribeSuccess": "Subscribed successfully",
+    "mapTitle": "School location map",
+    "address": "Mansoura, Dakahlia, Egypt",
+    "phone": "+20 100 123 4567",
+    "email": "info@mdls2.edu.eg",
+    "links": {
+      "home": "Home",
+      "topStudents": "Top students",
+      "achievements": "Achievements",
+      "events": "Events",
+      "blog": "Blog",
+      "contact": "Contact",
+      "termsOfApplying": "Terms of applying"
+    }
   }
 }

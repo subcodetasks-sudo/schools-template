@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { SupportedLanguage } from '@/lib/i18n'
@@ -17,8 +17,16 @@ const links = [
 export function SiteHeader() {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const isAr = i18n.language.startsWith('ar')
   const Arrow = isAr ? ArrowLeft : ArrowRight
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   const setLanguage = (lng: SupportedLanguage) => {
     if ((lng === 'ar') === isAr) return
@@ -26,7 +34,14 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="absolute inset-x-0 top-0 z-50">
+    <header
+      className={cn(
+        'fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300',
+        scrolled || open
+          ? 'border-b border-brand-muted/40 bg-brand-light/95 shadow-sm backdrop-blur-md'
+          : 'border-b border-transparent bg-transparent',
+      )}
+    >
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <NavLink to="/" className="group flex shrink-0 items-center gap-2.5">
           <img
