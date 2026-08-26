@@ -199,9 +199,28 @@
   "login": {
     "title": "Log in",
     "body": "Sign in to your account to continue.",
-    "email": "Email",
+    "panelBody": "Please enter your details to sign in.",
+    "nationalId": "National ID",
+    "nationalIdPlaceholder": "Your national ID",
     "password": "Password",
-    "success": "Logged in successfully"
+    "passwordPlaceholder": "Your password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "submit": "Log in",
+    "noAccount": "Don't have an account?",
+    "register": "Create an account",
+    "success": "Logged in successfully",
+    "slideDot": "Go to slide {{index}}",
+    "slides": {
+      "s1": {
+        "title": "Mansoura Distinguished Languages School 2",
+        "body": "A modern learning environment for students and teachers."
+      },
+      "s2": {
+        "title": "A confident start for every student",
+        "body": "Supportive classrooms, activities, and a bilingual community."
+      }
+    }
   },
   "pagination": {
     "label": "Pagination",
@@ -228,6 +247,41 @@
       "blog": "Blog",
       "contact": "Contact",
       "termsOfApplying": "Terms of applying"
+    }
+  },
+  "register": {
+    "title": "Create account",
+    "panelBody": "Please enter your details in two steps.",
+    "step1": "First step",
+    "step2": "Second step",
+    "nationalId": "National ID",
+    "nationalIdPlaceholder": "Your national ID",
+    "code": "Code",
+    "codePlaceholder": "Your code",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Your full name",
+    "password": "Password",
+    "passwordPlaceholder": "XXXXXXXXXX",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "XXXXXXXXXX",
+    "passwordMismatch": "Passwords do not match",
+    "next": "Next",
+    "back": "Back",
+    "submit": "Create account",
+    "hasAccount": "Already have an account?",
+    "login": "Log in",
+    "success": "Account created successfully",
+    "phone": "Phone number",
+    "phonePlaceholder": "10xxxxxxx",
+    "phoneNoLeadingZero": "You cannot add 0 after the country code",
+    "phoneInvalid": "Enter a valid phone number",
+    "agreePrefix": "By registering, you agree to the",
+    "agreeLink": "Terms of use and privacy policy",
+    "checks": {
+      "strong": "Password status: Strong",
+      "noPersonal": "Does not contain your name or email",
+      "minLength": "At least 8 characters",
+      "uppercase": "Contains an uppercase letter"
     }
   }
 }

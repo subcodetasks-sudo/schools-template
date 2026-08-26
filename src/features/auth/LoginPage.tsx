@@ -1,13 +1,17 @@
-import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
+import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
-  email: z.email(),
+  nationalId: z.string().min(10),
   password: z.string().min(6),
 })
 
@@ -15,6 +19,8 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const { t } = useTranslation()
+  const [showPassword, setShowPassword] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -29,65 +35,76 @@ export function LoginPage() {
   })
 
   return (
-    <section className="mx-auto flex max-w-md flex-col px-4 py-16 sm:px-6">
-      <div className="mb-8 text-center">
-        <img
-          src="/logo.jpeg"
-          alt=""
-          className="mx-auto mb-4 size-16 rounded-full object-cover ring-2 ring-brand-muted"
-        />
-        <h1 className="text-3xl font-semibold tracking-tight text-brand-dark">
-          {t('login.title')}
-        </h1>
-        <p className="mt-2 text-muted-foreground">{t('login.body')}</p>
-      </div>
+    <AuthShell panelTitle={t('login.title')} panelBody={t('login.panelBody')}>
+      <h1 className="text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl">
+        {t('login.title')}
+      </h1>
 
-      <form onSubmit={onSubmit} className="space-y-4 rounded-2xl border border-brand-muted/50 bg-white p-6 shadow-sm">
+      <form onSubmit={onSubmit} className="mt-8 space-y-5">
         <div>
-          <label className="mb-1.5 block text-sm font-medium" htmlFor="email">
-            {t('login.email')}
+          <label className="mb-1.5 block text-sm font-medium text-brand-dark" htmlFor="nationalId">
+            {t('login.nationalId')}
           </label>
           <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            {...register('email')}
+            id="nationalId"
+            inputMode="numeric"
+            autoComplete="username"
+            placeholder={t('login.nationalIdPlaceholder')}
+            className={authFieldClass}
+            {...register('nationalId')}
           />
-          {errors.email ? (
-            <p className="mt-1 text-xs text-destructive">{errors.email.message}</p>
+          {errors.nationalId ? (
+            <p className="mt-1 text-xs text-destructive">{errors.nationalId.message}</p>
           ) : null}
         </div>
+
         <div>
-          <label className="mb-1.5 block text-sm font-medium" htmlFor="password">
+          <label className="mb-1.5 block text-sm font-medium text-brand-dark" htmlFor="password">
             {t('login.password')}
           </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            className="h-10 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            {...register('password')}
-          />
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              placeholder={t('login.passwordPlaceholder')}
+              className={cn(authFieldClass, 'pe-11')}
+              {...register('password')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute inset-e-3 top-1/2 inline-flex -translate-y-1/2 text-brand-dark/45 transition-colors hover:text-brand-primary"
+              aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
+            >
+              {showPassword ? (
+                <EyeOff className="size-4" aria-hidden />
+              ) : (
+                <Eye className="size-4" aria-hidden />
+              )}
+            </button>
+          </div>
           {errors.password ? (
             <p className="mt-1 text-xs text-destructive">{errors.password.message}</p>
           ) : null}
         </div>
+
         <Button
           type="submit"
           size="lg"
           disabled={isSubmitting}
-          className="h-11 w-full rounded-xl bg-brand-dark text-white hover:bg-brand-primary"
+          className="h-12 w-full rounded-xl bg-brand-primary text-base font-semibold text-white hover:bg-brand-dark"
         >
-          {t('nav.login')}
+          {t('login.submit')}
         </Button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        <Link to="/contact" className="font-medium text-brand-primary hover:underline">
-          {t('nav.contact')}
+      <p className="mt-6 text-center text-sm text-brand-dark/55">
+        {t('login.noAccount')}{' '}
+        <Link to="/register" className="font-semibold text-brand-primary hover:underline">
+          {t('login.register')}
         </Link>
       </p>
-    </section>
+    </AuthShell>
   )
 }

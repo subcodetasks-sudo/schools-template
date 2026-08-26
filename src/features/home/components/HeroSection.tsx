@@ -50,7 +50,7 @@ export function HeroSection() {
       <div className="relative z-20 mx-auto flex min-h-[calc(100dvh-5rem)] w-full max-w-6xl flex-col justify-center px-4 py-8 sm:px-6 lg:flex-row lg:items-stretch lg:justify-between lg:gap-4 lg:py-0">
         <div className="relative order-2 mt-6 hidden min-h-[22rem] w-full flex-1 items-end justify-center lg:order-1 lg:mt-0 lg:flex lg:min-h-0 lg:justify-start">
           <motion.img
-            src="/hero.webp"
+            src="/hero.png"
             alt=""
             aria-hidden
             {...fadeBoy}

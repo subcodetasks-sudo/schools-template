@@ -10,6 +10,7 @@ import { BlogPage } from '@/features/blog/BlogPage'
 import { BlogDetailPage } from '@/features/blog/BlogDetailPage'
 import { ContactPage } from '@/features/contact/ContactPage'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { RegisterPage } from '@/features/auth/RegisterPage'
 import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
 
 export const router = createBrowserRouter([
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
       { path: 'contact', element: <ContactPage /> },
       { path: 'terms-of-applying', element: <TermsOfApplyingPage /> },
       { path: 'login', element: <LoginPage /> },
+      { path: 'register', element: <RegisterPage /> },
     ],
   },
 ])

@@ -199,9 +199,28 @@
   "login": {
     "title": "تسجيل الدخول",
     "body": "ادخل إلى حسابك للمتابعة.",
-    "email": "البريد الإلكتروني",
-    "password": "كلمة المرور",
-    "success": "تم تسجيل الدخول بنجاح"
+    "panelBody": "يرجى كتابة البيانات الخاصة لتسجيل الدخول",
+    "nationalId": "الرقم القومي",
+    "nationalIdPlaceholder": "الرقم القومي الخاص بك",
+    "password": "الرقم السري",
+    "passwordPlaceholder": "الرقم السري الخاص بك",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "submit": "تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "register": "تسجيل حساب",
+    "success": "تم تسجيل الدخول بنجاح",
+    "slideDot": "الانتقال إلى الشريحة {{index}}",
+    "slides": {
+      "s1": {
+        "title": "مدرسة المنصورة المتميزة للغات 2",
+        "body": "بيئة مميزة للطالب والمعلمين بنظام حديث وسهل."
+      },
+      "s2": {
+        "title": "بداية واثقة لكل طالب",
+        "body": "فصول داعمة وأنشطة ومجتمع تعليمي ثنائي اللغة."
+      }
+    }
   },
   "pagination": {
     "label": "التنقل بين الصفحات",
@@ -228,6 +247,41 @@
       "blog": "المدونة",
       "contact": "تواصل معنا",
       "termsOfApplying": "شروط التقديم"
+    }
+  },
+  "register": {
+    "title": "تسجيل الحساب",
+    "panelBody": "يرجى كتابة البيانات الخاصة بك على مرحلتين",
+    "step1": "الخطوة الأولى",
+    "step2": "الخطوة الثانية",
+    "nationalId": "الرقم القومي",
+    "nationalIdPlaceholder": "الرقم القومي الخاص بك",
+    "code": "الكود",
+    "codePlaceholder": "الكود الخاص بك",
+    "fullName": "الاسم الكامل",
+    "fullNamePlaceholder": "اسمك الكامل",
+    "password": "الرقم السري",
+    "passwordPlaceholder": "XXXXXXXXXX",
+    "confirmPassword": "تأكيد الرقم السري",
+    "confirmPasswordPlaceholder": "XXXXXXXXXX",
+    "passwordMismatch": "رقما السر غير متطابقين",
+    "next": "التالي",
+    "back": "رجوع",
+    "submit": "تسجيل الحساب",
+    "hasAccount": "لديك حساب بالفعل؟",
+    "login": "تسجيل الدخول",
+    "success": "تم إنشاء الحساب بنجاح",
+    "phone": "رقم الهاتف",
+    "phonePlaceholder": "10xxxxxxx",
+    "phoneNoLeadingZero": "لا يمكنك إضافة 0 بعد الكود",
+    "phoneInvalid": "أدخل رقم هاتف صحيح",
+    "agreePrefix": "بتسجيلك فإنك توافق على",
+    "agreeLink": "شروط الاستخدام وسياسة الخصوصية",
+    "checks": {
+      "strong": "حالة كلمة المرور: قوية",
+      "noPersonal": "لا تحتوي على اسمك الصريح أو بريدك",
+      "minLength": "8 حروف على الأقل",
+      "uppercase": "تحتوي على حرف كبير"
     }
   }
 }
