@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -19,6 +19,7 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
 
   const {
@@ -32,6 +33,7 @@ export function LoginPage() {
   const onSubmit = handleSubmit(async () => {
     await new Promise((r) => setTimeout(r, 400))
     toast.success(t('login.success'))
+    navigate('/profile')
   })
 
   return (
