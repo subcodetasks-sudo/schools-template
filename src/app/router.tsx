@@ -14,7 +14,10 @@ import { RegisterPage } from '@/features/auth/RegisterPage'
 import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
 import { ProfileLayout } from '@/features/profile/ProfileLayout'
 import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
-import { ProfilePlaceholderPage } from '@/features/profile/ProfilePlaceholderPage'
+import { CertificatePage } from '@/features/profile/CertificatePage'
+import { MonthlyEvaluationsPage } from '@/features/profile/MonthlyEvaluationsPage'
+import { SchedulePage } from '@/features/profile/SchedulePage'
+import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
 import { StatisticsPage } from '@/features/profile/StatisticsPage'
 
 export const router = createBrowserRouter([
@@ -40,62 +43,24 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <PersonalInfoPage /> },
           {
-            path: 'results',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.results"
-                bodyKey="profile.placeholders.results"
-              />
-            ),
+            path: 'certificate',
+            element: <CertificatePage />,
+          },
+          {
+            path: 'monthly-evaluations',
+            element: <MonthlyEvaluationsPage />,
           },
           {
             path: 'schedule',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.schedule"
-                bodyKey="profile.placeholders.schedule"
-              />
-            ),
+            element: <SchedulePage />,
+          },
+          {
+            path: 'parent-summon',
+            element: <ParentSummonPage />,
           },
           {
             path: 'statistics',
             element: <StatisticsPage />,
-          },
-          {
-            path: 'settings',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.settings"
-                bodyKey="profile.placeholders.settings"
-              />
-            ),
-          },
-          {
-            path: 'call-parent',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.callParent"
-                bodyKey="profile.placeholders.callParent"
-              />
-            ),
-          },
-          {
-            path: 'behavior',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.behavior"
-                bodyKey="profile.placeholders.behavior"
-              />
-            ),
-          },
-          {
-            path: 'complaints',
-            element: (
-              <ProfilePlaceholderPage
-                titleKey="profile.nav.complaints"
-                bodyKey="profile.placeholders.complaints"
-              />
-            ),
           },
         ],
       },

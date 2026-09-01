@@ -8,6 +8,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
+import { useAuth } from '@/features/auth/AuthContext'
 import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
@@ -20,6 +21,7 @@ type LoginForm = z.infer<typeof loginSchema>
 export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
 
   const {
@@ -30,8 +32,9 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = handleSubmit(async () => {
+  const onSubmit = handleSubmit(async (values) => {
     await new Promise((r) => setTimeout(r, 400))
+    login({ nationalId: values.nationalId })
     toast.success(t('login.success'))
     navigate('/profile')
   })

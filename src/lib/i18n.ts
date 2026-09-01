@@ -24,11 +24,12 @@ void i18n
   .use(initReactI18next)
   .init({
     resources,
+    lng: 'ar',
     fallbackLng: 'ar',
     defaultNS: 'common',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['localStorage', 'navigator'],
+      order: ['localStorage', 'htmlTag'],
       caches: ['localStorage'],
     },
   })

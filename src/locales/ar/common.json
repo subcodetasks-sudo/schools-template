@@ -9,12 +9,15 @@
     "events": "الفعاليات",
     "blog": "المدونة",
     "contact": "تواصل معنا",
-    "login": "تسجيل الدخول"
+    "login": "تسجيل الدخول",
+    "myProfile": "الملف الشخصي"
   },
   "language": {
     "label": "اللغة",
     "en": "English",
-    "ar": "العربية"
+    "ar": "العربية",
+    "switchToAr": "التبديل إلى العربية",
+    "switchToEn": "التبديل إلى الإنجليزية"
   },
   "hero": {
     "eyebrow": "أفضل مدرسة لأولادك",
@@ -290,92 +293,223 @@
     "studentName": "مهدي سعيد",
     "studentInitials": "مس",
     "studentGrade": "الصف الثاني الابتدائي",
-    "logout": "تسجيل خروج",
+    "logout": "تسجيل الخروج",
     "nav": {
-      "personal": "البيانات الشخصية",
-      "results": "النتائج",
+      "personal": "الملف الشخصي",
+      "certificate": "شهادة الطالب",
+      "monthlyEvaluations": "التقييمات الشهرية",
       "schedule": "الجدول الدراسي",
-      "statistics": "الإحصائيات",
-      "settings": "الإعدادات",
-      "more": "المزيد",
-      "callParent": "الاتصال بولي الأمر",
-      "behavior": "تقييم سلوك الطالب",
-      "complaints": "الشكاوى"
+      "parentSummon": "إستدعاء ولي الأمر",
+      "statistics": "الإحصائيات"
     },
     "personal": {
       "title": "البيانات الشخصية",
+      "edit": "تعديل البيانات",
+      "editTitle": "تعديل البيانات الشخصية",
+      "editDescription": "قم بتحديث بياناتك الشخصية وبيانات ولي الأمر.",
+      "save": "حفظ التغييرات",
+      "cancel": "إلغاء",
+      "saveSuccess": "تم حفظ البيانات بنجاح.",
+      "fieldRequired": "هذا الحقل مطلوب.",
+      "photo": "الصورة الشخصية",
+      "photoHint": "اختر صورة واضحة لتحديث صورتك في الملف الشخصي.",
+      "changePhoto": "تغيير الصورة",
+      "invalidPhoto": "يرجى اختيار ملف صورة صالح.",
       "hint": "بيانات تجريبية لعرض لوحة ملف الطالب.",
       "fields": {
         "nationalId": {
-          "label": "الرقم القومي",
-          "value": "30101011234567"
+          "label": "الرقم القومي"
         },
         "studentCode": {
-          "label": "كود الطالب",
-          "value": "234455"
+          "label": "كود الطالب"
         },
         "phone": {
-          "label": "رقم الهاتف",
-          "value": "01034678890"
+          "label": "رقم الهاتف"
         },
         "religion": {
-          "label": "الديانة",
-          "value": "مسلم"
+          "label": "الديانة"
         },
         "registrationStatus": {
-          "label": "حالة التسجيل",
-          "value": "نشط"
+          "label": "حالة التسجيل"
         },
         "classNumber": {
-          "label": "رقم الفصل",
-          "value": "2 / أ"
+          "label": "رقم الفصل"
         },
         "transfers": {
-          "label": "التحويلات",
-          "value": "لا يوجد"
+          "label": "التحويلات"
         },
         "fees": {
-          "label": "المصروفات",
-          "value": "مدفوعة"
+          "label": "المصروفات"
         },
         "paymentVoucher": {
-          "label": "إيصال الدفع",
-          "value": "INV-88421"
+          "label": "إيصال الدفع"
         },
         "paymentDate": {
-          "label": "تاريخ الدفع",
-          "value": "12 يناير 2026"
+          "label": "تاريخ الدفع"
         },
         "paymentAmount": {
-          "label": "مبلغ الدفع",
-          "value": "4500 جنيه"
+          "label": "مبلغ الدفع"
         },
         "fatherNationalId": {
-          "label": "الرقم القومي لولي الأمر",
-          "value": "27001011234567"
+          "label": "الرقم القومي لولي الأمر"
         },
         "fatherAddress": {
-          "label": "عنوان ولي الأمر",
-          "value": "المنصورة، مصر"
+          "label": "عنوان ولي الأمر"
         },
         "fatherJob": {
-          "label": "وظيفة ولي الأمر",
-          "value": "مهندس"
+          "label": "وظيفة ولي الأمر"
         },
         "fatherPhone": {
-          "label": "هاتف ولي الأمر",
-          "value": "01011223344"
+          "label": "هاتف ولي الأمر"
         }
       }
     },
+    "certificate": {
+      "codeLabel": "ادخل الكود لتري نتائجك",
+      "codePlaceholder": "أدخل كود الطالب",
+      "showResult": "عرض النتيجة",
+      "codeRequired": "يرجى إدخال الكود.",
+      "formTitle": "استمارة تقييم طالب وفقا للقرار الوزاري ١٣٦ لسنة ٢٠٢٤ الترم الأول للعام الدراسي ٢٠٢٥ / ٢٠٢٦",
+      "gradeLevel": "الصف الأول الابتدائي",
+      "studentName": "اسم الطالب",
+      "seatNumber": "رقم الجلوس",
+      "className": "الفصل",
+      "basicTotal": "المجموع الأساسي",
+      "grandTotal": "المجموع الكلي (بالمواد الإضافية)",
+      "activitiesTitle": "الأنشطة",
+      "summary": {
+        "totalSubjects": "عدد المواد: {{count}}",
+        "successSubjects": "عدد مواد النجاح: {{count}}",
+        "failureSubjects": "عدد مواد الرسوب: {{count}}"
+      },
+      "columns": {
+        "subject": "المادة",
+        "assessment": "درجة التقييمات",
+        "written": "درجة التحريري",
+        "final": "الدرجة النهائية",
+        "color": "اللون",
+        "score": "الدرجة"
+      },
+      "subjects": {
+        "arabic": "اللغة العربية",
+        "math": "الرياضيات",
+        "english": "اللغة الإنجليزية",
+        "advancedEnglish": "إنجليزي رفيع",
+        "religiousEducation": "التربية الدينية"
+      },
+      "activities": {
+        "vocational": "التربية المهنية",
+        "physical": "التربية البدنية",
+        "tokkatsu": "التوكاتسو",
+        "art": "التربية الفنية"
+      },
+      "colors": {
+        "blue": "أزرق",
+        "green": "أخضر",
+        "yellow": "أصفر",
+        "red": "أحمر"
+      },
+      "legend": {
+        "blue": "يفوق التوقعات",
+        "green": "يلبي التوقعات",
+        "yellow": "يلبي التوقعات أحيانا",
+        "red": "أقل من المتوقع"
+      },
+      "legendRanges": {
+        "blue": "85% - 100%",
+        "green": "65% - 84%",
+        "yellow": "50% - 64%",
+        "red": "0% - 49%"
+      },
+      "signatures": {
+        "computerOfficer": "مسئول الحاسب الآلي",
+        "committeeHead": "رئيس لجنة النظام والمراقبة",
+        "principal": "مدير المدرسة"
+      }
+    },
+    "schedule": {
+      "dayColumn": "اليوم",
+      "days": {
+        "saturday": "السبت",
+        "sunday": "الأحد",
+        "monday": "الإثنين",
+        "tuesday": "الثلاثاء",
+        "wednesday": "الأربعاء",
+        "thursday": "الخميس"
+      },
+      "subjects": {
+        "arabic": "لغة عربية",
+        "science": "علوم",
+        "english": "لغة انجليزية",
+        "math": "رياضيات",
+        "organicChemistry": "كيمياء عضوية",
+        "islamicEducation": "تربية إسلامية",
+        "thinkingSkills": "مهارات تفكير"
+      }
+    },
+    "parentSummon": {
+      "viewDetails": "عرض التفاصيل",
+      "backToList": "العودة للقائمة",
+      "notFound": "الإستدعاء غير موجود",
+      "reference": "رقم الإستدعاء: {{value}}",
+      "cardHint": "إستدعاء رسمي من المدرسة — اضغط لقراءة النص الكامل.",
+      "documentTitleLine1": "إستدعاء",
+      "documentTitleLine2": "ولي أمر",
+      "academicYearLabel": "العام الدراسي",
+      "reasonTitle": "سبب الإستدعاء:",
+      "issuedDate": "تاريخ الإصدار",
+      "carouselLabel": "إستدعاءات ولي الأمر",
+      "goToSlide": "الانتقال إلى الإستدعاء {{index}}",
+      "types": {
+        "urgent": "أهمية قصوى",
+        "academic": "متابعة دراسية",
+        "behavior": "متابعة سلوكية"
+      },
+      "emptyTitle": "لا توجد إستدعاءات حالياً",
+      "emptyDescription": "ستظهر هنا أي إستدعاءات من المدرسة لولي الأمر.",
+      "fields": {
+        "studentName": "اسم الطالب:",
+        "schoolName": "إسم المدرسة",
+        "grade": "الصف:",
+        "className": "الفصل:",
+        "parentName": "اسم ولي الأمر:",
+        "academicYear": "العام الدراسي"
+      },
+      "signatures": {
+        "studentAffairsOfficer": "مسؤول شئون الطلاب",
+        "stageVicePrincipal": "وكيل المرحلة",
+        "principal": "مدير المدرسة"
+      }
+    },
+    "monthlyEvaluations": {
+      "selectMonth": "اختر الشهر",
+      "studentName": "اسم الطالب",
+      "grade": "الصف الدراسي",
+      "className": "الفصل الدراسي",
+      "emptyTitle": "لا توجد بيانات متاحة لهذا الشهر",
+      "emptyDescription": "تواصل مع المدرسة لمزيد من التفاصيل",
+      "grandTotal": "الاجمالي",
+      "columns": {
+        "subject": "المادة",
+        "performanceTasks": "المهام الأدائية",
+        "homeworkNotebook": "كراسة الواجب",
+        "activityNotebook": "كراسة النشاط",
+        "weeklyEvaluation": "التقييم الأسبوعي",
+        "attendanceBehavior": "المواظبة والسلوك",
+        "total": "المجموع الكلي"
+      },
+      "subjects": {
+        "arabic": "اللغة العربية",
+        "english": "اللغة الإنجليزية",
+        "math": "الرياضيات"
+      }
+    },
     "placeholders": {
-      "results": "ستظهر نتائج الطالب هنا.",
+      "certificate": "ستظهر شهادة الطالب هنا.",
+      "monthlyEvaluations": "ستظهر التقييمات الشهرية هنا.",
       "schedule": "سيظهر الجدول الدراسي هنا.",
-      "statistics": "ستظهر إحصائيات الطالب هنا.",
-      "settings": "ستظهر إعدادات الملف هنا.",
-      "callParent": "ستظهر خيارات الاتصال بولي الأمر هنا.",
-      "behavior": "ستظهر سجلات تقييم السلوك هنا.",
-      "complaints": "ستظهر الشكاوى والطلبات هنا."
+      "parentSummon": "ستظهر إستدعاءات ولي الأمر هنا.",
+      "statistics": "ستظهر إحصائيات الطالب هنا."
     },
     "statistics": {
       "chartTitle": "تقييم الطالب",

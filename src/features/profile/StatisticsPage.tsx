@@ -17,6 +17,10 @@ import {
 } from 'recharts'
 import { cn } from '@/lib/utils'
 
+const brandPrimary = '#245c7c'
+const brandSecondary = '#3bb4b3'
+const brandDark = '#1f536f'
+
 const chartData = [
   { year: '2015', assignments: 25, tests: 0 },
   { year: '2016', assignments: 78, tests: 55 },
@@ -31,25 +35,25 @@ const stats = [
     valueKey: 'profile.statistics.cards.attendance.value',
     hintKey: 'profile.statistics.cards.attendance.hint',
     icon: History,
-    tone: 'bg-orange-100 text-orange-600',
+    tone: 'bg-brand-primary/10 text-brand-primary',
   },
   {
     key: 'callups',
     valueKey: 'profile.statistics.cards.callups.value',
     icon: Users,
-    tone: 'bg-violet-100 text-violet-600',
+    tone: 'bg-brand-secondary/10 text-brand-secondary',
   },
   {
     key: 'tests',
     valueKey: 'profile.statistics.cards.tests.value',
     icon: LineChartIcon,
-    tone: 'bg-emerald-100 text-emerald-600',
+    tone: 'bg-brand-light text-brand-primary',
   },
   {
     key: 'absences',
     valueKey: 'profile.statistics.cards.absences.value',
     icon: Package,
-    tone: 'bg-amber-100 text-amber-700',
+    tone: 'bg-brand-dark/10 text-brand-dark',
   },
 ] as const
 
@@ -113,11 +117,11 @@ export function StatisticsPage() {
           </h2>
           <div className="flex items-center gap-4 text-sm text-brand-dark/70">
             <span className="inline-flex items-center gap-2">
-              <span className="size-3 rounded-sm bg-rose-600" aria-hidden />
+              <span className="size-3 rounded-sm bg-brand-primary" aria-hidden />
               {t('profile.statistics.assignments')}
             </span>
             <span className="inline-flex items-center gap-2">
-              <span className="size-3 rounded-sm bg-brand-dark" aria-hidden />
+              <span className="size-3 rounded-sm bg-brand-secondary" aria-hidden />
               {t('profile.statistics.tests')}
             </span>
           </div>
@@ -126,25 +130,25 @@ export function StatisticsPage() {
         <div className="h-72 w-full sm:h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(31,83,111,0.12)" />
+              <CartesianGrid strokeDasharray="3 3" stroke={`${brandDark}1f`} />
               <XAxis
                 dataKey="year"
                 tickLine={false}
                 axisLine={false}
-                tick={{ fill: 'rgba(31,83,111,0.55)', fontSize: 12 }}
+                tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
               />
               <YAxis
                 domain={[0, 100]}
                 ticks={[0, 25, 50, 75, 100]}
                 tickLine={false}
                 axisLine={false}
-                tick={{ fill: 'rgba(31,83,111,0.55)', fontSize: 12 }}
+                tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
                 width={32}
               />
               <Tooltip
                 contentStyle={{
                   borderRadius: 12,
-                  borderColor: 'rgba(31,83,111,0.12)',
+                  borderColor: `${brandDark}1f`,
                   boxShadow: '0 8px 24px rgba(31,83,111,0.08)',
                 }}
               />
@@ -153,18 +157,18 @@ export function StatisticsPage() {
                 type="monotone"
                 dataKey="assignments"
                 name={t('profile.statistics.assignments')}
-                stroke="#e11d48"
+                stroke={brandPrimary}
                 strokeWidth={2.5}
-                dot={{ r: 4, fill: '#e11d48', strokeWidth: 0 }}
+                dot={{ r: 4, fill: brandPrimary, strokeWidth: 0 }}
                 activeDot={{ r: 5 }}
               />
               <Line
                 type="monotone"
                 dataKey="tests"
                 name={t('profile.statistics.tests')}
-                stroke="#1f536f"
+                stroke={brandSecondary}
                 strokeWidth={2.5}
-                dot={{ r: 4, fill: '#1f536f', strokeWidth: 0 }}
+                dot={{ r: 4, fill: brandSecondary, strokeWidth: 0 }}
                 activeDot={{ r: 5 }}
               />
             </LineChart>

@@ -189,7 +189,7 @@ export function SiteFooter() {
                 href={href}
                 aria-label={label}
                 className={cn(
-                  'inline-flex size-11 items-center justify-center rounded-full text-brand-primary transition-colors hover:bg-brand-primary/10',
+                  'inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-primary text-white shadow-sm transition-colors hover:bg-brand-secondary',
                 )}
               >
                 <Icon className="size-5" />

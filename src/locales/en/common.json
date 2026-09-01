@@ -9,12 +9,15 @@
     "events": "Events",
     "blog": "Blog",
     "contact": "Contact",
-    "login": "Log in"
+    "login": "Log in",
+    "myProfile": "My profile"
   },
   "language": {
     "label": "Language",
     "en": "English",
-    "ar": "العربية"
+    "ar": "العربية",
+    "switchToAr": "Switch to Arabic",
+    "switchToEn": "Switch to English"
   },
   "hero": {
     "eyebrow": "The best school for your children",
@@ -292,90 +295,221 @@
     "studentGrade": "Primary — Grade 2",
     "logout": "Log out",
     "nav": {
-      "personal": "Personal information",
-      "results": "Results",
+      "personal": "Personal profile",
+      "certificate": "Student certificate",
+      "monthlyEvaluations": "Monthly evaluations",
       "schedule": "School schedule",
-      "statistics": "Statistics",
-      "settings": "Settings",
-      "more": "More",
-      "callParent": "Call parent",
-      "behavior": "Student behavior evaluation",
-      "complaints": "Complaints"
+      "parentSummon": "Parent summon",
+      "statistics": "Statistics"
     },
     "personal": {
       "title": "Personal information",
+      "edit": "Edit information",
+      "editTitle": "Edit personal information",
+      "editDescription": "Update your personal details and guardian information.",
+      "save": "Save changes",
+      "cancel": "Cancel",
+      "saveSuccess": "Profile information saved successfully.",
+      "fieldRequired": "This field is required.",
+      "photo": "Profile photo",
+      "photoHint": "Choose a clear photo to update your profile picture.",
+      "changePhoto": "Change photo",
+      "invalidPhoto": "Please choose a valid image file.",
       "hint": "Mock student data for the profile dashboard preview.",
       "fields": {
         "nationalId": {
-          "label": "National ID",
-          "value": "30101011234567"
+          "label": "National ID"
         },
         "studentCode": {
-          "label": "Student code",
-          "value": "234455"
+          "label": "Student code"
         },
         "phone": {
-          "label": "Phone number",
-          "value": "01034678890"
+          "label": "Phone number"
         },
         "religion": {
-          "label": "Religion",
-          "value": "Muslim"
+          "label": "Religion"
         },
         "registrationStatus": {
-          "label": "Registration status",
-          "value": "Active"
+          "label": "Registration status"
         },
         "classNumber": {
-          "label": "Class number",
-          "value": "2 / A"
+          "label": "Class number"
         },
         "transfers": {
-          "label": "Transfers",
-          "value": "None"
+          "label": "Transfers"
         },
         "fees": {
-          "label": "Fees",
-          "value": "Paid"
+          "label": "Fees"
         },
         "paymentVoucher": {
-          "label": "Payment voucher",
-          "value": "INV-88421"
+          "label": "Payment voucher"
         },
         "paymentDate": {
-          "label": "Payment date",
-          "value": "12 Jan 2026"
+          "label": "Payment date"
         },
         "paymentAmount": {
-          "label": "Payment amount",
-          "value": "4,500 EGP"
+          "label": "Payment amount"
         },
         "fatherNationalId": {
-          "label": "Father national ID",
-          "value": "27001011234567"
+          "label": "Father national ID"
         },
         "fatherAddress": {
-          "label": "Father address",
-          "value": "Mansoura, Egypt"
+          "label": "Father address"
         },
         "fatherJob": {
-          "label": "Father job",
-          "value": "Engineer"
+          "label": "Father job"
         },
         "fatherPhone": {
-          "label": "Father phone",
-          "value": "01011223344"
+          "label": "Father phone"
         }
       }
     },
+    "certificate": {
+      "codeLabel": "Enter the code to see your results",
+      "codePlaceholder": "Enter student code",
+      "showResult": "Show result",
+      "codeRequired": "Please enter the code.",
+      "formTitle": "Student evaluation form according to Ministerial Decree 136 of 2024, first term for the academic year 2025/2026",
+      "gradeLevel": "First grade primary",
+      "studentName": "Student name",
+      "seatNumber": "Seat number",
+      "className": "Class",
+      "basicTotal": "Basic total",
+      "grandTotal": "Grand total (including additional subjects)",
+      "activitiesTitle": "Activities",
+      "summary": {
+        "totalSubjects": "Number of subjects: {{count}}",
+        "successSubjects": "Success subjects: {{count}}",
+        "failureSubjects": "Failure subjects: {{count}}"
+      },
+      "columns": {
+        "subject": "Subject",
+        "assessment": "Assessment grade",
+        "written": "Written grade",
+        "final": "Final grade",
+        "color": "Color",
+        "score": "Score"
+      },
+      "subjects": {
+        "arabic": "Arabic",
+        "math": "Mathematics",
+        "english": "English",
+        "advancedEnglish": "Advanced English",
+        "religiousEducation": "Religious education"
+      },
+      "activities": {
+        "vocational": "Vocational education",
+        "physical": "Physical education",
+        "tokkatsu": "Tokkatsu",
+        "art": "Art education"
+      },
+      "colors": {
+        "blue": "Blue",
+        "green": "Green",
+        "yellow": "Yellow",
+        "red": "Red"
+      },
+      "legend": {
+        "blue": "Exceeds expectations",
+        "green": "Meets expectations",
+        "yellow": "Sometimes meets expectations",
+        "red": "Below expectations"
+      },
+      "legendRanges": {
+        "blue": "85% - 100%",
+        "green": "65% - 84%",
+        "yellow": "50% - 64%",
+        "red": "0% - 49%"
+      },
+      "signatures": {
+        "computerOfficer": "Computer officer",
+        "committeeHead": "Head of system and monitoring committee",
+        "principal": "School principal"
+      }
+    },
+    "schedule": {
+      "dayColumn": "Day",
+      "days": {
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday"
+      },
+      "subjects": {
+        "arabic": "Arabic",
+        "science": "Science",
+        "english": "English",
+        "math": "Mathematics",
+        "organicChemistry": "Organic chemistry",
+        "islamicEducation": "Islamic education",
+        "thinkingSkills": "Thinking skills"
+      }
+    },
+    "parentSummon": {
+      "viewDetails": "View details",
+      "backToList": "Back to list",
+      "notFound": "Summon not found",
+      "reference": "Reference: {{value}}",
+      "cardHint": "Official school summon — tap to read the full message.",
+      "documentTitleLine1": "Parent",
+      "documentTitleLine2": "Summon",
+      "academicYearLabel": "Academic year",
+      "reasonTitle": "Reason for summon:",
+      "issuedDate": "Issue date",
+      "carouselLabel": "Parent summon notices",
+      "goToSlide": "Go to notice {{index}}",
+      "types": {
+        "urgent": "Urgent",
+        "academic": "Academic follow-up",
+        "behavior": "Behavioral follow-up"
+      },
+      "emptyTitle": "No summons at the moment",
+      "emptyDescription": "School summons for parents will appear here.",
+      "fields": {
+        "studentName": "Student name:",
+        "schoolName": "School name",
+        "grade": "Grade:",
+        "className": "Class:",
+        "parentName": "Parent name:",
+        "academicYear": "Academic year"
+      },
+      "signatures": {
+        "studentAffairsOfficer": "Student affairs officer",
+        "stageVicePrincipal": "Stage vice principal",
+        "principal": "School principal"
+      }
+    },
+    "monthlyEvaluations": {
+      "selectMonth": "Select month",
+      "studentName": "Student name",
+      "grade": "Grade level",
+      "className": "Class",
+      "emptyTitle": "No data available for this month",
+      "emptyDescription": "Contact the school for more details",
+      "grandTotal": "Total",
+      "columns": {
+        "subject": "Subject",
+        "performanceTasks": "Performance tasks",
+        "homeworkNotebook": "Homework notebook",
+        "activityNotebook": "Activity notebook",
+        "weeklyEvaluation": "Weekly evaluation",
+        "attendanceBehavior": "Attendance and behavior",
+        "total": "Grand total"
+      },
+      "subjects": {
+        "arabic": "Arabic",
+        "english": "English",
+        "math": "Mathematics"
+      }
+    },
     "placeholders": {
-      "results": "Student results will appear here.",
+      "certificate": "The student certificate will appear here.",
+      "monthlyEvaluations": "Monthly evaluations will appear here.",
       "schedule": "The school schedule will appear here.",
-      "statistics": "Student statistics will appear here.",
-      "settings": "Profile settings will appear here.",
-      "callParent": "Parent contact options will appear here.",
-      "behavior": "Behavior evaluation records will appear here.",
-      "complaints": "Complaints and requests will appear here."
+      "parentSummon": "Parent summon records will appear here.",
+      "statistics": "Student statistics will appear here."
     },
     "statistics": {
       "chartTitle": "Student evaluation",
