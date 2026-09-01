@@ -20,19 +20,10 @@ export function TermsOfApplyingPage() {
         <div className="relative overflow-hidden rounded-t-[1.75rem] sm:rounded-t-[2rem]">
           <div className="relative aspect-[21/9]">
             <img
-              src="/achiv-1.jpg"
-              alt={t('termsOfApplying.title')}
+              src="/school.png"
+              alt={t('termsOfApplying.heroTitle')}
               className="size-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-dark/55 via-brand-dark/35 to-transparent" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 text-center text-white">
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                {t('termsOfApplying.heroTitle')}
-              </h1>
-              <p className="mt-2 text-lg font-semibold text-white/90 sm:text-2xl">
-                {t('termsOfApplying.heroSubtitle')}
-              </p>
-            </div>
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 import type { AchievementAccent } from '@/features/home/components/AchievementCard'
 
 const images = {
-  campus: '/achiv-1.jpg',
+  campus: '/school.png',
   events: '/achiv-2.jpg',
   art: '/achive-3.jpg',
 } as const

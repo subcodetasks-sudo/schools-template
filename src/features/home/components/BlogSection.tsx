@@ -15,7 +15,7 @@ const posts = [
   { id: 'creativeClassroom', image: '/event-3.jpg' },
   { id: 'sportsSpirit', image: '/event-4.jpg' },
   { id: 'communityCare', image: '/event-2.jpg' },
-  { id: 'campusLife', image: '/event-5.jpg' },
+  { id: 'campusLife', image: '/school.png' },
   { id: 'stageTalent', image: '/event-1.jpg' },
 ] as const
 

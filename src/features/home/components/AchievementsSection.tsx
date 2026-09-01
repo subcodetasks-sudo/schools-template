@@ -15,7 +15,7 @@ import {
 import { cn } from '@/lib/utils'
 
 const images = {
-  campus: '/achiv-1.jpg',
+  campus: '/school.png',
   events: '/achiv-2.jpg',
   art: '/achive-3.jpg',
 } as const

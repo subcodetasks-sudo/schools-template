@@ -15,7 +15,7 @@ const items = [
   { id: 'community', image: '/event-2.jpg', date: '2026-02-08' },
   { id: 'childrensDay', image: '/event-3.jpg', date: '2026-03-21' },
   { id: 'swimming', image: '/event-4.jpg', date: '2026-04-12' },
-  { id: 'campusVisit', image: '/event-5.jpg', date: '2026-05-18' },
+  { id: 'campusVisit', image: '/school.png', date: '2026-05-18' },
   { id: 'readingWeek', image: '/event-1.jpg', date: '2026-06-09' },
   { id: 'sportsDay', image: '/event-4.jpg', date: '2026-07-15' },
 ] as const
