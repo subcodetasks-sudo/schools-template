@@ -14,11 +14,6 @@ export type ActivityRow = {
 }
 
 export const certificateReport = {
-  student: {
-    name: 'ابن محمد يس محمد المغربي',
-    seatNumber: '494208280',
-    className: 'A',
-  },
   summary: {
     totalSubjects: 5,
     successSubjects: 5,

@@ -42,10 +42,20 @@ export const defaultProfileData: ProfileData = {
 export const readOnlyProfileFields: ProfileFieldKey[] = [
   'nationalId',
   'studentCode',
+  'religion',
   'registrationStatus',
+  'classNumber',
   'transfers',
   'fees',
   'paymentVoucher',
   'paymentDate',
   'paymentAmount',
+]
+
+export const editableProfileFields: ProfileFieldKey[] = [
+  'phone',
+  'fatherNationalId',
+  'fatherAddress',
+  'fatherJob',
+  'fatherPhone',
 ]

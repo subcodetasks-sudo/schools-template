@@ -12,10 +12,10 @@ import {
   evaluationTotalMax,
   getMonthGrandTotal,
   getSubjectTotal,
-  monthlyEvaluationStudent,
   monthlyEvaluationsByMonth,
   type MonthEvaluation,
 } from '@/features/profile/monthlyEvaluationData'
+import { useProfile } from '@/features/profile/ProfileContext'
 import { cn } from '@/lib/utils'
 
 const scoreKeys = [
@@ -144,8 +144,13 @@ function EvaluationTable({ evaluation }: { evaluation: MonthEvaluation }) {
 
 export function MonthlyEvaluationsPage() {
   const { t, i18n } = useTranslation()
+  const { personalName, gradeLabel, profileData } = useProfile()
   const currentMonth = new Date().getMonth() + 1
   const [selectedMonth, setSelectedMonth] = useState(currentMonth)
+
+  const studentName = personalName || t('profile.studentName')
+  const studentGrade = gradeLabel || t('profile.studentGrade')
+  const studentClass = profileData.classNumber || '—'
 
   const months = useMemo(
     () =>
@@ -212,16 +217,16 @@ export function MonthlyEvaluationsPage() {
         <div className="space-y-4">
           <InfoField
             label={t('profile.monthlyEvaluations.studentName')}
-            value={monthlyEvaluationStudent.name}
+            value={studentName}
           />
           <div className="flex flex-col gap-4 sm:flex-row">
             <InfoField
               label={t('profile.monthlyEvaluations.grade')}
-              value={monthlyEvaluationStudent.grade}
+              value={studentGrade}
             />
             <InfoField
               label={t('profile.monthlyEvaluations.className')}
-              value={monthlyEvaluationStudent.className}
+              value={studentClass}
             />
           </div>
         </div>

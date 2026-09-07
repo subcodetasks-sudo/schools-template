@@ -10,6 +10,7 @@ import {
   colorStyles,
   type GradeRow,
 } from '@/features/profile/certificateData'
+import { useProfile } from '@/features/profile/ProfileContext'
 import { cn } from '@/lib/utils'
 
 const signatureIcons = {
@@ -73,8 +74,13 @@ const activitiesColGroup = (
 
 export function CertificatePage() {
   const { t } = useTranslation()
+  const { personalName, profileData } = useProfile()
   const [code, setCode] = useState('')
   const [showResults, setShowResults] = useState(false)
+
+  const studentName = personalName || t('profile.studentName')
+  const seatNumber = profileData.studentCode || '—'
+  const studentClass = profileData.classNumber || '—'
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -142,16 +148,16 @@ export function CertificatePage() {
             <div className="space-y-4">
               <InfoField
                 label={t('profile.certificate.studentName')}
-                value={certificateReport.student.name}
+                value={studentName}
               />
               <div className="flex flex-col gap-4 sm:flex-row">
                 <InfoField
                   label={t('profile.certificate.seatNumber')}
-                  value={certificateReport.student.seatNumber}
+                  value={seatNumber}
                 />
                 <InfoField
                   label={t('profile.certificate.className')}
-                  value={certificateReport.student.className}
+                  value={studentClass}
                 />
               </div>
             </div>

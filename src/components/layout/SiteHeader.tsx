@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, ChevronDown, LogOut, Menu, UserRound, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { formatStudentAccountId, useAuth } from '@/features/auth/AuthContext'
+import { formatStudentAccountId } from '@/features/auth/authApi'
+import { useAuth } from '@/features/auth/userStore'
 import { defaultProfilePhoto } from '@/features/profile/profileData'
 import { cn } from '@/lib/utils'
 
@@ -26,7 +27,7 @@ function ProfileMenuDropdown({
 }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { session, logout } = useAuth()
+  const { session, user, logout } = useAuth()
   const [open, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -56,6 +57,10 @@ function ProfileMenuDropdown({
 
   if (!session) return null
 
+  const studentName = user?.name || t('profile.studentName')
+  const studentPhoto = user?.image || defaultProfilePhoto
+  const accountId = formatStudentAccountId(session.nationalId || user?.code || '')
+
   const closeMenu = () => setOpen(false)
 
   const goToProfile = () => {
@@ -64,8 +69,8 @@ function ProfileMenuDropdown({
     navigate('/profile')
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     closeMenu()
     onNavigate?.()
     navigate('/login')
@@ -85,19 +90,19 @@ function ProfileMenuDropdown({
         )}
       >
         <img
-          src={defaultProfilePhoto}
+          src={studentPhoto}
           alt=""
           className="size-8 shrink-0 rounded-lg object-cover ring-2 ring-white/15"
         />
         <span className="min-w-0 flex-1 text-start">
           <span className="block truncate text-sm font-bold leading-tight text-white">
-            {t('profile.studentName')}
+            {studentName}
           </span>
           <span
             className="mt-0.5 block truncate text-[11px] leading-tight text-white/75"
             dir="ltr"
           >
-            {formatStudentAccountId(session.nationalId)}
+            {accountId}
           </span>
         </span>
         <ChevronDown

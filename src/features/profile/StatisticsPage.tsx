@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   History,
@@ -15,50 +16,97 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
+import { useProfile } from '@/features/profile/ProfileContext'
 import { cn } from '@/lib/utils'
 
 const brandPrimary = '#245c7c'
 const brandSecondary = '#3bb4b3'
 const brandDark = '#1f536f'
 
-const chartData = [
-  { year: '2015', assignments: 25, tests: 0 },
-  { year: '2016', assignments: 78, tests: 55 },
-  { year: '2017', assignments: 42, tests: 28 },
-  { year: '2018', assignments: 68, tests: 72 },
-  { year: '2019', assignments: 98, tests: 90 },
-]
-
-const stats = [
+const statsMeta = [
   {
     key: 'attendance',
-    valueKey: 'profile.statistics.cards.attendance.value',
-    hintKey: 'profile.statistics.cards.attendance.hint',
     icon: History,
     tone: 'bg-brand-primary/10 text-brand-primary',
   },
   {
     key: 'callups',
-    valueKey: 'profile.statistics.cards.callups.value',
     icon: Users,
     tone: 'bg-brand-secondary/10 text-brand-secondary',
   },
   {
     key: 'tests',
-    valueKey: 'profile.statistics.cards.tests.value',
     icon: LineChartIcon,
     tone: 'bg-brand-light text-brand-primary',
   },
   {
     key: 'absences',
-    valueKey: 'profile.statistics.cards.absences.value',
     icon: Package,
     tone: 'bg-brand-dark/10 text-brand-dark',
   },
 ] as const
 
+function formatValue(value: number | null | undefined, suffix = '') {
+  if (value === null || value === undefined) return '—'
+  return `${value}${suffix}`
+}
+
 export function StatisticsPage() {
   const { t } = useTranslation()
+  const { statistics, isLoading, error, refreshProfile } = useProfile()
+
+  const cards = useMemo(() => {
+    const data = statistics?.cards
+    return {
+      attendance: {
+        value: formatValue(data?.attendance?.rate, '%'),
+        hint:
+          data?.attendance?.sessions != null
+            ? `(${data.attendance.sessions} ${t('profile.statistics.sessions')})`
+            : '',
+      },
+      callups: { value: formatValue(data?.callups?.count) },
+      tests: { value: formatValue(data?.tests?.completed) },
+      absences: { value: formatValue(data?.absences?.count) },
+    }
+  }, [statistics, t])
+
+  const chartData = useMemo(() => {
+    const assignments = statistics?.evaluation?.assignments
+    const tests = statistics?.evaluation?.tests
+    if (assignments == null && tests == null) return []
+
+    return [
+      {
+        label: t('profile.statistics.current'),
+        assignments: assignments ?? 0,
+        tests: tests ?? 0,
+      },
+    ]
+  }, [statistics, t])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
+        {t('profile.loading')}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-destructive">{error}</p>
+        <button
+          type="button"
+          onClick={() => void refreshProfile()}
+          className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
+        >
+          {t('profile.retry')}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -80,7 +128,7 @@ export function StatisticsPage() {
       </h1>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
+        {statsMeta.map((stat) => (
           <article
             key={stat.key}
             className="flex items-center justify-between rounded-xl border border-brand-dark/10 bg-white px-4 py-4 shadow-sm"
@@ -90,10 +138,10 @@ export function StatisticsPage() {
                 {t(`profile.statistics.cards.${stat.key}.label`)}
               </p>
               <p className="mt-1 text-2xl font-bold text-brand-dark">
-                {t(stat.valueKey)}
-                {'hintKey' in stat ? (
+                {cards[stat.key].value}
+                {stat.key === 'attendance' && cards.attendance.hint ? (
                   <span className="ms-1 text-sm font-medium text-brand-dark/45">
-                    {t(stat.hintKey)}
+                    {cards.attendance.hint}
                   </span>
                 ) : null}
               </p>
@@ -127,53 +175,59 @@ export function StatisticsPage() {
           </div>
         </div>
 
-        <div className="h-72 w-full sm:h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={`${brandDark}1f`} />
-              <XAxis
-                dataKey="year"
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
-              />
-              <YAxis
-                domain={[0, 100]}
-                ticks={[0, 25, 50, 75, 100]}
-                tickLine={false}
-                axisLine={false}
-                tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
-                width={32}
-              />
-              <Tooltip
-                contentStyle={{
-                  borderRadius: 12,
-                  borderColor: `${brandDark}1f`,
-                  boxShadow: '0 8px 24px rgba(31,83,111,0.08)',
-                }}
-              />
-              <Legend content={() => null} />
-              <Line
-                type="monotone"
-                dataKey="assignments"
-                name={t('profile.statistics.assignments')}
-                stroke={brandPrimary}
-                strokeWidth={2.5}
-                dot={{ r: 4, fill: brandPrimary, strokeWidth: 0 }}
-                activeDot={{ r: 5 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="tests"
-                name={t('profile.statistics.tests')}
-                stroke={brandSecondary}
-                strokeWidth={2.5}
-                dot={{ r: 4, fill: brandSecondary, strokeWidth: 0 }}
-                activeDot={{ r: 5 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
+        {chartData.length === 0 ? (
+          <p className="py-16 text-center text-sm text-brand-dark/45">
+            {t('profile.placeholders.statistics')}
+          </p>
+        ) : (
+          <div className="h-72 w-full sm:h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={`${brandDark}1f`} />
+                <XAxis
+                  dataKey="label"
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
+                />
+                <YAxis
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  tickLine={false}
+                  axisLine={false}
+                  tick={{ fill: `${brandDark}8c`, fontSize: 12 }}
+                  width={32}
+                />
+                <Tooltip
+                  contentStyle={{
+                    borderRadius: 12,
+                    borderColor: `${brandDark}1f`,
+                    boxShadow: '0 8px 24px rgba(31,83,111,0.08)',
+                  }}
+                />
+                <Legend content={() => null} />
+                <Line
+                  type="monotone"
+                  dataKey="assignments"
+                  name={t('profile.statistics.assignments')}
+                  stroke={brandPrimary}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: brandPrimary, strokeWidth: 0 }}
+                  activeDot={{ r: 5 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="tests"
+                  name={t('profile.statistics.tests')}
+                  stroke={brandSecondary}
+                  strokeWidth={2.5}
+                  dot={{ r: 4, fill: brandSecondary, strokeWidth: 0 }}
+                  activeDot={{ r: 5 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -213,6 +213,7 @@
     "noAccount": "Don't have an account?",
     "register": "Create an account",
     "success": "Logged in successfully",
+    "error": "Could not log in. Check your details and try again",
     "slideDot": "Go to slide {{index}}",
     "slides": {
       "s1": {
@@ -274,6 +275,8 @@
     "hasAccount": "Already have an account?",
     "login": "Log in",
     "success": "Account created successfully",
+    "error": "Could not create the account. Please try again",
+    "step1Error": "Could not verify national ID and code",
     "phone": "Phone number",
     "phonePlaceholder": "10xxxxxxx",
     "phoneNoLeadingZero": "You cannot add 0 after the country code",
@@ -289,6 +292,8 @@
   },
   "profile": {
     "title": "Student profile",
+    "loading": "Loading profile...",
+    "retry": "Try again",
     "toggleMenu": "Toggle menu",
     "studentName": "Mahdi Saeed",
     "studentInitials": "MS",
@@ -310,9 +315,14 @@
       "save": "Save changes",
       "cancel": "Cancel",
       "saveSuccess": "Profile information saved successfully.",
+      "saveError": "Could not save profile. Please try again.",
       "fieldRequired": "This field is required.",
       "photo": "Profile photo",
-      "photoHint": "Choose a clear photo to update your profile picture.",
+      "photoHint": "Choose a clear photo (jpeg/png/webp/gif, max 2MB).",
+      "photoUploading": "Uploading photo...",
+      "photoUploadSuccess": "Photo updated successfully",
+      "photoUploadError": "Could not upload the photo. Please try again",
+      "photoTooLarge": "Photo must be 2MB or smaller",
       "changePhoto": "Change photo",
       "invalidPhoto": "Please choose a valid image file.",
       "hint": "Mock student data for the profile dashboard preview.",
@@ -429,6 +439,17 @@
     },
     "schedule": {
       "dayColumn": "Day",
+      "periodFallback": "Period {{n}}",
+      "periods": {
+        "1": "1st period",
+        "2": "2nd period",
+        "3": "3rd period",
+        "4": "4th period",
+        "5": "5th period",
+        "6": "6th period",
+        "7": "7th period",
+        "8": "8th period"
+      },
       "days": {
         "saturday": "Saturday",
         "sunday": "Sunday",
@@ -515,6 +536,8 @@
       "chartTitle": "Student evaluation",
       "assignments": "Assignments",
       "tests": "Tests",
+      "sessions": "sessions",
+      "current": "Current",
       "cards": {
         "attendance": {
           "label": "Attendance rate",

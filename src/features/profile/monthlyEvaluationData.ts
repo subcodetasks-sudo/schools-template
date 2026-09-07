@@ -18,12 +18,6 @@ export type MonthEvaluation = {
 export const evaluationColumnMaxScores = [10, 5, 5, 5, 5] as const
 export const evaluationTotalMax = 30
 
-export const monthlyEvaluationStudent = {
-  name: 'ابن محمد يس محمد المغربي',
-  grade: 'الصف الأول الابتدائي',
-  className: 'A',
-}
-
 const emptyMonths = new Set([2, 7, 8, 9])
 const subjectKeys = ['arabic', 'english', 'math'] as const
 

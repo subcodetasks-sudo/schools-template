@@ -1,11 +1,7 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CalendarDays, Clock } from 'lucide-react'
-import {
-  scheduleByDay,
-  scheduleDays,
-  scheduleTimeSlots,
-  type ScheduleLesson,
-} from '@/features/profile/scheduleData'
+import { CalendarDays } from 'lucide-react'
+import { useProfile } from '@/features/profile/ProfileContext'
 import { cn } from '@/lib/utils'
 
 const headerCellClass =
@@ -14,40 +10,72 @@ const bodyCellClass = 'border border-brand-dark/10 px-2 py-3 text-center align-m
 const dayCellClass =
   'border border-brand-dark/10 px-3 py-3 text-center align-middle text-xs font-semibold text-brand-primary sm:text-sm'
 
-const scheduleColGroup = (
-  <colgroup>
-    <col style={{ width: '11%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-    <col style={{ width: '12.7%' }} />
-  </colgroup>
-)
+function dayLabel(day: string, t: (key: string) => string) {
+  const key = `profile.schedule.days.${day}`
+  const translated = t(key)
+  return translated === key ? day : translated
+}
 
-function ScheduleCell({ lesson }: { lesson: ScheduleLesson | null }) {
-  const { t } = useTranslation()
-
-  if (!lesson) {
-    return <td className={bodyCellClass} />
-  }
-
-  return (
-    <td className={bodyCellClass}>
-      <p className="text-xs font-semibold leading-snug text-brand-dark sm:text-sm">
-        {t(`profile.schedule.subjects.${lesson.subjectKey}`)}
-      </p>
-      <p className="mt-1 text-[11px] leading-snug text-brand-dark/50 sm:text-xs">
-        {lesson.teacher}
-      </p>
-    </td>
-  )
+function periodLabel(period: number, t: (key: string, options?: Record<string, unknown>) => string) {
+  const key = `profile.schedule.periods.${period}`
+  const translated = t(key)
+  return translated === key ? t('profile.schedule.periodFallback', { n: period }) : translated
 }
 
 export function SchedulePage() {
   const { t } = useTranslation()
+  const { schedule, isLoading, error, refreshProfile } = useProfile()
+
+  const grid = useMemo(() => {
+    if (!schedule) return null
+
+    const days = schedule.days.length ? schedule.days : []
+    const periods = schedule.periods.length ? schedule.periods : [1, 2, 3, 4, 5, 6, 7]
+    const byDayPeriod = new Map<string, { subject: string; teacher: string }>()
+
+    for (const entry of schedule.entries ?? []) {
+      byDayPeriod.set(`${entry.day}-${entry.period}`, {
+        subject: entry.subject?.name?.trim() || '—',
+        teacher: entry.teacher?.name?.trim() || '—',
+      })
+    }
+
+    return { days, periods, byDayPeriod }
+  }, [schedule])
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
+        {t('profile.loading')}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-destructive">{error}</p>
+        <button
+          type="button"
+          onClick={() => void refreshProfile()}
+          className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
+        >
+          {t('profile.retry')}
+        </button>
+      </div>
+    )
+  }
+
+  if (!grid || grid.days.length === 0) {
+    return (
+      <div className="w-full">
+        <h1 className="relative inline-block pb-3 text-2xl font-bold text-brand-dark sm:text-3xl">
+          {t('profile.nav.schedule')}
+        </h1>
+        <p className="mt-8 text-sm text-brand-dark/55">{t('profile.placeholders.schedule')}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full">
@@ -68,51 +96,59 @@ export function SchedulePage() {
         </svg>
       </h1>
 
+      {schedule?.classroom?.label ? (
+        <p className="mt-3 text-sm text-brand-dark/55">{schedule.classroom.label}</p>
+      ) : null}
+
       <div className="-mx-5 mt-8 overflow-x-auto overscroll-x-contain px-5 sm:-mx-8 sm:px-8 lg:mx-0 lg:overflow-x-visible lg:px-0">
         <div className="min-w-[44rem] overflow-hidden rounded-2xl border border-brand-dark/10 shadow-sm lg:min-w-0 lg:w-full">
           <table className="w-full min-w-[44rem] table-fixed border-collapse text-sm lg:min-w-0">
-          {scheduleColGroup}
-          <thead>
-            <tr className="bg-brand-primary text-white">
-              <th className={headerCellClass}>
-                <div className="flex flex-col items-center justify-center gap-1.5">
-                  <CalendarDays className="size-4 text-white/90" aria-hidden />
-                  <span className="text-xs font-bold sm:text-sm">
-                    {t('profile.schedule.dayColumn')}
-                  </span>
-                </div>
-              </th>
-              {scheduleTimeSlots.map((slot) => (
-                <th
-                  key={`${slot.start}-${slot.end}`}
-                  className={cn(headerCellClass, 'px-2')}
-                >
+            <thead>
+              <tr className="bg-brand-primary text-white">
+                <th className={headerCellClass}>
                   <div className="flex flex-col items-center justify-center gap-1.5">
-                    <Clock className="size-3.5 text-white/90" aria-hidden />
-                    <span className="text-[10px] leading-tight font-bold sm:text-xs">
-                      {slot.start} _ {slot.end}
+                    <CalendarDays className="size-4 text-white/90" aria-hidden />
+                    <span className="text-xs font-bold sm:text-sm">
+                      {t('profile.schedule.dayColumn')}
                     </span>
                   </div>
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {scheduleDays.map((dayKey, index) => (
-              <tr key={dayKey} className={cn(index % 2 === 0 ? 'bg-white' : 'bg-muted/30')}>
-                <th
-                  scope="row"
-                  className={dayCellClass}
-                >
-                  {t(`profile.schedule.days.${dayKey}`)}
-                </th>
-                {scheduleByDay[dayKey].map((lesson, lessonIndex) => (
-                  <ScheduleCell key={`${dayKey}-${lessonIndex}`} lesson={lesson} />
+                {grid.periods.map((period) => (
+                  <th key={period} className={cn(headerCellClass, 'px-2')}>
+                    <span className="text-[10px] leading-tight font-bold sm:text-xs">
+                      {periodLabel(period, t)}
+                    </span>
+                  </th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {grid.days.map((day, index) => (
+                <tr key={day} className={cn(index % 2 === 0 ? 'bg-white' : 'bg-muted/30')}>
+                  <th scope="row" className={dayCellClass}>
+                    {dayLabel(day, t)}
+                  </th>
+                  {grid.periods.map((period) => {
+                    const lesson = grid.byDayPeriod.get(`${day}-${period}`)
+                    return (
+                      <td key={`${day}-${period}`} className={bodyCellClass}>
+                        {lesson ? (
+                          <>
+                            <p className="text-xs font-semibold leading-snug text-brand-dark sm:text-sm">
+                              {lesson.subject}
+                            </p>
+                            <p className="mt-1 text-[11px] leading-snug text-brand-dark/50 sm:text-xs">
+                              {lesson.teacher}
+                            </p>
+                          </>
+                        ) : null}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

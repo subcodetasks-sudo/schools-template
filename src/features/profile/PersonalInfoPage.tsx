@@ -23,8 +23,11 @@ import { toast } from 'sonner'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { authFieldClass } from '@/features/auth/AuthShell'
+import { getUserInitials } from '@/features/auth/authApi'
+import { getErrorMessage } from '@/lib/api'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
+  editableProfileFields,
   profileFieldKeys,
   readOnlyProfileFields,
   type ProfileData,
@@ -51,18 +54,32 @@ const fields = [
 ] as const satisfies ReadonlyArray<{ key: ProfileFieldKey; icon: typeof IdCard }>
 
 const profileSchema = z.object(
-  Object.fromEntries(profileFieldKeys.map((key) => [key, z.string().min(1)])) as Record<
-    ProfileFieldKey,
-    z.ZodString
-  >,
+  Object.fromEntries(
+    profileFieldKeys.map((key) => [
+      key,
+      editableProfileFields.includes(key) ? z.string() : z.string(),
+    ]),
+  ) as Record<ProfileFieldKey, z.ZodString>,
 )
 
 export function PersonalInfoPage() {
   const { t } = useTranslation()
-  const { profileData, profilePhoto, updateProfile } = useProfile()
+  const {
+    profileData,
+    profilePhoto,
+    personalName,
+    personalInitials,
+    isLoading,
+    error,
+    updateProfile,
+    uploadAvatar,
+    refreshProfile,
+  } = useProfile()
   const [isEditing, setIsEditing] = useState(false)
-  const [draftPhoto, setDraftPhoto] = useState(profilePhoto)
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const studentName = personalName || t('profile.studentName')
+  const studentInitials = personalInitials || getUserInitials(studentName)
 
   const {
     register,
@@ -75,47 +92,74 @@ export function PersonalInfoPage() {
   })
 
   useEffect(() => {
-    if (isEditing) {
-      reset(profileData)
-      setDraftPhoto(profilePhoto)
-    }
-  }, [isEditing, profileData, profilePhoto, reset])
+    reset(profileData)
+  }, [profileData, reset])
 
   const startEditing = () => {
+    reset(profileData)
     setIsEditing(true)
   }
 
   const cancelEditing = () => {
     reset(profileData)
-    setDraftPhoto(profilePhoto)
     setIsEditing(false)
   }
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
+    event.target.value = ''
     if (!file) return
 
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('profile.personal.invalidPhoto'))
-      return
+    try {
+      setIsUploadingPhoto(true)
+      await uploadAvatar(file)
+      toast.success(t('profile.personal.photoUploadSuccess'))
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message === 'INVALID_AVATAR_TYPE'
+          ? t('profile.personal.invalidPhoto')
+          : err instanceof Error && err.message === 'INVALID_AVATAR_SIZE'
+            ? t('profile.personal.photoTooLarge')
+            : getErrorMessage(err, t('profile.personal.photoUploadError'))
+      toast.error(message)
+    } finally {
+      setIsUploadingPhoto(false)
     }
-
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setDraftPhoto(reader.result)
-      }
-    }
-    reader.readAsDataURL(file)
-    event.target.value = ''
   }
 
   const onSubmit = handleSubmit(async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 300))
-    updateProfile(data, draftPhoto)
-    setIsEditing(false)
-    toast.success(t('profile.personal.saveSuccess'))
+    try {
+      await updateProfile(data)
+      setIsEditing(false)
+      toast.success(t('profile.personal.saveSuccess'))
+    } catch (err) {
+      toast.error(getErrorMessage(err, t('profile.personal.saveError')))
+    }
   })
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
+        {t('profile.loading')}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-destructive">{error}</p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => void refreshProfile()}
+          className="rounded-xl border-brand-dark/15"
+        >
+          {t('profile.retry')}
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -157,26 +201,31 @@ export function PersonalInfoPage() {
 
             <div className="mt-5 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
               <Avatar className="size-24 ring-4 ring-white shadow-sm">
-                <AvatarImage src={draftPhoto} alt={t('profile.studentName')} />
-                <AvatarFallback className="text-lg">{t('profile.studentInitials')}</AvatarFallback>
+                <AvatarImage src={profilePhoto} alt={studentName} />
+                <AvatarFallback className="text-lg">{studentInitials}</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col items-center gap-2 sm:items-start">
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
                   className="hidden"
-                  onChange={handlePhotoChange}
+                  onChange={(event) => {
+                    void handlePhotoChange(event)
+                  }}
                 />
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={isUploadingPhoto}
                   onClick={() => fileInputRef.current?.click()}
                   className="h-10 gap-2 rounded-xl border-brand-dark/15"
                 >
                   <Camera className="size-4" aria-hidden />
-                  {t('profile.personal.changePhoto')}
+                  {isUploadingPhoto
+                    ? t('profile.personal.photoUploading')
+                    : t('profile.personal.changePhoto')}
                 </Button>
               </div>
             </div>
@@ -243,7 +292,7 @@ export function PersonalInfoPage() {
                 {t(`profile.personal.fields.${field.key}.label`)}
               </span>
               <p className="text-sm font-semibold text-brand-dark" dir="auto">
-                {profileData[field.key]}
+                {profileData[field.key] || '—'}
               </p>
             </article>
           ))}

@@ -11,6 +11,7 @@ import { BlogDetailPage } from '@/features/blog/BlogDetailPage'
 import { ContactPage } from '@/features/contact/ContactPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
+import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
 import { ProfileLayout } from '@/features/profile/ProfileLayout'
 import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
@@ -39,28 +40,33 @@ export const router = createBrowserRouter([
       { path: 'register', element: <RegisterPage /> },
       {
         path: 'profile',
-        element: <ProfileLayout />,
+        element: <ProtectedRoute />,
         children: [
-          { index: true, element: <PersonalInfoPage /> },
           {
-            path: 'certificate',
-            element: <CertificatePage />,
-          },
-          {
-            path: 'monthly-evaluations',
-            element: <MonthlyEvaluationsPage />,
-          },
-          {
-            path: 'schedule',
-            element: <SchedulePage />,
-          },
-          {
-            path: 'parent-summon',
-            element: <ParentSummonPage />,
-          },
-          {
-            path: 'statistics',
-            element: <StatisticsPage />,
+            element: <ProfileLayout />,
+            children: [
+              { index: true, element: <PersonalInfoPage /> },
+              {
+                path: 'certificate',
+                element: <CertificatePage />,
+              },
+              {
+                path: 'monthly-evaluations',
+                element: <MonthlyEvaluationsPage />,
+              },
+              {
+                path: 'schedule',
+                element: <SchedulePage />,
+              },
+              {
+                path: 'parent-summon',
+                element: <ParentSummonPage />,
+              },
+              {
+                path: 'statistics',
+                element: <StatisticsPage />,
+              },
+            ],
           },
         ],
       },

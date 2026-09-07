@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,6 +9,12 @@ import { Check, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
+import {
+  registerStep1,
+  registerStep2,
+  toE164EgyptPhone,
+} from '@/features/auth/authApi'
+import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const stepOneSchema = z.object({
@@ -36,8 +42,9 @@ type StepTwoForm = z.infer<typeof stepTwoSchema>
 
 export function RegisterPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [step, setStep] = useState<1 | 2>(1)
-  const [stepOneData, setStepOneData] = useState<StepOneForm | null>(null)
+  const [registrationToken, setRegistrationToken] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -68,16 +75,39 @@ export function RegisterPage() {
 
   const phoneRegister = stepTwoForm.register('phone')
 
-  const onStepOne = stepOneForm.handleSubmit((data) => {
-    setStepOneData(data)
-    setStep(2)
+  const onStepOne = stepOneForm.handleSubmit(async (data) => {
+    try {
+      const result = await registerStep1({
+        national_id: data.nationalId,
+        code: data.code,
+      })
+      setRegistrationToken(result.token)
+      setStep(2)
+    } catch (error) {
+      toast.error(getErrorMessage(error, t('register.step1Error')))
+    }
   })
 
   const onStepTwo = stepTwoForm.handleSubmit(async (data) => {
-    await new Promise((r) => setTimeout(r, 400))
-    toast.success(t('register.success'))
-    void stepOneData
-    void data
+    if (!registrationToken) {
+      toast.error(t('register.step1Error'))
+      setStep(1)
+      return
+    }
+
+    try {
+      await registerStep2({
+        token: registrationToken,
+        phone: toE164EgyptPhone(data.phone),
+        password: data.password,
+        confirm_password: data.confirmPassword,
+      })
+
+      toast.success(t('register.success'))
+      navigate('/login')
+    } catch (error) {
+      toast.error(getErrorMessage(error, t('register.error')))
+    }
   })
 
   return (
@@ -120,6 +150,7 @@ export function RegisterPage() {
           <Button
             type="submit"
             size="lg"
+            disabled={stepOneForm.formState.isSubmitting}
             className="h-12 w-full rounded-xl bg-brand-primary text-base font-semibold text-white hover:bg-brand-dark"
           >
             {t('register.next')}

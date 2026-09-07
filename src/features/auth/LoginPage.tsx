@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -8,7 +8,8 @@ import { Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
-import { useAuth } from '@/features/auth/AuthContext'
+import { useAuth } from '@/features/auth/userStore'
+import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
@@ -21,8 +22,14 @@ type LoginForm = z.infer<typeof loginSchema>
 export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
+
+  const redirectTo =
+    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ||
+    new URLSearchParams(location.search).get('redirect') ||
+    '/profile'
 
   const {
     register,
@@ -33,10 +40,16 @@ export function LoginPage() {
   })
 
   const onSubmit = handleSubmit(async (values) => {
-    await new Promise((r) => setTimeout(r, 400))
-    login({ nationalId: values.nationalId })
-    toast.success(t('login.success'))
-    navigate('/profile')
+    try {
+      await login({
+        national_id: values.nationalId,
+        password: values.password,
+      })
+      toast.success(t('login.success'))
+      navigate(redirectTo, { replace: true })
+    } catch (error) {
+      toast.error(getErrorMessage(error, t('login.error')))
+    }
   })
 
   return (

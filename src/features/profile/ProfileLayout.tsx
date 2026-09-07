@@ -15,8 +15,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { getUserInitials } from '@/features/auth/authApi'
+import { useAuth } from '@/features/auth/userStore'
 import { ProfileProvider, useProfile } from '@/features/profile/ProfileContext'
-import { useAuth } from '@/features/auth/AuthContext'
 import { cn } from '@/lib/utils'
 
 const mainLinks = [
@@ -38,13 +39,17 @@ export function ProfileLayout() {
 
 function ProfileLayoutContent() {
   const { t } = useTranslation()
-  const { profilePhoto } = useProfile()
+  const { profilePhoto, personalName, personalInitials, gradeLabel } = useProfile()
   const { logout } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const handleLogout = () => {
-    logout()
+  const studentName = personalName || t('profile.studentName')
+  const studentGrade = gradeLabel || t('profile.studentGrade')
+  const studentInitials = personalInitials || getUserInitials(studentName)
+
+  const handleLogout = async () => {
+    await logout()
     navigate('/login')
   }
 
@@ -52,11 +57,11 @@ function ProfileLayoutContent() {
     <aside className="flex h-full w-full flex-col bg-muted/40 lg:w-64 lg:border-e lg:border-brand-dark/10">
       <div className="flex flex-col items-center px-5 pt-8 pb-6 text-center">
         <Avatar className="size-20 ring-4 ring-white shadow-sm">
-          <AvatarImage src={profilePhoto} alt={t('profile.studentName')} />
-          <AvatarFallback>{t('profile.studentInitials')}</AvatarFallback>
+          <AvatarImage src={profilePhoto} alt={studentName} />
+          <AvatarFallback>{studentInitials}</AvatarFallback>
         </Avatar>
-        <h2 className="mt-4 text-lg font-bold text-brand-dark">{t('profile.studentName')}</h2>
-        <p className="mt-1 text-sm text-brand-dark/55">{t('profile.studentGrade')}</p>
+        <h2 className="mt-4 text-lg font-bold text-brand-dark">{studentName}</h2>
+        <p className="mt-1 text-sm text-brand-dark/55">{studentGrade}</p>
       </div>
 
       <Separator className="mx-5 bg-brand-dark/10" />
