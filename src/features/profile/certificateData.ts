@@ -42,11 +42,6 @@ export const certificateReport = {
     { key: 'tokkatsu', score: 100 },
     { key: 'art', score: 20 },
   ] satisfies ActivityRow[],
-  signatures: [
-    { key: 'computerOfficer', name: 'هيثم بسيوني' },
-    { key: 'committeeHead', name: 'نادية عزمي' },
-    { key: 'principal', name: 'مروة حامد' },
-  ] as const,
 }
 
 export const colorLegend: Array<{

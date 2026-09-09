@@ -304,6 +304,7 @@
       "certificate": "Student certificate",
       "monthlyEvaluations": "Monthly evaluations",
       "schedule": "School schedule",
+      "attendance": "Attendance",
       "parentSummon": "Parent summon",
       "statistics": "Statistics"
     },
@@ -371,6 +372,24 @@
         },
         "fatherPhone": {
           "label": "Father phone"
+        }
+      },
+      "values": {
+        "religion": {
+          "islam": "Muslim",
+          "muslim": "Muslim",
+          "christian": "Christian",
+          "christianity": "Christian",
+          "other": "Other"
+        },
+        "registrationStatus": {
+          "active": "Active",
+          "enrolled": "Enrolled",
+          "inactive": "Inactive",
+          "transferred": "Transferred",
+          "graduated": "Graduated",
+          "dismissed": "Dismissed",
+          "re_enrolled": "Re-enrolled"
         }
       }
     },
@@ -466,6 +485,28 @@
         "organicChemistry": "Organic chemistry",
         "islamicEducation": "Islamic education",
         "thinkingSkills": "Thinking skills"
+      }
+    },
+    "attendance": {
+      "loadError": "Could not load attendance records.",
+      "academicYear": "Academic year {{year}}",
+      "byMonthTitle": "Absences by month",
+      "absencesTitle": "Absence days",
+      "emptyMonths": "No monthly absence breakdown yet.",
+      "emptyAbsences": "No absence days recorded.",
+      "absenceCount": "{{count}} day(s)",
+      "noNote": "—",
+      "summary": {
+        "attendanceRate": "Attendance rate",
+        "presentDays": "Present days",
+        "absenceDays": "Absence days",
+        "recordedDays": "Recorded days"
+      },
+      "columns": {
+        "date": "Date",
+        "day": "Day",
+        "note": "Note",
+        "classroom": "Class"
       }
     },
     "parentSummon": {

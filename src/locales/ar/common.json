@@ -304,6 +304,7 @@
       "certificate": "شهادة الطالب",
       "monthlyEvaluations": "التقييمات الشهرية",
       "schedule": "الجدول الدراسي",
+      "attendance": "الحضور والغياب",
       "parentSummon": "إستدعاء ولي الأمر",
       "statistics": "الإحصائيات"
     },
@@ -371,6 +372,24 @@
         },
         "fatherPhone": {
           "label": "هاتف ولي الأمر"
+        }
+      },
+      "values": {
+        "religion": {
+          "islam": "مسلم",
+          "muslim": "مسلم",
+          "christian": "مسيحي",
+          "christianity": "مسيحي",
+          "other": "أخرى"
+        },
+        "registrationStatus": {
+          "active": "نشط",
+          "enrolled": "مقيد",
+          "inactive": "غير نشط",
+          "transferred": "محول",
+          "graduated": "متخرج",
+          "dismissed": "مفصول",
+          "re_enrolled": "معاد القيد"
         }
       }
     },
@@ -466,6 +485,28 @@
         "organicChemistry": "كيمياء عضوية",
         "islamicEducation": "تربية إسلامية",
         "thinkingSkills": "مهارات تفكير"
+      }
+    },
+    "attendance": {
+      "loadError": "تعذر تحميل سجل الحضور والغياب.",
+      "academicYear": "العام الدراسي {{year}}",
+      "byMonthTitle": "الغياب حسب الشهر",
+      "absencesTitle": "أيام الغياب",
+      "emptyMonths": "لا يوجد توزيع شهري للغياب حالياً.",
+      "emptyAbsences": "لا توجد أيام غياب مسجلة.",
+      "absenceCount": "{{count}} يوم",
+      "noNote": "—",
+      "summary": {
+        "attendanceRate": "معدل الحضور",
+        "presentDays": "أيام الحضور",
+        "absenceDays": "أيام الغياب",
+        "recordedDays": "أيام مسجّلة"
+      },
+      "columns": {
+        "date": "التاريخ",
+        "day": "اليوم",
+        "note": "الملاحظة",
+        "classroom": "الفصل"
       }
     },
     "parentSummon": {

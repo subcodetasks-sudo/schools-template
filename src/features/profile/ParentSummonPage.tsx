@@ -53,15 +53,6 @@ function DocCell({ label, value }: { label: string; value: string }) {
   )
 }
 
-function SignatureCell({ title, name }: { title: string; name: string }) {
-  return (
-    <div className="border border-brand-dark/15 bg-white px-2 py-3 text-center">
-      <p className="text-[11px] font-bold leading-snug text-brand-dark sm:text-xs">{title}</p>
-      <p className="mt-2 text-xs font-semibold text-brand-primary sm:text-sm">{name}</p>
-    </div>
-  )
-}
-
 function SummonNoticeDetail({ notice }: { notice: ParentSummonNotice }) {
   const { t } = useTranslation()
 
@@ -107,21 +98,6 @@ function SummonNoticeDetail({ notice }: { notice: ParentSummonNotice }) {
         <p className="text-xs font-medium text-brand-dark">
           {t('profile.parentSummon.issuedDate')}: {formatDocumentDate(notice.issuedAt)}
         </p>
-      </div>
-
-      <div className="grid grid-cols-1 border-t border-brand-dark/10 sm:grid-cols-3">
-        <SignatureCell
-          title={t('profile.parentSummon.signatures.studentAffairsOfficer')}
-          name={notice.studentAffairsOfficer}
-        />
-        <SignatureCell
-          title={t('profile.parentSummon.signatures.stageVicePrincipal')}
-          name={notice.stageVicePrincipal}
-        />
-        <SignatureCell
-          title={t('profile.parentSummon.signatures.principal')}
-          name={notice.principal}
-        />
       </div>
 
       <footer className="border-t border-brand-dark/10 bg-muted/20 px-4 py-2.5 text-center sm:px-5">

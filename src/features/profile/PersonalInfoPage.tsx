@@ -53,6 +53,28 @@ const fields = [
   { key: 'fatherPhone', icon: Phone },
 ] as const satisfies ReadonlyArray<{ key: ProfileFieldKey; icon: typeof IdCard }>
 
+function normalizeLookupKey(value: string) {
+  return value.trim().toLowerCase().replace(/[\s-]+/g, '_')
+}
+
+function formatProfileFieldValue(
+  key: ProfileFieldKey,
+  value: string,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  const raw = value?.trim()
+  if (!raw || raw === '—') return '—'
+
+  if (key === 'religion' || key === 'registrationStatus') {
+    const lookup = normalizeLookupKey(raw)
+    const translationKey = `profile.personal.values.${key}.${lookup}`
+    const translated = t(translationKey)
+    if (translated !== translationKey) return translated
+  }
+
+  return raw
+}
+
 const profileSchema = z.object(
   Object.fromEntries(
     profileFieldKeys.map((key) => [
@@ -234,6 +256,8 @@ export function PersonalInfoPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {profileFieldKeys.map((key) => {
               const readOnly = readOnlyProfileFields.includes(key)
+              const showTranslated =
+                readOnly && (key === 'religion' || key === 'registrationStatus')
 
               return (
                 <div key={key}>
@@ -243,15 +267,27 @@ export function PersonalInfoPage() {
                   >
                     {t(`profile.personal.fields.${key}.label`)}
                   </label>
-                  <input
-                    id={`profile-${key}`}
-                    disabled={readOnly}
-                    className={cn(
-                      authFieldClass,
-                      readOnly && 'cursor-not-allowed bg-muted/50 text-brand-dark/55',
-                    )}
-                    {...register(key)}
-                  />
+                  {showTranslated ? (
+                    <input
+                      id={`profile-${key}`}
+                      disabled
+                      value={formatProfileFieldValue(key, profileData[key], t)}
+                      className={cn(
+                        authFieldClass,
+                        'cursor-not-allowed bg-muted/50 text-brand-dark/55',
+                      )}
+                    />
+                  ) : (
+                    <input
+                      id={`profile-${key}`}
+                      disabled={readOnly}
+                      className={cn(
+                        authFieldClass,
+                        readOnly && 'cursor-not-allowed bg-muted/50 text-brand-dark/55',
+                      )}
+                      {...register(key)}
+                    />
+                  )}
                   {errors[key] ? (
                     <p className="mt-1 text-xs text-destructive">
                       {t('profile.personal.fieldRequired')}
@@ -292,7 +328,7 @@ export function PersonalInfoPage() {
                 {t(`profile.personal.fields.${field.key}.label`)}
               </span>
               <p className="text-sm font-semibold text-brand-dark" dir="auto">
-                {profileData[field.key] || '—'}
+                {formatProfileFieldValue(field.key, profileData[field.key], t)}
               </p>
             </article>
           ))}

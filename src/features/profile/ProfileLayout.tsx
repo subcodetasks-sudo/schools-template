@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart3,
+  CalendarCheck2,
   CalendarDays,
   ClipboardList,
   FileBadge,
@@ -25,6 +26,7 @@ const mainLinks = [
   { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
   { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },
   { to: '/profile/schedule', key: 'schedule', icon: CalendarDays },
+  { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },
   { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
   { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
 ] as const

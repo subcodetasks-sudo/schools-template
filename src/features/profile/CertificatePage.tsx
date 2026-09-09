@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ClipboardCheck, Monitor, UserRound } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { authFieldClass } from '@/features/auth/AuthShell'
@@ -12,12 +11,6 @@ import {
 } from '@/features/profile/certificateData'
 import { useProfile } from '@/features/profile/ProfileContext'
 import { cn } from '@/lib/utils'
-
-const signatureIcons = {
-  computerOfficer: Monitor,
-  committeeHead: ClipboardCheck,
-  principal: UserRound,
-} as const
 
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
@@ -326,24 +319,6 @@ export function CertificatePage() {
                 </div>
               ))}
             </section>
-
-            <footer className="grid grid-cols-1 gap-4 border-t border-brand-dark/10 pt-6 sm:grid-cols-3">
-              {certificateReport.signatures.map((signature) => {
-                const Icon = signatureIcons[signature.key]
-
-                return (
-                  <div key={signature.key} className="text-center">
-                    <div className="mx-auto mb-2 inline-flex size-9 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
-                      <Icon className="size-4" aria-hidden />
-                    </div>
-                    <p className="text-sm font-medium text-brand-dark/55">
-                      {t(`profile.certificate.signatures.${signature.key}`)}
-                    </p>
-                    <p className="mt-1 font-bold text-brand-dark">{signature.name}</p>
-                  </div>
-                )
-              })}
-            </footer>
           </div>
         </div>
       ) : null}

@@ -180,9 +180,70 @@ export function mapProfileDataToUpdatePayload(
   return payload
 }
 
+export type StudentAbsenceDay = {
+  date: string
+  day_name?: string | null
+  academic_year?: string | null
+  note?: string | null
+  classroom?: StudentNamedRef | null
+  recorded_by?: string | null
+}
+
+export type StudentAbsencesSummary = {
+  recorded_days: number
+  present_days: number
+  absence_days: number
+  attendance_rate: number | null
+}
+
+export type StudentAbsencesByMonth = {
+  month: string
+  absence_days: number
+}
+
+export type StudentAbsencesPayload = {
+  student?: {
+    id?: string
+    name?: string | null
+    code?: string | null
+    national_id?: string | null
+    class_number?: string | null
+    stage?: StudentNamedRef | null
+    grade?: StudentNamedRef | null
+    classroom?: StudentNamedRef | null
+  } | null
+  filters?: {
+    academic_year?: string | null
+    from?: string | null
+    to?: string | null
+  } | null
+  summary: StudentAbsencesSummary
+  absences: StudentAbsenceDay[]
+  by_month: StudentAbsencesByMonth[]
+}
+
+export type StudentAbsencesQuery = {
+  academic_year?: string
+  month?: string
+  date_from?: string
+  date_to?: string
+}
+
 export async function getStudentProfile() {
   const response = await apiGet<StudentProfilePayload>('/v1/auth/student/profile', {
     requiresAuth: true,
+  })
+  return unwrapData(response)
+}
+
+export async function getStudentAbsences(query: StudentAbsencesQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(query).filter(([, value]) => value != null && value !== ''),
+  )
+
+  const response = await apiGet<StudentAbsencesPayload>('/v1/auth/student/profile/absences', {
+    requiresAuth: true,
+    params,
   })
   return unwrapData(response)
 }
