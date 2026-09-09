@@ -17,6 +17,7 @@ import { ProfileLayout } from '@/features/profile/ProfileLayout'
 import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
 import { CertificatePage } from '@/features/profile/CertificatePage'
 import { MonthlyEvaluationsPage } from '@/features/profile/MonthlyEvaluationsPage'
+import { WeeklyEvaluationsPage } from '@/features/profile/WeeklyEvaluationsPage'
 import { SchedulePage } from '@/features/profile/SchedulePage'
 import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
 import { StatisticsPage } from '@/features/profile/StatisticsPage'
@@ -54,6 +55,10 @@ export const router = createBrowserRouter([
               {
                 path: 'monthly-evaluations',
                 element: <MonthlyEvaluationsPage />,
+              },
+              {
+                path: 'weekly-evaluations',
+                element: <WeeklyEvaluationsPage />,
               },
               {
                 path: 'schedule',

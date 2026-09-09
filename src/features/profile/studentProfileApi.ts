@@ -73,10 +73,20 @@ export type StudentStatistics = {
   } | null
 } | null
 
+export type StudentCallup = {
+  id: string
+  reason: string
+  summons_date?: string | null
+  academic_year?: string | null
+  notes?: string | null
+  created_at?: string | null
+}
+
 export type StudentProfilePayload = {
   personal: StudentPersonal
   schedule: StudentSchedule
   statistics: StudentStatistics
+  callups?: StudentCallup[] | null
 }
 
 export type UpdateStudentProfilePayload = {
@@ -229,6 +239,84 @@ export type StudentAbsencesQuery = {
   date_to?: string
 }
 
+export type StudentWeeklyAssessmentTerm = 'first' | 'second'
+
+export type StudentWeeklyAssessmentMonth =
+  | 'january'
+  | 'february'
+  | 'march'
+  | 'april'
+  | 'may'
+  | 'june'
+  | 'july'
+  | 'august'
+  | 'september'
+
+export type StudentWeeklyAssessmentSubject = {
+  id: number
+  name: string
+  code?: string | null
+}
+
+export type StudentWeeklyAssessmentBucket = {
+  subject?: StudentWeeklyAssessmentSubject
+  term?: StudentWeeklyAssessmentTerm | string
+  sessions: number
+  score: number
+  max: number
+  percentage: number | null
+}
+
+export type StudentWeeklyAssessmentEntry = {
+  id: string
+  session_id?: string
+  subject?: StudentWeeklyAssessmentSubject | null
+  academic_year?: string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
+  month?: StudentWeeklyAssessmentMonth | string | null
+  week?: number | null
+  week_date?: string | null
+  scores: Record<string, number | null>
+  total: number
+  max_total: number
+  percentage: number | null
+}
+
+export type StudentWeeklyAssessmentsPayload = {
+  student?: {
+    id?: string
+    name?: string | null
+    code?: string | null
+    national_id?: string | null
+    class_number?: string | null
+    stage?: StudentNamedRef | null
+    grade?: StudentNamedRef | null
+    classroom?: StudentNamedRef | null
+  } | null
+  filters?: {
+    academic_year?: string | null
+    term?: StudentWeeklyAssessmentTerm | string | null
+    subject_id?: number | null
+    month?: StudentWeeklyAssessmentMonth | string | null
+  } | null
+  summary: {
+    sessions_count: number
+    total_score: number
+    total_max: number
+    percentage: number | null
+    by_subject: StudentWeeklyAssessmentBucket[]
+    by_term: StudentWeeklyAssessmentBucket[]
+  }
+  entries: StudentWeeklyAssessmentEntry[]
+}
+
+export type StudentWeeklyAssessmentsQuery = {
+  academic_year?: string
+  term?: StudentWeeklyAssessmentTerm | string
+  subject_id?: number | string
+  month?: StudentWeeklyAssessmentMonth | string
+}
+
 export async function getStudentProfile() {
   const response = await apiGet<StudentProfilePayload>('/v1/auth/student/profile', {
     requiresAuth: true,
@@ -245,6 +333,21 @@ export async function getStudentAbsences(query: StudentAbsencesQuery = {}) {
     requiresAuth: true,
     params,
   })
+  return unwrapData(response)
+}
+
+export async function getStudentWeeklyAssessments(query: StudentWeeklyAssessmentsQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(query).filter(([, value]) => value != null && value !== ''),
+  )
+
+  const response = await apiGet<StudentWeeklyAssessmentsPayload>(
+    '/v1/auth/student/profile/weekly-assessments',
+    {
+      requiresAuth: true,
+      params,
+    },
+  )
   return unwrapData(response)
 }
 

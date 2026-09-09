@@ -303,6 +303,7 @@
       "personal": "الملف الشخصي",
       "certificate": "شهادة الطالب",
       "monthlyEvaluations": "التقييمات الشهرية",
+      "weeklyEvaluations": "التقييمات الأسبوعية",
       "schedule": "الجدول الدراسي",
       "attendance": "الحضور والغياب",
       "parentSummon": "إستدعاء ولي الأمر",
@@ -532,11 +533,13 @@
       "fields": {
         "studentName": "اسم الطالب:",
         "schoolName": "إسم المدرسة",
+        "stage": "المرحلة:",
         "grade": "الصف:",
         "className": "الفصل:",
         "parentName": "اسم ولي الأمر:",
         "academicYear": "العام الدراسي"
       },
+      "classroomSection": "فصل-{{section}}",
       "signatures": {
         "studentAffairsOfficer": "مسؤول شئون الطلاب",
         "stageVicePrincipal": "وكيل المرحلة",
@@ -566,9 +569,60 @@
         "math": "الرياضيات"
       }
     },
+    "weeklyEvaluations": {
+      "studentName": "اسم الطالب",
+      "grade": "الصف الدراسي",
+      "className": "الفصل الدراسي",
+      "loadError": "تعذر تحميل التقييمات الأسبوعية.",
+      "academicYear": "العام الدراسي {{year}}",
+      "bySubjectTitle": "حسب المادة",
+      "entriesTitle": "التقييمات",
+      "emptyTitle": "لا توجد تقييمات أسبوعية مسجّلة",
+      "emptyDescription": "ستظهر هنا التقييمات الأسبوعية عند توفرها من المدرسة.",
+      "emptySubjects": "لا يوجد تفصيل حسب المادة حالياً.",
+      "noScores": "لا توجد درجات تفصيلية لهذا التقييم.",
+      "weekNumber": "الأسبوع {{n}}",
+      "weekDate": "تاريخ الأسبوع",
+      "subjectSessions": "{{count}} تقييم",
+      "summary": {
+        "percentage": "النسبة العامة",
+        "sessions": "عدد التقييمات",
+        "totalScore": "مجموع الدرجات"
+      },
+      "filters": {
+        "allTerms": "كل الفصول",
+        "allMonths": "كل الشهور",
+        "allSubjects": "كل المواد",
+        "clear": "مسح الفلاتر"
+      },
+      "emptyFilteredTitle": "لا توجد نتائج لهذا الفلتر",
+      "emptyFiltered": "جرّب تغيير الفلتر أو مسح الفلاتر لعرض كل التقييمات.",
+      "terms": {
+        "first": "الفصل الأول",
+        "second": "الفصل الثاني"
+      },
+      "months": {
+        "january": "يناير",
+        "february": "فبراير",
+        "march": "مارس",
+        "april": "أبريل",
+        "may": "مايو",
+        "june": "يونيو",
+        "july": "يوليو",
+        "august": "أغسطس",
+        "september": "سبتمبر"
+      },
+      "scoreColumns": {
+        "weekly": "التقييم الأسبوعي",
+        "notebook": "الكراسة",
+        "homework": "الواجب",
+        "participation": "المشاركة"
+      }
+    },
     "placeholders": {
       "certificate": "ستظهر شهادة الطالب هنا.",
       "monthlyEvaluations": "ستظهر التقييمات الشهرية هنا.",
+      "weeklyEvaluations": "ستظهر التقييمات الأسبوعية هنا.",
       "schedule": "سيظهر الجدول الدراسي هنا.",
       "parentSummon": "ستظهر إستدعاءات ولي الأمر هنا.",
       "statistics": "ستظهر إحصائيات الطالب هنا."

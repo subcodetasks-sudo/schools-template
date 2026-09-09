@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ClipboardList,
   FileBadge,
+  ListChecks,
   LogOut,
   Menu,
   Phone,
@@ -24,6 +25,7 @@ import { cn } from '@/lib/utils'
 const mainLinks = [
   { to: '/profile', key: 'personal', icon: UserRound, end: true },
   { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
+  { to: '/profile/weekly-evaluations', key: 'weeklyEvaluations', icon: ListChecks },
   { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },
   { to: '/profile/schedule', key: 'schedule', icon: CalendarDays },
   { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },

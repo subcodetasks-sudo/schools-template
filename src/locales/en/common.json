@@ -303,6 +303,7 @@
       "personal": "Personal profile",
       "certificate": "Student certificate",
       "monthlyEvaluations": "Monthly evaluations",
+      "weeklyEvaluations": "Weekly evaluations",
       "schedule": "School schedule",
       "attendance": "Attendance",
       "parentSummon": "Parent summon",
@@ -532,11 +533,13 @@
       "fields": {
         "studentName": "Student name:",
         "schoolName": "School name",
+        "stage": "Stage:",
         "grade": "Grade:",
         "className": "Class:",
         "parentName": "Parent name:",
         "academicYear": "Academic year"
       },
+      "classroomSection": "Class-{{section}}",
       "signatures": {
         "studentAffairsOfficer": "Student affairs officer",
         "stageVicePrincipal": "Stage vice principal",
@@ -566,9 +569,60 @@
         "math": "Mathematics"
       }
     },
+    "weeklyEvaluations": {
+      "studentName": "Student name",
+      "grade": "Grade level",
+      "className": "Class",
+      "loadError": "Could not load weekly assessments.",
+      "academicYear": "Academic year {{year}}",
+      "bySubjectTitle": "By subject",
+      "entriesTitle": "Assessments",
+      "emptyTitle": "No weekly assessments recorded",
+      "emptyDescription": "Weekly assessments will appear here when the school publishes them.",
+      "emptySubjects": "No subject breakdown yet.",
+      "noScores": "No detailed scores for this assessment.",
+      "weekNumber": "Week {{n}}",
+      "weekDate": "Week date",
+      "subjectSessions": "{{count}} assessment(s)",
+      "summary": {
+        "percentage": "Overall percentage",
+        "sessions": "Assessments count",
+        "totalScore": "Total score"
+      },
+      "filters": {
+        "allTerms": "All terms",
+        "allMonths": "All months",
+        "allSubjects": "All subjects",
+        "clear": "Clear filters"
+      },
+      "emptyFilteredTitle": "No results for this filter",
+      "emptyFiltered": "Try changing the filter or clear filters to see all assessments.",
+      "terms": {
+        "first": "First term",
+        "second": "Second term"
+      },
+      "months": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September"
+      },
+      "scoreColumns": {
+        "weekly": "Weekly assessment",
+        "notebook": "Notebook",
+        "homework": "Homework",
+        "participation": "Participation"
+      }
+    },
     "placeholders": {
       "certificate": "The student certificate will appear here.",
       "monthlyEvaluations": "Monthly evaluations will appear here.",
+      "weeklyEvaluations": "Weekly evaluations will appear here.",
       "schedule": "The school schedule will appear here.",
       "parentSummon": "Parent summon records will appear here.",
       "statistics": "Student statistics will appear here."

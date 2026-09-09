@@ -7,10 +7,8 @@ import {
   CarouselItem,
   type CarouselApi,
 } from '@/components/ui/carousel'
-import {
-  parentSummonNotices,
-  type ParentSummonNotice,
-} from '@/features/profile/parentSummonData'
+import { useProfile } from '@/features/profile/ProfileContext'
+import type { StudentCallup } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
 
 function PageTitle() {
@@ -36,8 +34,10 @@ function PageTitle() {
   )
 }
 
-function formatDocumentDate(date: string) {
-  const value = new Date(date)
+function formatDocumentDate(date: string | null | undefined) {
+  if (!date) return '—'
+  const value = new Date(date.includes(' ') ? date.replace(' ', 'T') : date)
+  if (Number.isNaN(value.getTime())) return date
   const day = String(value.getDate()).padStart(2, '0')
   const month = String(value.getMonth() + 1).padStart(2, '0')
   const year = value.getFullYear()
@@ -53,8 +53,21 @@ function DocCell({ label, value }: { label: string; value: string }) {
   )
 }
 
-function SummonNoticeDetail({ notice }: { notice: ParentSummonNotice }) {
+function SummonNoticeDetail({
+  callup,
+  studentName,
+  stageName,
+  gradeName,
+  classroomLabel,
+}: {
+  callup: StudentCallup
+  studentName: string
+  stageName: string
+  gradeName: string
+  classroomLabel: string
+}) {
   const { t } = useTranslation()
+  const issuedAt = callup.summons_date || callup.created_at
 
   return (
     <article className="mx-auto max-w-3xl overflow-hidden rounded-xl border border-brand-dark/10 bg-white text-sm shadow-sm">
@@ -66,23 +79,19 @@ function SummonNoticeDetail({ notice }: { notice: ParentSummonNotice }) {
       </header>
 
       <div className="border-y border-brand-dark/10 bg-muted/35 px-4 py-3 text-center sm:px-5">
-        <p className="text-sm font-bold text-brand-dark">{notice.schoolName}</p>
-        <p className="mt-1 text-xs text-brand-dark/70">
-          {t('profile.parentSummon.academicYearLabel')}: {notice.academicYear}
-        </p>
+        <p className="text-sm font-bold text-brand-dark">{t('brand')}</p>
+        {callup.academic_year ? (
+          <p className="mt-1 text-xs text-brand-dark/70">
+            {t('profile.parentSummon.academicYearLabel')}: {callup.academic_year}
+          </p>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-2 border-b border-brand-dark/10">
-        <DocCell
-          label={t('profile.parentSummon.fields.studentName')}
-          value={t('profile.studentName')}
-        />
-        <DocCell label={t('profile.parentSummon.fields.grade')} value={t('profile.studentGrade')} />
-        <DocCell label={t('profile.parentSummon.fields.className')} value={notice.className} />
-        <DocCell
-          label={t('profile.parentSummon.fields.parentName')}
-          value={notice.parentName}
-        />
+        <DocCell label={t('profile.parentSummon.fields.studentName')} value={studentName} />
+        <DocCell label={t('profile.parentSummon.fields.stage')} value={stageName} />
+        <DocCell label={t('profile.parentSummon.fields.grade')} value={gradeName} />
+        <DocCell label={t('profile.parentSummon.fields.className')} value={classroomLabel} />
       </div>
 
       <section className="border-y-2 border-amber-400 bg-amber-50 px-4 py-4 text-center sm:px-5 sm:py-5">
@@ -90,31 +99,39 @@ function SummonNoticeDetail({ notice }: { notice: ParentSummonNotice }) {
           {t('profile.parentSummon.reasonTitle')}
         </p>
         <p className="mt-2 text-sm font-semibold leading-relaxed text-amber-800">
-          {notice.reason}
+          {callup.reason}
         </p>
+        {callup.notes?.trim() ? (
+          <p className="mt-3 text-xs leading-relaxed text-amber-800/80">{callup.notes}</p>
+        ) : null}
       </section>
 
       <div className="px-4 py-2.5 text-center sm:px-5">
         <p className="text-xs font-medium text-brand-dark">
-          {t('profile.parentSummon.issuedDate')}: {formatDocumentDate(notice.issuedAt)}
+          {t('profile.parentSummon.issuedDate')}: {formatDocumentDate(issuedAt)}
         </p>
       </div>
-
-      <footer className="border-t border-brand-dark/10 bg-muted/20 px-4 py-2.5 text-center sm:px-5">
-        <p className="text-[11px] text-brand-dark/55 sm:text-xs">
-          {notice.educationalAdministration}
-        </p>
-      </footer>
     </article>
   )
 }
 
-function ParentSummonCarousel() {
+function ParentSummonCarousel({
+  callups,
+  studentName,
+  stageName,
+  gradeName,
+  classroomLabel,
+}: {
+  callups: StudentCallup[]
+  studentName: string
+  stageName: string
+  gradeName: string
+  classroomLabel: string
+}) {
   const { t, i18n } = useTranslation()
   const [api, setApi] = useState<CarouselApi>()
   const [selected, setSelected] = useState(0)
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
-  const notices = parentSummonNotices
   const dir = i18n.language.startsWith('ar') ? 'rtl' : 'ltr'
 
   useEffect(() => {
@@ -135,7 +152,7 @@ function ParentSummonCarousel() {
     }
   }, [api])
 
-  if (notices.length === 0) {
+  if (callups.length === 0) {
     return (
       <div className="mt-8 flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-dark/15 bg-muted/20 px-6 py-16 text-center">
         <div className="mb-4 inline-flex size-14 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
@@ -163,9 +180,15 @@ function ParentSummonCarousel() {
         className="w-full"
       >
         <CarouselContent>
-          {notices.map((notice) => (
-            <CarouselItem key={notice.id} className="basis-full">
-              <SummonNoticeDetail notice={notice} />
+          {callups.map((callup) => (
+            <CarouselItem key={callup.id} className="basis-full">
+              <SummonNoticeDetail
+                callup={callup}
+                studentName={studentName}
+                stageName={stageName}
+                gradeName={gradeName}
+                classroomLabel={classroomLabel}
+              />
             </CarouselItem>
           ))}
         </CarouselContent>
@@ -198,10 +221,58 @@ function ParentSummonCarousel() {
 }
 
 export function ParentSummonPage() {
+  const { t } = useTranslation()
+  const {
+    callups,
+    personalName,
+    stageName,
+    gradeName,
+    classroomLabel,
+    isLoading,
+    error,
+    refreshProfile,
+  } = useProfile()
+
+  const studentName = personalName || t('profile.studentName')
+  const stage = stageName || '—'
+  const grade = gradeName || '—'
+  const classroom = classroomLabel
+    ? t('profile.parentSummon.classroomSection', { section: classroomLabel })
+    : '—'
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
+        {t('profile.loading')}
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
+        <p className="text-sm text-destructive">{error}</p>
+        <button
+          type="button"
+          onClick={() => void refreshProfile()}
+          className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
+        >
+          {t('profile.retry')}
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full">
       <PageTitle />
-      <ParentSummonCarousel />
+      <ParentSummonCarousel
+        callups={callups}
+        studentName={studentName}
+        stageName={stage}
+        gradeName={grade}
+        classroomLabel={classroom}
+      />
     </div>
   )
 }
