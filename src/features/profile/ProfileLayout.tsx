@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart3,
+  Bell,
   CalendarCheck2,
   CalendarDays,
   ClipboardList,
@@ -24,6 +25,7 @@ import { cn } from '@/lib/utils'
 
 const mainLinks = [
   { to: '/profile', key: 'personal', icon: UserRound, end: true },
+  { to: '/profile/notifications', key: 'notifications', icon: Bell },
   { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
   { to: '/profile/weekly-evaluations', key: 'weeklyEvaluations', icon: ListChecks },
   { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },

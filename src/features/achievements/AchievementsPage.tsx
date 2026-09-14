@@ -5,26 +5,29 @@ import { Pagination } from '@/components/Pagination'
 import {
   AchievementCard,
   type Achievement,
+  type AchievementAccent,
 } from '@/features/home/components/AchievementCard'
-import { achievementCatalog } from '@/features/achievements/data'
+import { getAchievements } from '@/features/achievements/achievementsApi'
+import { useApiResource } from '@/lib/useApiResource'
 import { usePagination } from '@/lib/usePagination'
 
+const ACCENTS: AchievementAccent[] = ['rose', 'gold', 'emerald']
+
 export function AchievementsPage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
+  const { data, isLoading, error, reload } = useApiResource(() => getAchievements(50), [])
 
   const achievements = useMemo<Achievement[]>(
     () =>
-      Array.from({ length: 3 }, (_, copy) =>
-        achievementCatalog.map((item) => ({
-          id: `${item.id}-${copy}`,
-          image: item.image,
-          accent: item.accent,
-          title: t(`achievements.items.${item.id}.title`),
-          body: t(`achievements.items.${item.id}.body`),
-          href: `/achievements/${item.id}`,
-        })),
-      ).flat(),
-    [t, i18n.language],
+      (data ?? []).map((item, index) => ({
+        id: item.slug,
+        image: item.image_url ?? '',
+        accent: ACCENTS[index % ACCENTS.length]!,
+        title: item.title,
+        body: item.description,
+        href: `/achievements/${item.slug}`,
+      })),
+    [data],
   )
 
   const { page, setPage, pageCount, current } = usePagination(achievements, 9)
@@ -40,22 +43,41 @@ export function AchievementsPage() {
       />
 
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {current.map((achievement) => (
-            <AchievementCard
-              key={achievement.id}
-              achievement={achievement}
-              notchClassName="bg-background"
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <p className="py-16 text-center text-sm text-brand-dark/55">{t('state.loading')}</p>
+        ) : error ? (
+          <div className="flex flex-col items-center gap-3 py-16 text-center">
+            <p className="text-sm text-destructive">{error}</p>
+            <button
+              type="button"
+              onClick={() => void reload()}
+              className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
+            >
+              {t('state.retry')}
+            </button>
+          </div>
+        ) : achievements.length === 0 ? (
+          <p className="py-16 text-center text-sm text-brand-dark/55">{t('state.empty')}</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {current.map((achievement) => (
+                <AchievementCard
+                  key={achievement.id}
+                  achievement={achievement}
+                  notchClassName="bg-background"
+                />
+              ))}
+            </div>
 
-        <Pagination
-          className="mt-12"
-          page={page}
-          pageCount={pageCount}
-          onPageChange={setPage}
-        />
+            <Pagination
+              className="mt-12"
+              page={page}
+              pageCount={pageCount}
+              onPageChange={setPage}
+            />
+          </>
+        )}
       </div>
     </section>
   )

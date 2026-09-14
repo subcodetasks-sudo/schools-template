@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { CalendarDays } from 'lucide-react'
+import { ImageWithFallback } from '@/components/ImageWithFallback'
 import { cn } from '@/lib/utils'
 
 export type SchoolEvent = {
@@ -46,7 +47,7 @@ export function EventCard({
           dense ? 'aspect-4/3' : 'h-80',
         )}
       >
-        <img
+        <ImageWithFallback
           src={event.image}
           alt={event.title}
           className="size-full object-cover"

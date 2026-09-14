@@ -7,12 +7,17 @@ import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import { PageBanner } from '@/components/PageBanner'
 import { Button } from '@/components/ui/button'
+import { getContactInfo, sendContactMessage, type ContactMessagePayload } from '@/features/contact/contactApi'
+import { ApiError, getErrorMessage, getFieldErrors } from '@/lib/api'
+import { useApiResource } from '@/lib/useApiResource'
 import { cn } from '@/lib/utils'
 
 const contactSchema = z.object({
   name: z.string().min(2),
   email: z.email(),
-  message: z.string().min(10),
+  phone: z.string().optional(),
+  subject: z.string().optional(),
+  message: z.string().min(10).max(5000),
 })
 
 type ContactForm = z.infer<typeof contactSchema>
@@ -22,27 +27,59 @@ const fieldClass =
 
 export function ContactPage() {
   const { t } = useTranslation()
+  const { data: contacts } = useApiResource(() => getContactInfo(), [])
+  const info = contacts?.[0]
+
   const {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
   })
 
-  const onSubmit = handleSubmit(async () => {
-    await new Promise((r) => setTimeout(r, 400))
-    toast.success(t('contact.form.success'))
-    reset()
+  const onSubmit = handleSubmit(async (values) => {
+    const payload: ContactMessagePayload = {
+      name: values.name,
+      email: values.email,
+      message: values.message,
+      phone: values.phone || undefined,
+      subject: values.subject || undefined,
+    }
+
+    try {
+      await sendContactMessage(payload)
+      toast.success(t('contact.form.success'))
+      reset()
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 422) {
+        const fieldErrors = getFieldErrors(err)
+        for (const [field, messages] of Object.entries(fieldErrors ?? {})) {
+          if (messages?.[0] && field in contactSchema.shape) {
+            setError(field as keyof ContactForm, { message: messages[0] })
+          }
+        }
+      }
+      toast.error(getErrorMessage(err, t('contact.form.error')))
+    }
   })
 
   const infoItems = [
-    { icon: MapPin, label: t('footer.address') },
-    { icon: Phone, label: t('footer.phone'), href: 'tel:+201001234567', dir: 'ltr' as const },
-    { icon: Mail, label: t('footer.email'), href: `mailto:${t('footer.email')}`, dir: 'ltr' as const },
-    { icon: Clock3, label: t('contact.hours') },
-  ]
+    info?.address ? { icon: MapPin, label: info.address } : null,
+    info?.phone
+      ? { icon: Phone, label: info.phone, href: `tel:${info.phone}`, dir: 'ltr' as const }
+      : null,
+    info?.email
+      ? { icon: Mail, label: info.email, href: `mailto:${info.email}`, dir: 'ltr' as const }
+      : null,
+    info?.working_hours ? { icon: Clock3, label: info.working_hours } : null,
+  ].filter((item): item is NonNullable<typeof item> => item !== null)
+
+  const mapSrc = info?.location
+    ? `https://maps.google.com/maps?q=${info.location.lat},${info.location.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+    : 'https://maps.google.com/maps?q=Mansoura%2C%20Egypt&t=&z=13&ie=UTF8&iwloc=&output=embed'
 
   return (
     <section className="bg-background pb-16">
@@ -121,6 +158,29 @@ export function ContactPage() {
                       {...register('email')}
                     />
                   </Field>
+                  <Field
+                    id="phone"
+                    label={t('contact.form.phone')}
+                    error={errors.phone?.message}
+                  >
+                    <input
+                      id="phone"
+                      dir="ltr"
+                      className={cn(fieldClass, 'h-12')}
+                      {...register('phone')}
+                    />
+                  </Field>
+                  <Field
+                    id="subject"
+                    label={t('contact.form.subject')}
+                    error={errors.subject?.message}
+                  >
+                    <input
+                      id="subject"
+                      className={cn(fieldClass, 'h-12')}
+                      {...register('subject')}
+                    />
+                  </Field>
                 </div>
                 <Field
                   id="message"
@@ -150,7 +210,7 @@ export function ContactPage() {
         <div className="mt-10 overflow-hidden rounded-[1.75rem] border border-brand-muted/50 bg-white shadow-sm">
           <iframe
             title={t('footer.mapTitle')}
-            src="https://maps.google.com/maps?q=Mansoura%2C%20Egypt&t=&z=13&ie=UTF8&iwloc=&output=embed"
+            src={mapSrc}
             className="h-64 w-full border-0 grayscale-20 sm:h-80"
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

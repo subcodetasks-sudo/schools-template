@@ -22,6 +22,7 @@ import { SchedulePage } from '@/features/profile/SchedulePage'
 import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
 import { StatisticsPage } from '@/features/profile/StatisticsPage'
 import { AttendancePage } from '@/features/profile/AttendancePage'
+import { NotificationsPage } from '@/features/notifications/NotificationsPage'
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
               {
                 path: 'statistics',
                 element: <StatisticsPage />,
+              },
+              {
+                path: 'notifications',
+                element: <NotificationsPage />,
               },
             ],
           },

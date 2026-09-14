@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ImageWithFallback } from '@/components/ImageWithFallback'
 import { cn } from '@/lib/utils'
 
 export type BlogPost = {
@@ -28,7 +29,7 @@ export function BlogCard({ post, readMoreLabel, className }: BlogCardProps) {
       )}
     >
       <Link to={href} className="aspect-4/3 overflow-hidden">
-        <img
+        <ImageWithFallback
           src={post.image}
           alt={post.title}
           className="size-full object-cover transition-transform duration-300 hover:scale-[1.02]"

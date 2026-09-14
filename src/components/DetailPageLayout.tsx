@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react'
 import { PageBanner, type PageBreadcrumb } from '@/components/PageBanner'
+import { ImageWithFallback } from '@/components/ImageWithFallback'
 import { cn } from '@/lib/utils'
 
 export type DetailSection = {
   title: string
   body: string
+  /** Render `body` as HTML (e.g. rich-text article content) instead of plain text. */
+  html?: boolean
 }
 
 type DetailPageLayoutProps = {
@@ -39,7 +42,7 @@ export function DetailPageLayout({
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
         <div className="relative mt-6 overflow-hidden rounded-t-[1.75rem] lg:mt-8 lg:w-[calc(100%-8rem)] w-full ">
           <div className="relative max-h-[500px] w-full">
-            <img
+            <ImageWithFallback
               src={image}
               alt={imageAlt}
               className="size-full object-cover"
@@ -67,9 +70,16 @@ export function DetailPageLayout({
                   <h3 className="border-s-4 border-brand-primary ps-3 text-lg font-bold leading-snug text-brand-dark sm:text-xl">
                     {section.title}
                   </h3>
-                  <p className="mt-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8">
-                    {section.body}
-                  </p>
+                  {section.html ? (
+                    <div
+                      className="mt-3 space-y-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8 [&_a]:text-brand-primary [&_a]:underline [&_img]:my-4 [&_img]:rounded-xl"
+                      dangerouslySetInnerHTML={{ __html: section.body }}
+                    />
+                  ) : (
+                    <p className="mt-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8">
+                      {section.body}
+                    </p>
+                  )}
                 </section>
               ))}
             </div>

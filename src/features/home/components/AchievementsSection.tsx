@@ -12,26 +12,11 @@ import {
   type Achievement,
   type AchievementAccent,
 } from '@/features/home/components/AchievementCard'
+import { getAchievements } from '@/features/achievements/achievementsApi'
+import { useApiResource } from '@/lib/useApiResource'
 import { cn } from '@/lib/utils'
 
-const images = {
-  campus: '/school.png',
-  events: '/achiv-2.jpg',
-  art: '/achive-3.jpg',
-} as const
-
-const items = [
-  { id: 'campusAward', image: images.campus, accent: 'rose' },
-  { id: 'artTalents', image: images.art, accent: 'gold' },
-  { id: 'nationalEvents', image: images.events, accent: 'emerald' },
-  { id: 'campusEnvironment', image: images.campus, accent: 'rose' },
-  { id: 'creativePrograms', image: images.art, accent: 'gold' },
-  { id: 'studentLife', image: images.events, accent: 'emerald' },
-] as const satisfies ReadonlyArray<{
-  id: string
-  image: string
-  accent: AchievementAccent
-}>
+const ACCENTS: AchievementAccent[] = ['rose', 'gold', 'emerald']
 
 export function AchievementsSection() {
   const { t, i18n } = useTranslation()
@@ -39,17 +24,19 @@ export function AchievementsSection() {
   const [api, setApi] = useState<CarouselApi>()
   const [selected, setSelected] = useState(0)
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+  const { data } = useApiResource(() => getAchievements(6), [])
 
   const achievements = useMemo<Achievement[]>(
     () =>
-      items.map((item) => ({
-        id: item.id,
-        image: item.image,
-        accent: item.accent,
-        title: t(`achievements.items.${item.id}.title`),
-        body: t(`achievements.items.${item.id}.body`),
+      (data ?? []).map((item, index) => ({
+        id: item.slug,
+        image: item.image_url ?? '',
+        accent: ACCENTS[index % ACCENTS.length]!,
+        title: item.title,
+        body: item.description,
+        href: `/achievements/${item.slug}`,
       })),
-    [t, i18n.language],
+    [data],
   )
 
   useEffect(() => {
@@ -68,6 +55,8 @@ export function AchievementsSection() {
       api.off('reInit', sync)
     }
   }, [api])
+
+  if (achievements.length === 0) return null
 
   return (
     <section className="bg-muted py-16 sm:py-20">

@@ -8,16 +8,9 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel'
 import { BlogCard, type BlogPost } from '@/features/home/components/BlogCard'
+import { getBlogArticles } from '@/features/blog/blogApi'
+import { useApiResource } from '@/lib/useApiResource'
 import { cn } from '@/lib/utils'
-
-const posts = [
-  { id: 'learningHabits', image: '/event-1.jpg' },
-  { id: 'creativeClassroom', image: '/event-3.jpg' },
-  { id: 'sportsSpirit', image: '/event-4.jpg' },
-  { id: 'communityCare', image: '/event-2.jpg' },
-  { id: 'campusLife', image: '/school.png' },
-  { id: 'stageTalent', image: '/event-1.jpg' },
-] as const
 
 export function BlogSection() {
   const { t, i18n } = useTranslation()
@@ -25,17 +18,18 @@ export function BlogSection() {
   const [api, setApi] = useState<CarouselApi>()
   const [selected, setSelected] = useState(0)
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([])
+  const { data } = useApiResource(() => getBlogArticles(), [])
 
   const articles = useMemo<BlogPost[]>(
     () =>
-      posts.map((post) => ({
-        id: post.id,
-        image: post.image,
-        title: t(`blog.items.${post.id}.title`),
-        body: t(`blog.items.${post.id}.body`),
-        href: `/blog/${post.id}`,
+      (data ?? []).slice(0, 6).map((post) => ({
+        id: post.slug,
+        image: post.thumbnail_url ?? '',
+        title: post.title,
+        body: post.content.replace(/<[^>]+>/g, ' ').trim(),
+        href: `/blog/${post.slug}`,
       })),
-    [t, i18n.language],
+    [data],
   )
 
   useEffect(() => {
@@ -54,6 +48,8 @@ export function BlogSection() {
       api.off('reInit', sync)
     }
   }, [api])
+
+  if (articles.length === 0) return null
 
   return (
     <section className="bg-muted py-16 sm:py-20">

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ImageWithFallback } from '@/components/ImageWithFallback'
 import { cn } from '@/lib/utils'
 
 export type AchievementAccent = 'emerald' | 'gold' | 'rose'
@@ -47,7 +48,7 @@ export function AchievementCard({
       />
 
       <div className="aspect-16/10 shrink-0 overflow-hidden">
-        <img
+        <ImageWithFallback
           src={achievement.image}
           alt={achievement.title}
           className="size-full object-cover"

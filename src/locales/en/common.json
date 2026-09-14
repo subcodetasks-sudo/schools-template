@@ -2,6 +2,11 @@
   "brand": "Mansoura Distinguished Languages School 2",
   "brandShort": "MDLS 2",
   "viewAll": "View all",
+  "state": {
+    "loading": "Loading...",
+    "retry": "Try again",
+    "empty": "Nothing to show yet."
+  },
   "nav": {
     "home": "Home",
     "topStudents": "Top students",
@@ -10,7 +15,8 @@
     "blog": "Blog",
     "contact": "Contact",
     "login": "Log in",
-    "myProfile": "My profile"
+    "myProfile": "My profile",
+    "notifications": "Notifications"
   },
   "language": {
     "label": "Language",
@@ -154,11 +160,7 @@
     "title": "Terms of applying",
     "body": "Review the admission requirements and application terms before starting your child's enrollment.",
     "heroTitle": "Mansoura Distinguished Languages School 2",
-    "heroSubtitle": "MDLS 2",
     "subtitle": "Mansoura, Dakahlia Governorate",
-    "paragraph1": "The school follows a modern educational approach that combines academic excellence, activities, and character building in a safe and motivating environment.",
-    "paragraph2": "Admissions are open according to age requirements and available seats in each stage, with priority for students who complete the required documents and placement steps.",
-    "paragraph3": "Our admissions team supports parents through each step to ensure a smooth and transparent application process from inquiry to enrollment.",
     "ctaPrimary": "Call the school",
     "ctaSecondary": "Other ways to contact"
   },
@@ -175,7 +177,8 @@
       "agenda": "Event agenda",
       "notes": "Important notes",
       "story": "The story behind it",
-      "impact": "Impact on our school"
+      "impact": "Impact on our school",
+      "gallery": "Gallery"
     },
     "blogHighlights": "This article shares practical ideas from our teachers and school community to help families support learning with confidence and care.",
     "blogMore": "We invite parents and students to apply these ideas at home and stay connected with school activities throughout the year.",
@@ -194,9 +197,12 @@
     "form": {
       "name": "Full name",
       "email": "Email",
+      "phone": "Phone (optional)",
+      "subject": "Subject (optional)",
       "message": "Message",
       "submit": "Send message",
-      "success": "Your message was sent successfully"
+      "success": "Your message was sent successfully",
+      "error": "Could not send your message. Please try again"
     }
   },
   "login": {
@@ -231,6 +237,24 @@
     "prev": "Previous page",
     "next": "Next page",
     "page": "Page {{page}}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet.",
+    "emptyDescription": "Attendance updates and profile changes will appear here.",
+    "markAllRead": "Mark all as read",
+    "delete": "Delete notification",
+    "viewAll": "View all notifications",
+    "loadError": "Could not load notifications.",
+    "deleteError": "Could not delete this notification.",
+    "markAllError": "Could not mark notifications as read.",
+    "new": "New notification",
+    "types": {
+      "attendance": "Attendance",
+      "student_profile": "Profile",
+      "chat_message": "Message",
+      "generic": "Notice"
+    }
   },
   "footer": {
     "rights": "All rights reserved.",
@@ -301,6 +325,7 @@
     "logout": "Log out",
     "nav": {
       "personal": "Personal profile",
+      "notifications": "Notifications",
       "certificate": "Student certificate",
       "monthlyEvaluations": "Monthly evaluations",
       "weeklyEvaluations": "Weekly evaluations",

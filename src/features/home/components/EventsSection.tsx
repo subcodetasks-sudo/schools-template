@@ -8,29 +8,12 @@ import {
   type CarouselApi,
 } from '@/components/ui/carousel'
 import { EventCard, type SchoolEvent } from '@/features/home/components/EventCard'
+import { formatEventDate, getEvents } from '@/features/events/eventsApi'
+import { useApiResource } from '@/lib/useApiResource'
 import { cn } from '@/lib/utils'
-
-const items = [
-  { id: 'theater', image: '/event-1.jpg', date: '2026-01-13' },
-  { id: 'community', image: '/event-2.jpg', date: '2026-02-08' },
-  { id: 'childrensDay', image: '/event-3.jpg', date: '2026-03-21' },
-  { id: 'swimming', image: '/event-4.jpg', date: '2026-04-12' },
-  { id: 'campusVisit', image: '/school.png', date: '2026-05-18' },
-  { id: 'readingWeek', image: '/event-1.jpg', date: '2026-06-09' },
-  { id: 'sportsDay', image: '/event-4.jpg', date: '2026-07-15' },
-] as const
 
 /** Extra copies so Embla loop always has content on both sides. */
 const LOOP_COPIES = 3
-
-function formatEventDate(isoDate: string, language: string) {
-  const locale = language.startsWith('ar') ? 'ar-EG' : 'en-GB'
-  return new Intl.DateTimeFormat(locale, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(`${isoDate}T12:00:00`))
-}
 
 function applyCoverflow(api: NonNullable<CarouselApi>, isRtl: boolean) {
   const engine = api.internalEngine()
@@ -77,17 +60,19 @@ export function EventsSection() {
   const [api, setApi] = useState<CarouselApi>()
   const [selected, setSelected] = useState(0)
   const rafId = useRef(0)
+  const { data } = useApiResource(() => getEvents('upcoming'), [])
 
   const events = useMemo<SchoolEvent[]>(
     () =>
-      items.map((item) => ({
-        id: item.id,
-        image: item.image,
-        dateLabel: formatEventDate(item.date, i18n.language),
-        title: t(`events.items.${item.id}.title`),
-        body: t(`events.items.${item.id}.body`),
+      (data ?? []).map((item) => ({
+        id: item.slug,
+        image: item.image_url ?? '',
+        dateLabel: formatEventDate(item.event_date, i18n.language),
+        title: item.title,
+        body: item.description,
+        href: `/events/${item.slug}`,
       })),
-    [t, i18n.language],
+    [data, i18n.language],
   )
 
   const carouselEvents = useMemo(
@@ -150,6 +135,8 @@ export function EventsSection() {
     const safeCopy = Math.min(Math.max(copy, 0), LOOP_COPIES - 1)
     api.scrollTo(safeCopy * logicalCount + logicalIndex)
   }
+
+  if (logicalCount === 0) return null
 
   return (
     <section className="overflow-x-clip bg-background py-16 sm:py-20">

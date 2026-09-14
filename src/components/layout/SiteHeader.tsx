@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { formatStudentAccountId } from '@/features/auth/authApi'
 import { useAuth } from '@/features/auth/userStore'
+import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { defaultProfilePhoto } from '@/features/profile/profileData'
 import { cn } from '@/lib/utils'
 
@@ -244,6 +245,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          <NotificationBell />
           <Button
             type="button"
             onClick={toggleLanguage}

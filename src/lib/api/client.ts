@@ -153,6 +153,10 @@ export async function apiPost<T>(url: string, data?: unknown, config?: AxiosRequ
   return apiRequest<T>({ ...config, method: 'POST', url, data })
 }
 
+export async function apiPut<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+  return apiRequest<T>({ ...config, method: 'PUT', url, data })
+}
+
 export async function apiUpload<T>(url: string, data: FormData, config?: AxiosRequestConfig) {
   return apiRequest<T>({
     ...config,
@@ -183,4 +187,14 @@ export function unwrapData<T>(payload: ApiEnvelope<T> | T): T {
   }
 
   return first
+}
+
+/** Unwraps a list endpoint's envelope, tolerating a plain array or a Laravel-style paginated `{ data: [...] }` shape. */
+export function unwrapList<T>(payload: ApiEnvelope<T[]> | ApiEnvelope<{ data: T[] }> | T[]): T[] {
+  const data = unwrapData(payload as ApiEnvelope<unknown>)
+  if (Array.isArray(data)) return data as T[]
+  if (data && typeof data === 'object' && Array.isArray((data as { data?: unknown }).data)) {
+    return (data as { data: T[] }).data
+  }
+  return []
 }

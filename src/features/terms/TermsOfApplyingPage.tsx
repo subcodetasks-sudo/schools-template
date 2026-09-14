@@ -2,9 +2,13 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Globe, Mail, Phone, PhoneCall, Share2 } from 'lucide-react'
 import { PageBanner } from '@/components/PageBanner'
+import { ImageWithFallback } from '@/components/ImageWithFallback'
+import { getApplicationTerms } from '@/features/terms/termsApi'
+import { useApiResource } from '@/lib/useApiResource'
 
 export function TermsOfApplyingPage() {
   const { t } = useTranslation()
+  const { data: terms, isLoading, error, reload } = useApiResource(() => getApplicationTerms(), [])
 
   return (
     <section className="bg-background pb-16 sm:pb-20">
@@ -45,10 +49,46 @@ export function TermsOfApplyingPage() {
 
           <div className="mx-auto mt-6 h-px max-w-4xl bg-brand-muted/40" />
 
-          <div className="mx-auto mt-6 max-w-4xl space-y-4 text-center text-sm leading-7 text-brand-dark/70 sm:text-base">
-            <p>{t('termsOfApplying.paragraph1')}</p>
-            <p>{t('termsOfApplying.paragraph2')}</p>
-            <p>{t('termsOfApplying.paragraph3')}</p>
+          <div className="mx-auto mt-8 max-w-4xl">
+            {isLoading ? (
+              <p className="py-8 text-center text-sm text-brand-dark/55">{t('state.loading')}</p>
+            ) : error ? (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <p className="text-sm text-destructive">{error}</p>
+                <button
+                  type="button"
+                  onClick={() => void reload()}
+                  className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
+                >
+                  {t('state.retry')}
+                </button>
+              </div>
+            ) : !terms || terms.length === 0 ? (
+              <p className="py-8 text-center text-sm text-brand-dark/55">{t('state.empty')}</p>
+            ) : (
+              <ul className="space-y-4">
+                {terms.map((term) => (
+                  <li
+                    key={term.id}
+                    className="flex items-start gap-4 rounded-2xl border border-brand-dark/8 bg-white px-5 py-4 text-start shadow-sm"
+                  >
+                    <ImageWithFallback
+                      src={term.icon_url}
+                      alt=""
+                      className="mt-0.5 size-9 shrink-0 rounded-full object-cover"
+                    />
+                    <div>
+                      <h3 className="text-sm font-bold text-brand-dark sm:text-base">
+                        {term.title}
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-brand-dark/60">
+                        {term.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           <div className="mt-9 flex flex-col-reverse items-center justify-center gap-3 sm:flex-row sm:items-center sm:gap-5">
