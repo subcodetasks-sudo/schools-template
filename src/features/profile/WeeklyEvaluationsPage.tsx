@@ -20,6 +20,10 @@ import {
 import { cn } from '@/lib/utils'
 
 const FILTER_MONTHS: StudentWeeklyAssessmentMonth[] = [
+  'september',
+  'october',
+  'november',
+  'december',
   'january',
   'february',
   'march',
@@ -28,7 +32,6 @@ const FILTER_MONTHS: StudentWeeklyAssessmentMonth[] = [
   'june',
   'july',
   'august',
-  'september',
 ]
 
 function formatPercentage(value: number | null | undefined) {

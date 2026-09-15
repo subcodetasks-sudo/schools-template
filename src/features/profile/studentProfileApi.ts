@@ -251,6 +251,9 @@ export type StudentWeeklyAssessmentMonth =
   | 'july'
   | 'august'
   | 'september'
+  | 'october'
+  | 'november'
+  | 'december'
 
 export type StudentWeeklyAssessmentSubject = {
   id: number
@@ -343,6 +346,60 @@ export async function getStudentWeeklyAssessments(query: StudentWeeklyAssessment
 
   const response = await apiGet<StudentWeeklyAssessmentsPayload>(
     '/v1/auth/student/profile/weekly-assessments',
+    {
+      requiresAuth: true,
+      params,
+    },
+  )
+  return unwrapData(response)
+}
+
+export type StudentMonthlyAssessmentRow = {
+  month: StudentWeeklyAssessmentMonth | string
+  academic_year?: string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
+  subject?: StudentWeeklyAssessmentSubject | null
+  sessions: number
+  score: number
+  max: number
+  percentage: number | null
+}
+
+export type StudentMonthlyAssessmentsPayload = {
+  student?: {
+    id?: string
+    name?: string | null
+    code?: string | null
+    stage?: StudentNamedRef | null
+    grade?: StudentNamedRef | null
+    classroom?: StudentNamedRef | null
+  } | null
+  filters?: {
+    academic_year?: string | null
+    term?: StudentWeeklyAssessmentTerm | string | null
+    subject_id?: number | null
+  } | null
+  summary: {
+    total_score: number
+    total_max: number
+    percentage: number | null
+  }
+  months: StudentMonthlyAssessmentRow[]
+}
+
+export type StudentMonthlyAssessmentsQuery = {
+  academic_year?: string
+  term?: StudentWeeklyAssessmentTerm | string
+  subject_id?: number | string
+}
+
+export async function getStudentMonthlyAssessments(query: StudentMonthlyAssessmentsQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(query).filter(([, value]) => value != null && value !== ''),
+  )
+
+  const response = await apiGet<StudentMonthlyAssessmentsPayload>(
+    '/v1/auth/student/profile/monthly-assessments',
     {
       requiresAuth: true,
       params,

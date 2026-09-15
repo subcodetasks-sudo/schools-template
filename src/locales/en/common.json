@@ -579,22 +579,23 @@
       "studentName": "Student name",
       "grade": "Grade level",
       "className": "Class",
-      "emptyTitle": "No data available for this month",
-      "emptyDescription": "Contact the school for more details",
+      "loadError": "Could not load monthly assessments.",
+      "academicYear": "Academic year {{year}}",
+      "emptyTitle": "No monthly assessments recorded",
+      "emptyDescription": "Monthly assessments appear here after weekly scores are published for the month.",
       "grandTotal": "Total",
-      "columns": {
-        "subject": "Subject",
-        "performanceTasks": "Performance tasks",
-        "homeworkNotebook": "Homework notebook",
-        "activityNotebook": "Activity notebook",
-        "weeklyEvaluation": "Weekly evaluation",
-        "attendanceBehavior": "Attendance and behavior",
-        "total": "Grand total"
+      "summary": {
+        "percentage": "Overall percentage",
+        "subjects": "Subjects",
+        "totalScore": "Total score"
       },
-      "subjects": {
-        "arabic": "Arabic",
-        "english": "English",
-        "math": "Mathematics"
+      "columns": {
+        "month": "Month",
+        "subject": "Subject",
+        "sessions": "Sessions",
+        "score": "Score",
+        "max": "Max",
+        "percentage": "Percentage"
       }
     },
     "weeklyEvaluations": {
@@ -638,7 +639,10 @@
         "june": "June",
         "july": "July",
         "august": "August",
-        "september": "September"
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
       },
       "scoreColumns": {
         "weekly": "Weekly assessment",

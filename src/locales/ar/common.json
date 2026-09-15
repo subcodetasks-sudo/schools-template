@@ -579,22 +579,23 @@
       "studentName": "اسم الطالب",
       "grade": "الصف الدراسي",
       "className": "الفصل الدراسي",
-      "emptyTitle": "لا توجد بيانات متاحة لهذا الشهر",
-      "emptyDescription": "تواصل مع المدرسة لمزيد من التفاصيل",
+      "loadError": "تعذر تحميل التقييمات الشهرية.",
+      "academicYear": "العام الدراسي {{year}}",
+      "emptyTitle": "لا توجد تقييمات شهرية مسجّلة",
+      "emptyDescription": "ستظهر هنا التقييمات الشهرية بعد نشر درجات التقييم الأسبوعي للشهر.",
       "grandTotal": "الاجمالي",
-      "columns": {
-        "subject": "المادة",
-        "performanceTasks": "المهام الأدائية",
-        "homeworkNotebook": "كراسة الواجب",
-        "activityNotebook": "كراسة النشاط",
-        "weeklyEvaluation": "التقييم الأسبوعي",
-        "attendanceBehavior": "المواظبة والسلوك",
-        "total": "المجموع الكلي"
+      "summary": {
+        "percentage": "النسبة العامة",
+        "subjects": "عدد المواد",
+        "totalScore": "مجموع الدرجات"
       },
-      "subjects": {
-        "arabic": "اللغة العربية",
-        "english": "اللغة الإنجليزية",
-        "math": "الرياضيات"
+      "columns": {
+        "month": "الشهر",
+        "subject": "المادة",
+        "sessions": "عدد الأسابيع",
+        "score": "الدرجة",
+        "max": "من",
+        "percentage": "النسبة"
       }
     },
     "weeklyEvaluations": {
@@ -638,7 +639,10 @@
         "june": "يونيو",
         "july": "يوليو",
         "august": "أغسطس",
-        "september": "سبتمبر"
+        "september": "سبتمبر",
+        "october": "أكتوبر",
+        "november": "نوفمبر",
+        "december": "ديسمبر"
       },
       "scoreColumns": {
         "weekly": "التقييم الأسبوعي",
