@@ -256,6 +256,28 @@
       "generic": "Notice"
     }
   },
+  "finalResults": {
+    "ministryManagedHint": "Final results for this grade are managed by the ministry. The school certificate matrix is not available here.",
+    "table": {
+      "student": "Student",
+      "classroom": "Classroom",
+      "status": "Status"
+    },
+    "sheet": {
+      "seatNumber": "Seat number",
+      "yearWork": "Year work",
+      "finalExam": "Final exam",
+      "subjectTotal": "Subject total",
+      "grandTotal": "Grand total",
+      "empty": "No certificate rows for this student.",
+      "noSubjects": "No approved subjects for this term yet.",
+      "results": {
+        "passed": "Passed",
+        "failed": "Failed",
+        "pending": "Pending"
+      }
+    }
+  },
   "footer": {
     "rights": "All rights reserved.",
     "importantLinks": "Important links",
@@ -420,10 +442,16 @@
       }
     },
     "certificate": {
-      "codeLabel": "Enter the code to see your results",
-      "codePlaceholder": "Enter student code",
-      "showResult": "Show result",
-      "codeRequired": "Please enter the code.",
+      "codeLabel": "Enter or scan your student-card QR",
+      "codePlaceholder": "QR token or verify link",
+      "showResult": "Unlock certificate",
+      "codeRequired": "Please enter the QR token.",
+      "unlockHint": "Your success certificate is shown only after you enter or scan the current student-card QR. Leaving this page or refreshing locks it again.",
+      "unlockSuccess": "Certificate unlocked successfully",
+      "unlockError": "Could not unlock the certificate. Check the QR and try again.",
+      "unlocking": "Unlocking...",
+      "loadError": "Could not load the success certificate.",
+      "academicYear": "Academic year {{year}}",
       "formTitle": "Student evaluation form according to Ministerial Decree 136 of 2024, first term for the academic year 2025/2026",
       "gradeLevel": "First grade primary",
       "studentName": "Student name",
