@@ -1,9 +1,8 @@
 import { apiPost, unwrapData } from '@/lib/api'
 
-export type RegisterStep1Payload = {
-  national_id: string
-  code: string
-}
+export type RegisterStep1Payload =
+  | { national_id: string; code: string; passport_number?: never }
+  | { passport_number: string; code: string; national_id?: never }
 
 export type RegisterStep1Result = {
   token: string
@@ -11,7 +10,8 @@ export type RegisterStep1Result = {
   student: {
     name?: string
     code?: string
-    national_id?: string
+    national_id?: string | null
+    passport_number?: string | null
   }
 }
 
@@ -237,7 +237,8 @@ export async function registerStep1(payload: RegisterStep1Payload) {
     student: data.student ?? {
       name: undefined,
       code: payload.code,
-      national_id: payload.national_id,
+      national_id: 'national_id' in payload ? payload.national_id : null,
+      passport_number: 'passport_number' in payload ? payload.passport_number : null,
     },
   } satisfies RegisterStep1Result
 }

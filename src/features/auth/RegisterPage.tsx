@@ -17,10 +17,37 @@ import {
 import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
-const stepOneSchema = z.object({
-  nationalId: z.string().min(10),
-  code: z.string().min(4),
-})
+type StudentIdentityType = 'egyptian' | 'foreigner'
+
+const stepOneSchema = z
+  .object({
+    identityType: z.enum(['egyptian', 'foreigner']),
+    nationalId: z.string().optional(),
+    passportNumber: z.string().optional(),
+    code: z.string().min(4),
+  })
+  .superRefine((data, ctx) => {
+    if (data.identityType === 'egyptian') {
+      const nationalId = data.nationalId?.trim() ?? ''
+      if (nationalId.length < 10) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['nationalId'],
+          message: 'required',
+        })
+      }
+      return
+    }
+
+    const passportNumber = data.passportNumber?.trim() ?? ''
+    if (passportNumber.length < 4) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['passportNumber'],
+        message: 'required',
+      })
+    }
+  })
 
 const stepTwoSchema = z
   .object({
@@ -50,6 +77,12 @@ export function RegisterPage() {
 
   const stepOneForm = useForm<StepOneForm>({
     resolver: zodResolver(stepOneSchema),
+    defaultValues: {
+      identityType: 'egyptian',
+      nationalId: '',
+      passportNumber: '',
+      code: '',
+    },
   })
 
   const stepTwoForm = useForm<StepTwoForm>({
@@ -57,17 +90,24 @@ export function RegisterPage() {
     defaultValues: { phone: '', password: '', confirmPassword: '' },
   })
 
+  const identityType =
+    useWatch({ control: stepOneForm.control, name: 'identityType' }) ?? 'egyptian'
   const password = useWatch({ control: stepTwoForm.control, name: 'password' }) ?? ''
 
   const passwordChecks = useMemo(() => {
     const hasMinLength = password.length >= 8
     const hasUppercase = /[A-Z]/.test(password)
     const hasNoPersonalInfo = !/(name|email|admin)/i.test(password)
-    const isStrong = hasMinLength && hasUppercase && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)
+    const isStrong =
+      hasMinLength && hasUppercase && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)
 
     return [
       { key: 'strong', met: isStrong, label: t('register.checks.strong') },
-      { key: 'noPersonal', met: hasNoPersonalInfo && password.length > 0, label: t('register.checks.noPersonal') },
+      {
+        key: 'noPersonal',
+        met: hasNoPersonalInfo && password.length > 0,
+        label: t('register.checks.noPersonal'),
+      },
       { key: 'minLength', met: hasMinLength, label: t('register.checks.minLength') },
       { key: 'uppercase', met: hasUppercase, label: t('register.checks.uppercase') },
     ] as const
@@ -75,12 +115,24 @@ export function RegisterPage() {
 
   const phoneRegister = stepTwoForm.register('phone')
 
+  const setIdentityType = (type: StudentIdentityType) => {
+    stepOneForm.setValue('identityType', type, { shouldValidate: true })
+    stepOneForm.clearErrors(['nationalId', 'passportNumber'])
+  }
+
   const onStepOne = stepOneForm.handleSubmit(async (data) => {
     try {
-      const result = await registerStep1({
-        national_id: data.nationalId,
-        code: data.code,
-      })
+      const code = data.code.trim()
+      const result =
+        data.identityType === 'egyptian'
+          ? await registerStep1({
+              national_id: data.nationalId!.trim(),
+              code,
+            })
+          : await registerStep1({
+              passport_number: data.passportNumber!.trim(),
+              code,
+            })
       setRegistrationToken(result.token)
       setStep(2)
     } catch (error) {
@@ -112,7 +164,7 @@ export function RegisterPage() {
 
   return (
     <AuthShell panelTitle={t('register.title')} panelBody={t('register.panelBody')}>
-      <h1 className="mb-8 text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl text-center">
+      <h1 className="mb-8 text-center text-3xl font-bold tracking-tight text-brand-primary sm:text-4xl">
         {t('register.title')}
       </h1>
 
@@ -120,19 +172,81 @@ export function RegisterPage() {
 
       {step === 1 ? (
         <form onSubmit={onStepOne} className="mt-8 space-y-5">
-          <Field
-            id="nationalId"
-            label={t('register.nationalId')}
-            error={stepOneForm.formState.errors.nationalId?.message}
-          >
-            <input
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-brand-dark">
+              {t('register.identityType')}
+            </p>
+            <div
+              role="radiogroup"
+              aria-label={t('register.identityType')}
+              className="grid grid-cols-2 gap-2 rounded-xl border border-brand-dark/10 bg-muted/30 p-1"
+            >
+              {(
+                [
+                  { value: 'egyptian', label: t('register.egyptian') },
+                  { value: 'foreigner', label: t('register.foreigner') },
+                ] as const
+              ).map((option) => {
+                const selected = identityType === option.value
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setIdentityType(option.value)}
+                    className={cn(
+                      'h-10 rounded-lg text-sm font-semibold transition-colors',
+                      selected
+                        ? 'bg-white text-brand-primary shadow-sm'
+                        : 'text-brand-dark/60 hover:text-brand-dark',
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          {identityType === 'egyptian' ? (
+            <Field
               id="nationalId"
-              inputMode="numeric"
-              placeholder={t('register.nationalIdPlaceholder')}
-              className={authFieldClass}
-              {...stepOneForm.register('nationalId')}
-            />
-          </Field>
+              label={t('register.nationalId')}
+              error={
+                stepOneForm.formState.errors.nationalId
+                  ? t('register.nationalIdRequired')
+                  : undefined
+              }
+            >
+              <input
+                id="nationalId"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder={t('register.nationalIdPlaceholder')}
+                className={authFieldClass}
+                {...stepOneForm.register('nationalId')}
+              />
+            </Field>
+          ) : (
+            <Field
+              id="passportNumber"
+              label={t('register.passportNumber')}
+              error={
+                stepOneForm.formState.errors.passportNumber
+                  ? t('register.passportNumberRequired')
+                  : undefined
+              }
+            >
+              <input
+                id="passportNumber"
+                autoComplete="off"
+                placeholder={t('register.passportNumberPlaceholder')}
+                className={authFieldClass}
+                {...stepOneForm.register('passportNumber')}
+              />
+            </Field>
+          )}
 
           <Field
             id="code"
