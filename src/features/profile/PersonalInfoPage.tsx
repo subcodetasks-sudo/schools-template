@@ -1,25 +1,30 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
+  AlertTriangle,
   BadgeCheck,
   Briefcase,
   CalendarDays,
   Camera,
   CreditCard,
   FileBadge,
+  GraduationCap,
   Hash,
   Home,
   IdCard,
+  Link2,
   Pencil,
   Phone,
   Receipt,
   RefreshCcw,
+  UserRound,
   Wallet,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { authFieldClass } from '@/features/auth/AuthShell'
@@ -28,6 +33,7 @@ import { getErrorMessage } from '@/lib/api'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
   editableProfileFields,
+  getContactCompleteness,
   profileFieldKeys,
   readOnlyProfileFields,
   type ProfileData,
@@ -51,6 +57,12 @@ const fields = [
   { key: 'fatherAddress', icon: Home },
   { key: 'fatherJob', icon: Briefcase },
   { key: 'fatherPhone', icon: Phone },
+  { key: 'guardianName', icon: UserRound },
+  { key: 'guardianRelation', icon: Link2 },
+  { key: 'guardianNationalId', icon: IdCard },
+  { key: 'guardianQualification', icon: GraduationCap },
+  { key: 'guardianJob', icon: Briefcase },
+  { key: 'guardianAddress', icon: Home },
 ] as const satisfies ReadonlyArray<{ key: ProfileFieldKey; icon: typeof IdCard }>
 
 function normalizeLookupKey(value: string) {
@@ -102,6 +114,20 @@ export function PersonalInfoPage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const studentName = personalName || t('profile.studentName')
   const studentInitials = personalInitials || getUserInitials(studentName)
+  const contactCompleteness = useMemo(
+    () => getContactCompleteness(profileData),
+    [profileData],
+  )
+  const incompleteContactMessage = useMemo(() => {
+    if (!contactCompleteness.incomplete) return null
+    if (contactCompleteness.fatherIncomplete && contactCompleteness.guardianIncomplete) {
+      return t('profile.personal.incompleteContact.both')
+    }
+    if (contactCompleteness.fatherIncomplete) {
+      return t('profile.personal.incompleteContact.father')
+    }
+    return t('profile.personal.incompleteContact.guardian')
+  }, [contactCompleteness, t])
 
   const {
     register,
@@ -116,6 +142,14 @@ export function PersonalInfoPage() {
   useEffect(() => {
     reset(profileData)
   }, [profileData, reset])
+
+  useEffect(() => {
+    if (isLoading || error || !incompleteContactMessage || isEditing) return
+    toast.warning(t('profile.personal.incompleteContact.title'), {
+      id: 'profile-incomplete-contact',
+      description: incompleteContactMessage,
+    })
+  }, [error, incompleteContactMessage, isEditing, isLoading, t])
 
   const startEditing = () => {
     reset(profileData)
@@ -215,6 +249,25 @@ export function PersonalInfoPage() {
         ) : null}
       </div>
 
+      {incompleteContactMessage && !isEditing ? (
+        <Alert className="mt-6 border-amber-500/30 bg-amber-50 text-amber-950">
+          <AlertTriangle aria-hidden />
+          <AlertTitle>{t('profile.personal.incompleteContact.title')}</AlertTitle>
+          <AlertDescription>{incompleteContactMessage}</AlertDescription>
+          <AlertAction>
+            <Button
+              type="button"
+              size="sm"
+              onClick={startEditing}
+              className="h-8 gap-1.5 rounded-lg bg-amber-700 text-white hover:bg-amber-800"
+            >
+              <Pencil className="size-3.5" aria-hidden />
+              {t('profile.personal.incompleteContact.action')}
+            </Button>
+          </AlertAction>
+        </Alert>
+      ) : null}
+
       {isEditing ? (
         <form onSubmit={onSubmit} className="mt-8 space-y-8">
           <div className="rounded-2xl border border-brand-dark/10 bg-muted/20 p-5 sm:p-6">
@@ -256,8 +309,7 @@ export function PersonalInfoPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {profileFieldKeys.map((key) => {
               const readOnly = readOnlyProfileFields.includes(key)
-              const showTranslated =
-                readOnly && (key === 'religion' || key === 'registrationStatus')
+              const showTranslated = readOnly && key === 'registrationStatus'
 
               return (
                 <div key={key}>
@@ -318,7 +370,15 @@ export function PersonalInfoPage() {
         </form>
       ) : (
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
-          {fields.map((field) => (
+          {fields
+            .filter((field) => {
+              const isContactField =
+                field.key.startsWith('father') || field.key.startsWith('guardian')
+              if (!isContactField) return true
+              const value = profileData[field.key]?.trim()
+              return Boolean(value) && value !== '—'
+            })
+            .map((field) => (
             <article
               key={field.key}
               className="flex flex-col items-start gap-1.5 rounded-xl border border-brand-dark/10 bg-white px-3.5 py-3.5 shadow-sm"

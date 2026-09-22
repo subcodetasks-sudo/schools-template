@@ -14,6 +14,12 @@ export const profileFieldKeys = [
   'fatherAddress',
   'fatherJob',
   'fatherPhone',
+  'guardianName',
+  'guardianRelation',
+  'guardianNationalId',
+  'guardianQualification',
+  'guardianJob',
+  'guardianAddress',
 ] as const
 
 export type ProfileFieldKey = (typeof profileFieldKeys)[number]
@@ -37,12 +43,18 @@ export const defaultProfileData: ProfileData = {
   fatherAddress: 'المنصورة، مصر',
   fatherJob: 'مهندس',
   fatherPhone: '01011223344',
+  guardianName: '',
+  guardianRelation: '',
+  guardianNationalId: '',
+  guardianQualification: '',
+  guardianJob: '',
+  guardianAddress: '',
 }
 
+/** School-owned fields — cannot be changed via POST /profile */
 export const readOnlyProfileFields: ProfileFieldKey[] = [
   'nationalId',
   'studentCode',
-  'religion',
   'registrationStatus',
   'classNumber',
   'transfers',
@@ -52,10 +64,50 @@ export const readOnlyProfileFields: ProfileFieldKey[] = [
   'paymentAmount',
 ]
 
+/** Matches editable keys in docs/student-profile-api.md §4 */
 export const editableProfileFields: ProfileFieldKey[] = [
   'phone',
+  'religion',
   'fatherNationalId',
   'fatherAddress',
   'fatherJob',
   'fatherPhone',
+  'guardianName',
+  'guardianRelation',
+  'guardianNationalId',
+  'guardianQualification',
+  'guardianJob',
+  'guardianAddress',
 ]
+
+export const fatherProfileFields = [
+  'fatherNationalId',
+  'fatherAddress',
+  'fatherJob',
+  'fatherPhone',
+] as const satisfies ReadonlyArray<ProfileFieldKey>
+
+export const guardianProfileFields = [
+  'guardianName',
+  'guardianRelation',
+  'guardianNationalId',
+  'guardianQualification',
+  'guardianJob',
+  'guardianAddress',
+] as const satisfies ReadonlyArray<ProfileFieldKey>
+
+function isFilled(value: string | undefined) {
+  const trimmed = value?.trim()
+  return Boolean(trimmed) && trimmed !== '—'
+}
+
+export function getContactCompleteness(data: ProfileData) {
+  const fatherIncomplete = fatherProfileFields.some((key) => !isFilled(data[key]))
+  const guardianIncomplete = guardianProfileFields.some((key) => !isFilled(data[key]))
+
+  return {
+    fatherIncomplete,
+    guardianIncomplete,
+    incomplete: fatherIncomplete || guardianIncomplete,
+  }
+}

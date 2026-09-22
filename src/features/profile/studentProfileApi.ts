@@ -40,6 +40,14 @@ export type StudentPersonal = {
     job?: string | null
     phone?: string | null
   } | null
+  guardian?: {
+    name?: string | null
+    relation?: string | null
+    national_id?: string | null
+    qualification?: string | null
+    job?: string | null
+    address?: string | null
+  } | null
 }
 
 export type StudentScheduleEntry = {
@@ -97,6 +105,12 @@ export type UpdateStudentProfilePayload = {
   father_address?: string
   father_job?: string
   father_phone?: string
+  guardian_name?: string
+  guardian_relation?: string
+  guardian_national_id?: string
+  guardian_qualification?: string
+  guardian_job?: string
+  guardian_address?: string
 }
 
 function text(value: unknown, fallback = '—') {
@@ -129,6 +143,12 @@ export function mapPersonalToProfileData(
     fatherAddress: text(personal.father?.address, ''),
     fatherJob: text(personal.father?.job, ''),
     fatherPhone: text(personal.father?.phone, ''),
+    guardianName: text(personal.guardian?.name, ''),
+    guardianRelation: text(personal.guardian?.relation, ''),
+    guardianNationalId: text(personal.guardian?.national_id, ''),
+    guardianQualification: text(personal.guardian?.qualification, ''),
+    guardianJob: text(personal.guardian?.job, ''),
+    guardianAddress: text(personal.guardian?.address, ''),
   }
 }
 
@@ -177,10 +197,17 @@ export function mapProfileDataToUpdatePayload(
 ): UpdateStudentProfilePayload {
   const payload: UpdateStudentProfilePayload = {
     phone: data.phone.trim() || undefined,
+    religion: data.religion.trim() || undefined,
     father_national_id: data.fatherNationalId.trim() || undefined,
     father_address: data.fatherAddress.trim() || undefined,
     father_job: data.fatherJob.trim() || undefined,
     father_phone: data.fatherPhone.trim() || undefined,
+    guardian_name: data.guardianName.trim() || undefined,
+    guardian_relation: data.guardianRelation.trim() || undefined,
+    guardian_national_id: data.guardianNationalId.trim() || undefined,
+    guardian_qualification: data.guardianQualification.trim() || undefined,
+    guardian_job: data.guardianJob.trim() || undefined,
+    guardian_address: data.guardianAddress.trim() || undefined,
   }
 
   if (image && /^https?:\/\//i.test(image)) {

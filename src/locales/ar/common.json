@@ -366,6 +366,13 @@
       "saveSuccess": "تم حفظ البيانات بنجاح.",
       "saveError": "تعذر حفظ البيانات. حاول مرة أخرى.",
       "fieldRequired": "هذا الحقل مطلوب.",
+      "incompleteContact": {
+        "title": "بيانات الاتصال غير مكتملة",
+        "both": "بيانات الأب وولي الأمر غير مكتملة. يرجى إكمالها الآن.",
+        "father": "بيانات الأب غير مكتملة. يرجى إكمالها الآن.",
+        "guardian": "بيانات ولي الأمر غير مكتملة. يرجى إكمالها الآن.",
+        "action": "إكمال البيانات"
+      },
       "photo": "الصورة الشخصية",
       "photoHint": "اختر صورة واضحة (jpeg/png/webp/gif، بحد أقصى 2MB).",
       "photoUploading": "جاري رفع الصورة...",
@@ -410,16 +417,34 @@
           "label": "مبلغ الدفع"
         },
         "fatherNationalId": {
-          "label": "الرقم القومي لولي الأمر"
+          "label": "الرقم القومي للأب"
         },
         "fatherAddress": {
-          "label": "عنوان ولي الأمر"
+          "label": "عنوان الأب"
         },
         "fatherJob": {
-          "label": "وظيفة ولي الأمر"
+          "label": "وظيفة الأب"
         },
         "fatherPhone": {
-          "label": "هاتف ولي الأمر"
+          "label": "هاتف الأب"
+        },
+        "guardianName": {
+          "label": "اسم ولي الأمر"
+        },
+        "guardianRelation": {
+          "label": "صلة القرابة"
+        },
+        "guardianNationalId": {
+          "label": "الرقم القومي لولي الأمر"
+        },
+        "guardianQualification": {
+          "label": "مؤهل ولي الأمر"
+        },
+        "guardianJob": {
+          "label": "وظيفة ولي الأمر"
+        },
+        "guardianAddress": {
+          "label": "عنوان ولي الأمر"
         }
       },
       "values": {

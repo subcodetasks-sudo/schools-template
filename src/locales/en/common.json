@@ -366,6 +366,13 @@
       "saveSuccess": "Profile information saved successfully.",
       "saveError": "Could not save profile. Please try again.",
       "fieldRequired": "This field is required.",
+      "incompleteContact": {
+        "title": "Contact details incomplete",
+        "both": "Father and guardian details are incomplete. Please complete them now.",
+        "father": "Father details are incomplete. Please complete them now.",
+        "guardian": "Guardian details are incomplete. Please complete them now.",
+        "action": "Complete details"
+      },
       "photo": "Profile photo",
       "photoHint": "Choose a clear photo (jpeg/png/webp/gif, max 2MB).",
       "photoUploading": "Uploading photo...",
@@ -420,6 +427,24 @@
         },
         "fatherPhone": {
           "label": "Father phone"
+        },
+        "guardianName": {
+          "label": "Guardian name"
+        },
+        "guardianRelation": {
+          "label": "Guardian relation"
+        },
+        "guardianNationalId": {
+          "label": "Guardian national ID"
+        },
+        "guardianQualification": {
+          "label": "Guardian qualification"
+        },
+        "guardianJob": {
+          "label": "Guardian job"
+        },
+        "guardianAddress": {
+          "label": "Guardian address"
         }
       },
       "values": {
