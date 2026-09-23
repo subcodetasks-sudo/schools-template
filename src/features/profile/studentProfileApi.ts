@@ -191,24 +191,59 @@ export function mapPersonalToPhoto(personal: StudentPersonal | null | undefined)
   return defaultProfilePhoto
 }
 
+function filledText(value: string | undefined) {
+  const trimmed = value?.trim()
+  if (!trimmed || trimmed === '—') return undefined
+  return trimmed
+}
+
+function assignFilled(
+  payload: UpdateStudentProfilePayload,
+  key: keyof UpdateStudentProfilePayload,
+  value: string | undefined,
+) {
+  const next = filledText(value)
+  if (next) payload[key] = next
+}
+
+export const profileApiFieldMap = {
+  phone: 'phone',
+  religion: 'religion',
+  father_national_id: 'fatherNationalId',
+  father_address: 'fatherAddress',
+  father_job: 'fatherJob',
+  father_phone: 'fatherPhone',
+  guardian_name: 'guardianName',
+  guardian_relation: 'guardianRelation',
+  guardian_national_id: 'guardianNationalId',
+  guardian_qualification: 'guardianQualification',
+  guardian_job: 'guardianJob',
+  guardian_address: 'guardianAddress',
+} as const satisfies Record<string, keyof ProfileData>
+
+export function mapApiFieldToProfileKey(field: string): keyof ProfileData | undefined {
+  const normalized = field.trim().toLowerCase().replace(/[\s-]+/g, '_')
+  return profileApiFieldMap[normalized as keyof typeof profileApiFieldMap]
+}
+
 export function mapProfileDataToUpdatePayload(
   data: ProfileData,
   image?: string | null,
 ): UpdateStudentProfilePayload {
-  const payload: UpdateStudentProfilePayload = {
-    phone: data.phone.trim() || undefined,
-    religion: data.religion.trim() || undefined,
-    father_national_id: data.fatherNationalId.trim() || undefined,
-    father_address: data.fatherAddress.trim() || undefined,
-    father_job: data.fatherJob.trim() || undefined,
-    father_phone: data.fatherPhone.trim() || undefined,
-    guardian_name: data.guardianName.trim() || undefined,
-    guardian_relation: data.guardianRelation.trim() || undefined,
-    guardian_national_id: data.guardianNationalId.trim() || undefined,
-    guardian_qualification: data.guardianQualification.trim() || undefined,
-    guardian_job: data.guardianJob.trim() || undefined,
-    guardian_address: data.guardianAddress.trim() || undefined,
-  }
+  const payload: UpdateStudentProfilePayload = {}
+
+  assignFilled(payload, 'phone', data.phone)
+  assignFilled(payload, 'religion', data.religion)
+  assignFilled(payload, 'father_national_id', data.fatherNationalId)
+  assignFilled(payload, 'father_address', data.fatherAddress)
+  assignFilled(payload, 'father_job', data.fatherJob)
+  assignFilled(payload, 'father_phone', data.fatherPhone)
+  assignFilled(payload, 'guardian_name', data.guardianName)
+  assignFilled(payload, 'guardian_relation', data.guardianRelation)
+  assignFilled(payload, 'guardian_national_id', data.guardianNationalId)
+  assignFilled(payload, 'guardian_qualification', data.guardianQualification)
+  assignFilled(payload, 'guardian_job', data.guardianJob)
+  assignFilled(payload, 'guardian_address', data.guardianAddress)
 
   if (image && /^https?:\/\//i.test(image)) {
     payload.image = image

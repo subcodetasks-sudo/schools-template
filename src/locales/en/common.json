@@ -379,6 +379,8 @@
       "saveSuccess": "Profile information saved successfully.",
       "saveError": "Could not save profile. Please try again.",
       "fieldRequired": "This field is required.",
+      "completeRequiredFields": "Complete father and guardian details before saving.",
+      "validationFailed": "These fields are required: {{fields}}",
       "incompleteContact": {
         "title": "Contact details incomplete",
         "both": "Father and guardian details are incomplete. Please complete them now.",

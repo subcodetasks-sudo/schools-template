@@ -174,14 +174,16 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
       // Student `image` is a string field — persist the exact media URL returned by the API.
       if (url) {
-        const payload = await updateStudentProfile({ image: url })
+        const payload = await updateStudentProfile(
+          mapProfileDataToUpdatePayload(profileData, url),
+        )
         applyProfilePayload(payload, payloadSetters)
         return
       }
 
       await refreshProfile()
     },
-    [payloadSetters, refreshProfile],
+    [payloadSetters, profileData, refreshProfile],
   )
 
   const removeAvatar = useCallback(async () => {

@@ -101,6 +101,11 @@ function isFilled(value: string | undefined) {
   return Boolean(trimmed) && trimmed !== '—'
 }
 
+export const requiredContactFields = [
+  ...fatherProfileFields,
+  ...guardianProfileFields,
+] as const satisfies ReadonlyArray<ProfileFieldKey>
+
 export function getContactCompleteness(data: ProfileData) {
   const fatherIncomplete = fatherProfileFields.some((key) => !isFilled(data[key]))
   const guardianIncomplete = guardianProfileFields.some((key) => !isFilled(data[key]))
@@ -109,5 +114,10 @@ export function getContactCompleteness(data: ProfileData) {
     fatherIncomplete,
     guardianIncomplete,
     incomplete: fatherIncomplete || guardianIncomplete,
+    missingFields: requiredContactFields.filter((key) => !isFilled(data[key])),
   }
+}
+
+export function isProfileFieldFilled(value: string | undefined) {
+  return isFilled(value)
 }

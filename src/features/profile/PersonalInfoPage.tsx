@@ -29,16 +29,17 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { authFieldClass } from '@/features/auth/AuthShell'
 import { getUserInitials } from '@/features/auth/authApi'
-import { getErrorMessage } from '@/lib/api'
+import { getErrorMessage, getFieldErrors } from '@/lib/api'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
-  editableProfileFields,
   getContactCompleteness,
   profileFieldKeys,
   readOnlyProfileFields,
+  requiredContactFields,
   type ProfileData,
   type ProfileFieldKey,
 } from '@/features/profile/profileData'
+import { mapApiFieldToProfileKey } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
 
 const fields = [
@@ -87,11 +88,13 @@ function formatProfileFieldValue(
   return raw
 }
 
+const requiredContactFieldSet = new Set<ProfileFieldKey>(requiredContactFields)
+
 const profileSchema = z.object(
   Object.fromEntries(
     profileFieldKeys.map((key) => [
       key,
-      editableProfileFields.includes(key) ? z.string() : z.string(),
+      requiredContactFieldSet.has(key) ? z.string().trim().min(1) : z.string(),
     ]),
   ) as Record<ProfileFieldKey, z.ZodString>,
 )
@@ -133,10 +136,13 @@ export function PersonalInfoPage() {
     register,
     handleSubmit,
     reset,
+    setError,
+    setFocus,
     formState: { errors, isSubmitting },
   } = useForm<ProfileData>({
     resolver: zodResolver(profileSchema),
     defaultValues: profileData,
+    shouldFocusError: true,
   })
 
   useEffect(() => {
@@ -183,15 +189,57 @@ export function PersonalInfoPage() {
     }
   }
 
-  const onSubmit = handleSubmit(async (data) => {
-    try {
-      await updateProfile(data)
-      setIsEditing(false)
-      toast.success(t('profile.personal.saveSuccess'))
-    } catch (err) {
-      toast.error(getErrorMessage(err, t('profile.personal.saveError')))
-    }
-  })
+  const showMissingFieldsToast = (keys: ProfileFieldKey[]) => {
+    const unique = [...new Set(keys)]
+    if (unique.length === 0) return
+    toast.error(t('profile.personal.completeRequiredFields'), {
+      description: t('profile.personal.validationFailed', {
+        fields: unique.map((key) => t(`profile.personal.fields.${key}.label`)).join('، '),
+      }),
+    })
+  }
+
+  const onSubmit = handleSubmit(
+    async (data) => {
+      const missing = getContactCompleteness(data).missingFields
+      if (missing.length > 0) {
+        missing.forEach((key) => {
+          setError(key, { type: 'required', message: t('profile.personal.fieldRequired') })
+        })
+        setFocus(missing[0])
+        showMissingFieldsToast(missing)
+        return
+      }
+
+      try {
+        await updateProfile(data)
+        setIsEditing(false)
+        toast.success(t('profile.personal.saveSuccess'))
+      } catch (err) {
+        const fieldErrors = getFieldErrors(err)
+        const failedFields = Object.keys(fieldErrors ?? {})
+          .map((field) => mapApiFieldToProfileKey(field))
+          .filter((key): key is ProfileFieldKey => Boolean(key))
+
+        failedFields.forEach((key) => {
+          setError(key, { type: 'server', message: t('profile.personal.fieldRequired') })
+        })
+        if (failedFields[0]) setFocus(failedFields[0])
+
+        if (failedFields.length > 0) {
+          showMissingFieldsToast(failedFields)
+          return
+        }
+
+        toast.error(getErrorMessage(err, t('profile.personal.saveError')))
+      }
+    },
+    (formErrors) => {
+      const missing = requiredContactFields.filter((key) => formErrors[key])
+      if (missing[0]) setFocus(missing[0])
+      showMissingFieldsToast(missing)
+    },
+  )
 
   if (isLoading) {
     return (
@@ -309,6 +357,7 @@ export function PersonalInfoPage() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {profileFieldKeys.map((key) => {
               const readOnly = readOnlyProfileFields.includes(key)
+              const required = requiredContactFieldSet.has(key)
               const showTranslated = readOnly && key === 'registrationStatus'
 
               return (
@@ -318,6 +367,11 @@ export function PersonalInfoPage() {
                     htmlFor={`profile-${key}`}
                   >
                     {t(`profile.personal.fields.${key}.label`)}
+                    {required ? (
+                      <span className="ms-1 text-destructive" aria-hidden>
+                        *
+                      </span>
+                    ) : null}
                   </label>
                   {showTranslated ? (
                     <input
@@ -333,9 +387,11 @@ export function PersonalInfoPage() {
                     <input
                       id={`profile-${key}`}
                       disabled={readOnly}
+                      aria-invalid={Boolean(errors[key])}
                       className={cn(
                         authFieldClass,
                         readOnly && 'cursor-not-allowed bg-muted/50 text-brand-dark/55',
+                        errors[key] && 'border-destructive/50 focus-visible:ring-destructive/30',
                       )}
                       {...register(key)}
                     />
