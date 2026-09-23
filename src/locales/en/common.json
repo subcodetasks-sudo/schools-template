@@ -585,23 +585,36 @@
       "byMonthTitle": "Absences by month",
       "byMonthHint": "Absence days during the month",
       "absencesTitle": "Absence days",
+      "lessonsTitle": "Missed lessons",
+      "lessonsByMonthTitle": "Missed lessons by month",
+      "lessonsByMonthHint": "Missed lessons during the month",
       "dayUnit": "days",
+      "lessonUnit": "lessons",
       "recordedBy": "Recorded by: {{name}}",
       "emptyMonths": "No monthly absence breakdown yet.",
       "emptyAbsences": "No absence days recorded.",
+      "emptyLessons": "No missed lessons recorded.",
+      "emptyLessonMonths": "No monthly lesson-absence breakdown yet.",
       "absenceCount": "{{count}} day(s)",
+      "lessonCount": "{{count}} lesson(s)",
       "noNote": "No note",
       "summary": {
         "attendanceRate": "Attendance rate",
         "presentDays": "Present days",
         "absenceDays": "Absence days",
-        "recordedDays": "Recorded days"
+        "recordedDays": "Recorded days",
+        "lessonRate": "Lesson attendance",
+        "presentLessons": "Present lessons",
+        "absenceLessons": "Missed lessons",
+        "recordedLessons": "Recorded lessons"
       },
       "columns": {
         "date": "Date",
         "day": "Day",
         "note": "Note",
-        "classroom": "Class"
+        "classroom": "Class",
+        "subject": "Subject",
+        "period": "Period"
       }
     },
     "parentSummon": {

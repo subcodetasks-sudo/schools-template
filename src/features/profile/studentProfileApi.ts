@@ -366,6 +366,58 @@ export async function getStudentAbsences(query: StudentAbsencesQuery = {}) {
   return unwrapData(response)
 }
 
+export type StudentLessonAbsence = {
+  date: string
+  day_name?: string | null
+  academic_year?: string | null
+  period?: number | null
+  period_label?: string | null
+  subject?: (StudentNamedRef & { code?: string | null }) | null
+  recorded_by?: string | null
+}
+
+export type StudentLessonAbsencesSummary = {
+  recorded_lessons: number
+  present_lessons: number
+  absence_lessons: number
+  attendance_rate: number | null
+}
+
+export type StudentLessonAbsencesByMonth = {
+  month: string
+  absence_lessons: number
+}
+
+export type StudentLessonAbsencesPayload = {
+  filters?: {
+    academic_year?: string | null
+    from?: string | null
+    to?: string | null
+  } | null
+  summary: StudentLessonAbsencesSummary
+  absences: StudentLessonAbsence[]
+  by_month: StudentLessonAbsencesByMonth[]
+}
+
+export type StudentAnnualReportPayload = {
+  academic_year?: string | null
+  attendance?: {
+    daily?: StudentAbsencesPayload | null
+    lessons?: StudentLessonAbsencesPayload | null
+  } | null
+}
+
+export async function getStudentAnnualReport(academicYear?: string) {
+  const response = await apiGet<StudentAnnualReportPayload>(
+    '/v1/auth/student/profile/annual-report',
+    {
+      requiresAuth: true,
+      params: academicYear ? { academic_year: academicYear } : undefined,
+    },
+  )
+  return unwrapData(response)
+}
+
 export async function getStudentWeeklyAssessments(query: StudentWeeklyAssessmentsQuery = {}) {
   const params = Object.fromEntries(
     Object.entries(query).filter(([, value]) => value != null && value !== ''),

@@ -585,23 +585,36 @@
       "byMonthTitle": "الغياب حسب الشهر",
       "byMonthHint": "عدد أيام الغياب خلال الشهر",
       "absencesTitle": "أيام الغياب",
+      "lessonsTitle": "حصص الغياب",
+      "lessonsByMonthTitle": "حصص الغياب حسب الشهر",
+      "lessonsByMonthHint": "عدد حصص الغياب خلال الشهر",
       "dayUnit": "يوم",
+      "lessonUnit": "حصة",
       "recordedBy": "سجّله: {{name}}",
       "emptyMonths": "لا يوجد توزيع شهري للغياب حالياً.",
       "emptyAbsences": "لا توجد أيام غياب مسجلة.",
+      "emptyLessons": "لا توجد حصص غياب مسجّلة.",
+      "emptyLessonMonths": "لا يوجد توزيع شهري لحصص الغياب حالياً.",
       "absenceCount": "{{count}} يوم",
+      "lessonCount": "{{count}} حصة",
       "noNote": "بدون ملاحظة",
       "summary": {
         "attendanceRate": "معدل الحضور",
         "presentDays": "أيام الحضور",
         "absenceDays": "أيام الغياب",
-        "recordedDays": "أيام مسجّلة"
+        "recordedDays": "أيام مسجّلة",
+        "lessonRate": "حضور الحصص",
+        "presentLessons": "حصص الحضور",
+        "absenceLessons": "حصص الغياب",
+        "recordedLessons": "حصص مسجّلة"
       },
       "columns": {
         "date": "التاريخ",
         "day": "اليوم",
         "note": "الملاحظة",
-        "classroom": "الفصل"
+        "classroom": "الفصل",
+        "subject": "المادة",
+        "period": "الحصة"
       }
     },
     "parentSummon": {
