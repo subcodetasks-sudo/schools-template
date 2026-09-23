@@ -58,7 +58,7 @@ export type AuthSessionResult = {
 }
 
 export type LoginPayload = {
-  national_id: string
+  code: string
   password: string
 }
 
@@ -277,8 +277,7 @@ export async function loginRequest(payload: LoginPayload) {
     requiresAuth: false,
   })
   return normalizeSession(unwrapData(response), {
-    national_id: payload.national_id,
-    nationalId: payload.national_id,
+    code: payload.code,
     role: 'student',
     type: 'student',
   })

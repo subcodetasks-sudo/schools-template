@@ -13,7 +13,7 @@ import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
-  nationalId: z.string().min(10),
+  code: z.string().regex(/^\d{9}$/),
   password: z.string().min(6),
 })
 
@@ -42,7 +42,7 @@ export function LoginPage() {
   const onSubmit = handleSubmit(async (values) => {
     try {
       await login({
-        national_id: values.nationalId,
+        code: values.code.trim(),
         password: values.password,
       })
       toast.success(t('login.success'))
@@ -60,19 +60,20 @@ export function LoginPage() {
 
       <form onSubmit={onSubmit} className="mt-8 space-y-5">
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-brand-dark" htmlFor="nationalId">
-            {t('login.nationalId')}
+          <label className="mb-1.5 block text-sm font-medium text-brand-dark" htmlFor="code">
+            {t('login.code')}
           </label>
           <input
-            id="nationalId"
+            id="code"
             inputMode="numeric"
             autoComplete="username"
-            placeholder={t('login.nationalIdPlaceholder')}
+            maxLength={9}
+            placeholder={t('login.codePlaceholder')}
             className={authFieldClass}
-            {...register('nationalId')}
+            {...register('code')}
           />
-          {errors.nationalId ? (
-            <p className="mt-1 text-xs text-destructive">{errors.nationalId.message}</p>
+          {errors.code ? (
+            <p className="mt-1 text-xs text-destructive">{t('login.codeRequired')}</p>
           ) : null}
         </div>
 

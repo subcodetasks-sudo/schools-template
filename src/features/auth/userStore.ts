@@ -43,8 +43,9 @@ export const useUserStore = create<UserState>()(
           const merged = {
             ...session.user,
             ...me,
-            national_id: me.national_id ?? session.user.national_id ?? payload.national_id,
-            nationalId: me.nationalId ?? session.user.nationalId ?? payload.national_id,
+            national_id: me.national_id ?? session.user.national_id,
+            nationalId: me.nationalId ?? session.user.nationalId,
+            code: me.code ?? session.user.code ?? payload.code,
           }
           get().setAuth({ token: session.token, user: merged })
           return merged
