@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { SiteLayout } from '@/components/layout/SiteLayout'
 import { HomePage } from '@/features/home/HomePage'
 import { TopStudentsPage } from '@/features/top-students/TopStudentsPage'
@@ -23,6 +23,7 @@ import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
 import { StatisticsPage } from '@/features/profile/StatisticsPage'
 import { AttendancePage } from '@/features/profile/AttendancePage'
 import { NotificationsPage } from '@/features/notifications/NotificationsPage'
+import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 
 export const router = createBrowserRouter([
   {
@@ -81,10 +82,13 @@ export const router = createBrowserRouter([
                 path: 'notifications',
                 element: <NotificationsPage />,
               },
+              { path: '*', element: <Navigate to="/404" replace /> },
             ],
           },
         ],
       },
+      { path: '404', element: <NotFoundPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

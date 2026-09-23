@@ -9,6 +9,7 @@ export function SiteLayout() {
   const isHome = pathname === '/'
   const isAuth = pathname === '/login' || pathname === '/register'
   const isProfile = pathname.startsWith('/profile')
+  const isNotFound = pathname === '/404'
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -18,7 +19,7 @@ export function SiteLayout() {
     <div
       className={cn(
         'flex min-h-dvh flex-col',
-        (isHome || isAuth || isProfile) && 'bg-brand-light',
+        (isHome || isAuth || isProfile || isNotFound) && 'bg-brand-light',
       )}
     >
       <SiteHeader />

@@ -7,6 +7,12 @@
     "retry": "Try again",
     "empty": "Nothing to show yet."
   },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or may have been moved. Return to the homepage or contact the school for help.",
+    "backHome": "Back to home",
+    "contact": "Contact us"
+  },
   "nav": {
     "home": "Home",
     "topStudents": "Top students",
