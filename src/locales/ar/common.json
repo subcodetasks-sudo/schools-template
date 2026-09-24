@@ -369,6 +369,7 @@
       "weeklyEvaluations": "التقييمات الأسبوعية",
       "schedule": "الجدول الدراسي",
       "attendance": "الحضور والغياب",
+      "fees": "المصروفات",
       "parentSummon": "إستدعاء ولي الأمر",
       "statistics": "الإحصائيات"
     },
@@ -463,6 +464,43 @@
         },
         "guardianAddress": {
           "label": "عنوان ولي الأمر"
+        },
+        "governorate": {
+          "label": "المحافظة"
+        },
+        "district": {
+          "label": "الإدارة التعليمية"
+        },
+        "city": {
+          "label": "المدينة / المركز"
+        },
+        "area": {
+          "label": "المنطقة"
+        },
+        "detailedAddress": {
+          "label": "العنوان بالتفصيل"
+        },
+        "alternativePhone": {
+          "label": "هاتف بديل"
+        }
+      },
+      "address": {
+        "title": "العنوان",
+        "empty": "لم يتم إدخال العنوان بعد."
+      },
+      "documents": {
+        "title": "المستندات",
+        "hint": "يمكنك إضافة ملف جديد فقط. الملفات الحالية تبقى كما هي.",
+        "add": "إضافة ملف",
+        "empty": "لا توجد ملفات مرفوعة.",
+        "unnamed": "ملف",
+        "invalidType": "نوع الملف غير مسموح.",
+        "tooLarge": "حجم الملف يجب ألا يتجاوز 5MB.",
+        "collections": {
+          "student_photo": "صورة شخصية",
+          "birth_certificate": "شهادة الميلاد",
+          "father_id_card": "بطاقة الأب",
+          "mother_id_card": "بطاقة الأم"
         }
       },
       "values": {
@@ -622,6 +660,25 @@
         "period": "الحصة"
       }
     },
+    "fees": {
+      "loadError": "تعذر تحميل المصروفات.",
+      "academicYear": "العام الدراسي {{year}}",
+      "amount": "{{amount}} جنيه",
+      "tuition": {
+        "title": "مصروفات الدراسة",
+        "hint": "الصافي والمسدد والمتبقي خاصون بمصروفات الدراسة فقط.",
+        "net": "الصافي",
+        "paid": "المسدد",
+        "remaining": "المتبقي"
+      },
+      "separate": {
+        "title": "مصروفات منفصلة",
+        "hint": "هذه المبالغ لا تُخصم من متبقي مصروفات الدراسة.",
+        "total": "الإجمالي: {{amount}}",
+        "empty": "لا توجد مصروفات منفصلة مسجلة.",
+        "unnamed": "مصروف"
+      }
+    },
     "parentSummon": {
       "viewDetails": "عرض التفاصيل",
       "backToList": "العودة للقائمة",
@@ -660,6 +717,9 @@
     },
     "monthlyEvaluations": {
       "selectMonth": "اختر الشهر",
+      "selectTerm": "اختر الفصل",
+      "allMonths": "كل الشهور",
+      "allTerms": "كل الفصول",
       "studentName": "اسم الطالب",
       "grade": "الصف الدراسي",
       "className": "الفصل الدراسي",
@@ -669,7 +729,8 @@
       "emptyDescription": "ستظهر هنا التقييمات الشهرية بعد نشر درجات التقييم الأسبوعي للشهر.",
       "grandTotal": "الاجمالي",
       "summary": {
-        "percentage": "النسبة العامة",
+        "percentage": "النسبة: {{value}}",
+        "score": "المجموع: {{score}} / {{max}}",
         "subjects": "عدد المواد",
         "totalScore": "مجموع الدرجات"
       },
@@ -679,7 +740,20 @@
         "sessions": "عدد الأسابيع",
         "score": "الدرجة",
         "max": "من",
+        "total": "المجموع الكلي",
         "percentage": "النسبة"
+      },
+      "scoreColumns": {
+        "performanceTasks": "المهام الأدائية",
+        "homeworkNotebook": "كراسة الواجب",
+        "activityNotebook": "كراسة النشاط",
+        "weeklyEvaluation": "التقييم الأسبوعي",
+        "attendanceBehavior": "المواظبة والسلوك",
+        "weekly": "أسبوعي",
+        "notebook": "كراسة",
+        "homework": "واجب",
+        "participation": "مشاركة",
+        "behavior": "المواظبة والسلوك"
       }
     },
     "weeklyEvaluations": {
@@ -694,6 +768,7 @@
       "emptyDescription": "ستظهر هنا التقييمات الأسبوعية عند توفرها من المدرسة.",
       "emptySubjects": "لا يوجد تفصيل حسب المادة حالياً.",
       "noScores": "لا توجد درجات تفصيلية لهذا التقييم.",
+      "absent": "غائب",
       "weekNumber": "الأسبوع {{n}}",
       "weekDate": "تاريخ الأسبوع",
       "subjectSessions": "{{count}} تقييم",
@@ -732,7 +807,8 @@
         "weekly": "التقييم الأسبوعي",
         "notebook": "الكراسة",
         "homework": "الواجب",
-        "participation": "المشاركة"
+        "participation": "المشاركة",
+        "behavior": "المواظبة والسلوك"
       }
     },
     "placeholders": {
@@ -740,6 +816,7 @@
       "monthlyEvaluations": "ستظهر التقييمات الشهرية هنا.",
       "weeklyEvaluations": "ستظهر التقييمات الأسبوعية هنا.",
       "schedule": "سيظهر الجدول الدراسي هنا.",
+      "fees": "ستظهر المصروفات هنا.",
       "parentSummon": "ستظهر إستدعاءات ولي الأمر هنا.",
       "statistics": "ستظهر إحصائيات الطالب هنا."
     },

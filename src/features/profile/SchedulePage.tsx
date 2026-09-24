@@ -31,13 +31,38 @@ export function SchedulePage() {
 
     const days = schedule.days.length ? schedule.days : []
     const periods = schedule.periods.length ? schedule.periods : [1, 2, 3, 4, 5, 6, 7]
-    const byDayPeriod = new Map<string, { subject: string; teacher: string }>()
+    const byDayPeriod = new Map<string, Array<{ subject: string; teacher: string }>>()
 
-    for (const entry of schedule.entries ?? []) {
-      byDayPeriod.set(`${entry.day}-${entry.period}`, {
-        subject: entry.subject?.name?.trim() || '—',
-        teacher: entry.teacher?.name?.trim() || '—',
-      })
+    const pushLesson = (day: string, period: number, subject: string, teacher: string) => {
+      const key = `${day}-${period}`
+      const list = byDayPeriod.get(key) ?? []
+      list.push({ subject, teacher })
+      byDayPeriod.set(key, list)
+    }
+
+    if (schedule.slots?.length) {
+      for (const slot of schedule.slots) {
+        const assignments = slot.assignments?.length
+          ? slot.assignments
+          : [{ subject: null, teacher: null }]
+        for (const assignment of assignments) {
+          pushLesson(
+            slot.day,
+            slot.period,
+            assignment.subject?.name?.trim() || '—',
+            assignment.teacher?.name?.trim() || '—',
+          )
+        }
+      }
+    } else {
+      for (const entry of schedule.entries ?? []) {
+        pushLesson(
+          entry.day,
+          entry.period,
+          entry.subject?.name?.trim() || '—',
+          entry.teacher?.name?.trim() || '—',
+        )
+      }
     }
 
     return { days, periods, byDayPeriod }
@@ -129,18 +154,22 @@ export function SchedulePage() {
                     {dayLabel(day, t)}
                   </th>
                   {grid.periods.map((period) => {
-                    const lesson = grid.byDayPeriod.get(`${day}-${period}`)
+                    const lessons = grid.byDayPeriod.get(`${day}-${period}`) ?? []
                     return (
                       <td key={`${day}-${period}`} className={bodyCellClass}>
-                        {lesson ? (
-                          <>
-                            <p className="text-xs font-semibold leading-snug text-brand-dark sm:text-sm">
-                              {lesson.subject}
-                            </p>
-                            <p className="mt-1 text-[11px] leading-snug text-brand-dark/50 sm:text-xs">
-                              {lesson.teacher}
-                            </p>
-                          </>
+                        {lessons.length > 0 ? (
+                          <div className="flex flex-col gap-2">
+                            {lessons.map((lesson, lessonIndex) => (
+                              <div key={`${day}-${period}-${lessonIndex}`}>
+                                <p className="text-xs font-semibold leading-snug text-brand-dark sm:text-sm">
+                                  {lesson.subject}
+                                </p>
+                                <p className="mt-1 text-[11px] leading-snug text-brand-dark/50 sm:text-xs">
+                                  {lesson.teacher}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
                         ) : null}
                       </td>
                     )

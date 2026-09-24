@@ -122,7 +122,14 @@ function EntryCard({
         className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start transition-colors hover:bg-muted/30"
       >
         <div className="min-w-0">
-          <p className="font-semibold text-brand-dark">{entry.subject?.name || '—'}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="font-semibold text-brand-dark">{entry.subject?.name || '—'}</p>
+            {entry.is_absent ? (
+              <span className="rounded-lg bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
+                {t('profile.weeklyEvaluations.absent')}
+              </span>
+            ) : null}
+          </div>
           {meta ? <p className="mt-1 text-xs text-brand-dark/55 sm:text-sm">{meta}</p> : null}
           {entry.week_date ? (
             <p className="mt-1 text-xs text-brand-dark/45">

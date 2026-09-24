@@ -20,6 +20,12 @@ export const profileFieldKeys = [
   'guardianQualification',
   'guardianJob',
   'guardianAddress',
+  'governorate',
+  'district',
+  'city',
+  'area',
+  'detailedAddress',
+  'alternativePhone',
 ] as const
 
 export type ProfileFieldKey = (typeof profileFieldKeys)[number]
@@ -28,27 +34,33 @@ export type ProfileData = Record<ProfileFieldKey, string>
 export const defaultProfilePhoto = '/student-1.png'
 
 export const defaultProfileData: ProfileData = {
-  nationalId: '30101011234567',
-  studentCode: '234455',
-  phone: '01034678890',
-  religion: 'مسلم',
-  registrationStatus: 'نشط',
-  classNumber: '2 / أ',
-  transfers: 'لا يوجد',
-  fees: 'مدفوعة',
-  paymentVoucher: 'INV-88421',
-  paymentDate: '12 يناير 2026',
-  paymentAmount: '4500 جنيه',
-  fatherNationalId: '27001011234567',
-  fatherAddress: 'المنصورة، مصر',
-  fatherJob: 'مهندس',
-  fatherPhone: '01011223344',
+  nationalId: '',
+  studentCode: '',
+  phone: '',
+  religion: '',
+  registrationStatus: '',
+  classNumber: '',
+  transfers: '',
+  fees: '',
+  paymentVoucher: '',
+  paymentDate: '',
+  paymentAmount: '',
+  fatherNationalId: '',
+  fatherAddress: '',
+  fatherJob: '',
+  fatherPhone: '',
   guardianName: '',
   guardianRelation: '',
   guardianNationalId: '',
   guardianQualification: '',
   guardianJob: '',
   guardianAddress: '',
+  governorate: '',
+  district: '',
+  city: '',
+  area: '',
+  detailedAddress: '',
+  alternativePhone: '',
 }
 
 /** School-owned fields — cannot be changed via POST /profile */
@@ -64,7 +76,6 @@ export const readOnlyProfileFields: ProfileFieldKey[] = [
   'paymentAmount',
 ]
 
-/** Matches editable keys in docs/student-profile-api.md §4 */
 export const editableProfileFields: ProfileFieldKey[] = [
   'phone',
   'religion',
@@ -78,6 +89,12 @@ export const editableProfileFields: ProfileFieldKey[] = [
   'guardianQualification',
   'guardianJob',
   'guardianAddress',
+  'governorate',
+  'district',
+  'city',
+  'area',
+  'detailedAddress',
+  'alternativePhone',
 ]
 
 export const fatherProfileFields = [
@@ -96,24 +113,38 @@ export const guardianProfileFields = [
   'guardianAddress',
 ] as const satisfies ReadonlyArray<ProfileFieldKey>
 
-function isFilled(value: string | undefined) {
-  const trimmed = value?.trim()
-  return Boolean(trimmed) && trimmed !== '—'
-}
+export const fatherContactFields = fatherProfileFields
+export const guardianContactFields = guardianProfileFields
+
+export const addressProfileFields = [
+  'governorate',
+  'district',
+  'city',
+  'area',
+  'detailedAddress',
+  'alternativePhone',
+] as const satisfies ReadonlyArray<ProfileFieldKey>
 
 export const requiredContactFields = [
   ...fatherProfileFields,
   ...guardianProfileFields,
 ] as const satisfies ReadonlyArray<ProfileFieldKey>
 
+function isFilled(value: string | undefined) {
+  const trimmed = value?.trim()
+  return Boolean(trimmed) && trimmed !== '—'
+}
+
 export function getContactCompleteness(data: ProfileData) {
-  const fatherIncomplete = fatherProfileFields.some((key) => !isFilled(data[key]))
-  const guardianIncomplete = guardianProfileFields.some((key) => !isFilled(data[key]))
+  const missingFather = fatherProfileFields.filter((key) => !isFilled(data[key]))
+  const missingGuardian = guardianProfileFields.filter((key) => !isFilled(data[key]))
 
   return {
-    fatherIncomplete,
-    guardianIncomplete,
-    incomplete: fatherIncomplete || guardianIncomplete,
+    missingFather,
+    missingGuardian,
+    fatherIncomplete: missingFather.length > 0,
+    guardianIncomplete: missingGuardian.length > 0,
+    incomplete: missingFather.length > 0 || missingGuardian.length > 0,
     missingFields: requiredContactFields.filter((key) => !isFilled(data[key])),
   }
 }

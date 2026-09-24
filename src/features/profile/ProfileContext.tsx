@@ -14,13 +14,17 @@ import {
   type ProfileData,
 } from '@/features/profile/profileData'
 import {
+  emptyStudentDocuments,
   getStudentProfile,
+  mapPersonalDocuments,
   mapPersonalToAuthUser,
   mapPersonalToPhoto,
   mapPersonalToProfileData,
   mapProfileDataToUpdatePayload,
   updateStudentProfile,
   type StudentCallup,
+  type StudentDocumentUploads,
+  type StudentDocuments,
   type StudentProfilePayload,
   type StudentSchedule,
   type StudentStatistics,
@@ -39,10 +43,13 @@ type ProfileContextValue = {
   schedule: StudentSchedule
   statistics: StudentStatistics
   callups: StudentCallup[]
+  documents: StudentDocuments
+  successCertificateUnlocked: boolean
+  setSuccessCertificateUnlocked: (unlocked: boolean) => void
   isLoading: boolean
   error: string | null
   refreshProfile: () => Promise<void>
-  updateProfile: (data: ProfileData) => Promise<void>
+  updateProfile: (data: ProfileData, files?: StudentDocumentUploads) => Promise<void>
   uploadAvatar: (file: File) => Promise<void>
   removeAvatar: () => Promise<void>
 }
@@ -61,6 +68,8 @@ function applyProfilePayload(
     setSchedule: (schedule: StudentSchedule) => void
     setStatistics: (statistics: StudentStatistics) => void
     setCallups: (callups: StudentCallup[]) => void
+    setDocuments: (documents: StudentDocuments) => void
+    setSuccessCertificateUnlocked: (unlocked: boolean) => void
     setPersonalName: (name: string | null) => void
     setPersonalInitials: (initials: string | null) => void
     setGradeLabel: (label: string | null) => void
@@ -75,6 +84,8 @@ function applyProfilePayload(
   setters.setSchedule(payload.schedule ?? null)
   setters.setStatistics(payload.statistics ?? null)
   setters.setCallups(normalizeCallups(payload.callups))
+  setters.setDocuments(mapPersonalDocuments(payload.personal))
+  setters.setSuccessCertificateUnlocked(Boolean(payload.success_certificate_unlocked))
   setters.setPersonalName(payload.personal.name ?? null)
   setters.setPersonalInitials(payload.personal.initials ?? null)
   setters.setGradeLabel(payload.personal.grade_label ?? payload.personal.grade?.name ?? null)
@@ -102,6 +113,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   const [schedule, setSchedule] = useState<StudentSchedule>(null)
   const [statistics, setStatistics] = useState<StudentStatistics>(null)
   const [callups, setCallups] = useState<StudentCallup[]>([])
+  const [documents, setDocuments] = useState<StudentDocuments>(emptyStudentDocuments)
+  const [successCertificateUnlocked, setSuccessCertificateUnlocked] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -124,6 +137,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       setSchedule,
       setStatistics,
       setCallups,
+      setDocuments,
+      setSuccessCertificateUnlocked,
       setPersonalName,
       setPersonalInitials,
       setGradeLabel,
@@ -161,8 +176,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   }, [token, refreshProfile])
 
   const updateProfile = useCallback(
-    async (data: ProfileData) => {
-      const payload = await updateStudentProfile(mapProfileDataToUpdatePayload(data))
+    async (data: ProfileData, files?: StudentDocumentUploads) => {
+      const payload = await updateStudentProfile(mapProfileDataToUpdatePayload(data), files)
       applyProfilePayload(payload, payloadSetters)
     },
     [payloadSetters],
@@ -172,7 +187,6 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     async (file: File) => {
       const { url } = await uploadProfileAvatar(file)
 
-      // Student `image` is a string field — persist the exact media URL returned by the API.
       if (url) {
         const payload = await updateStudentProfile(
           mapProfileDataToUpdatePayload(profileData, url),
@@ -204,6 +218,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       schedule,
       statistics,
       callups,
+      documents,
+      successCertificateUnlocked,
+      setSuccessCertificateUnlocked,
       isLoading,
       error,
       refreshProfile,
@@ -223,6 +240,8 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
       schedule,
       statistics,
       callups,
+      documents,
+      successCertificateUnlocked,
       isLoading,
       error,
       refreshProfile,

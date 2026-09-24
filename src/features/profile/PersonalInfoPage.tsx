@@ -11,16 +11,19 @@ import {
   Camera,
   CreditCard,
   FileBadge,
+  FileText,
   GraduationCap,
   Hash,
   Home,
   IdCard,
-  Link2,
+  MapPin,
   Pencil,
   Phone,
   Receipt,
   RefreshCcw,
+  Upload,
   UserRound,
+  Users,
   Wallet,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -32,6 +35,7 @@ import { getUserInitials } from '@/features/auth/authApi'
 import { getErrorMessage, getFieldErrors } from '@/lib/api'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
+  addressProfileFields,
   getContactCompleteness,
   profileFieldKeys,
   readOnlyProfileFields,
@@ -39,7 +43,13 @@ import {
   type ProfileData,
   type ProfileFieldKey,
 } from '@/features/profile/profileData'
-import { mapApiFieldToProfileKey } from '@/features/profile/studentProfileApi'
+import {
+  mapApiFieldToProfileKey,
+  studentDocumentCollections,
+  type StudentDocumentCollection,
+  type StudentDocumentFile,
+  type StudentDocumentUploads,
+} from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
 
 const fields = [
@@ -59,15 +69,57 @@ const fields = [
   { key: 'fatherJob', icon: Briefcase },
   { key: 'fatherPhone', icon: Phone },
   { key: 'guardianName', icon: UserRound },
-  { key: 'guardianRelation', icon: Link2 },
+  { key: 'guardianRelation', icon: Users },
   { key: 'guardianNationalId', icon: IdCard },
   { key: 'guardianQualification', icon: GraduationCap },
   { key: 'guardianJob', icon: Briefcase },
   { key: 'guardianAddress', icon: Home },
 ] as const satisfies ReadonlyArray<{ key: ProfileFieldKey; icon: typeof IdCard }>
 
+const addressFields = [
+  { key: 'governorate', icon: MapPin },
+  { key: 'district', icon: MapPin },
+  { key: 'city', icon: MapPin },
+  { key: 'area', icon: MapPin },
+  { key: 'detailedAddress', icon: Home },
+  { key: 'alternativePhone', icon: Phone },
+] as const satisfies ReadonlyArray<{ key: ProfileFieldKey; icon: typeof MapPin }>
+
+const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const DOCUMENT_TYPES = new Set([...PHOTO_TYPES, 'application/pdf'])
+const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024
+const addressFieldSet = new Set<ProfileFieldKey>(addressProfileFields)
+
+function emptyDocumentUploads(): StudentDocumentUploads {
+  return {
+    student_photo: [],
+    birth_certificate: [],
+    father_id_card: [],
+    mother_id_card: [],
+  }
+}
+
+function acceptForCollection(collection: StudentDocumentCollection) {
+  return collection === 'student_photo'
+    ? 'image/jpeg,image/png,image/webp'
+    : 'image/jpeg,image/png,image/webp,application/pdf'
+}
+
+function assertDocumentFile(collection: StudentDocumentCollection, file: File) {
+  const allowed = collection === 'student_photo' ? PHOTO_TYPES : DOCUMENT_TYPES
+  if (!allowed.has(file.type)) throw new Error('INVALID_DOCUMENT_TYPE')
+  if (file.size > MAX_DOCUMENT_BYTES) throw new Error('INVALID_DOCUMENT_SIZE')
+}
+
+const INCOMPLETE_TOAST_ID = 'profile-incomplete-contact'
+
 function normalizeLookupKey(value: string) {
   return value.trim().toLowerCase().replace(/[\s-]+/g, '_')
+}
+
+function isEmptyDisplayValue(value: string) {
+  const raw = value?.trim()
+  return !raw || raw === '—'
 }
 
 function formatProfileFieldValue(
@@ -86,6 +138,18 @@ function formatProfileFieldValue(
   }
 
   return raw
+}
+
+function firstValidationMessage(error: unknown) {
+  const fieldErrors = getFieldErrors(error)
+  if (!fieldErrors) return undefined
+
+  for (const messages of Object.values(fieldErrors)) {
+    const first = Array.isArray(messages) ? messages[0] : messages
+    if (typeof first === 'string' && first.trim()) return first
+  }
+
+  return undefined
 }
 
 const requiredContactFieldSet = new Set<ProfileFieldKey>(requiredContactFields)
@@ -111,9 +175,13 @@ export function PersonalInfoPage() {
     updateProfile,
     uploadAvatar,
     refreshProfile,
+    documents,
   } = useProfile()
   const [isEditing, setIsEditing] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
+  const [pendingDocuments, setPendingDocuments] = useState<StudentDocumentUploads>(
+    emptyDocumentUploads,
+  )
   const fileInputRef = useRef<HTMLInputElement>(null)
   const studentName = personalName || t('profile.studentName')
   const studentInitials = personalInitials || getUserInitials(studentName)
@@ -152,19 +220,41 @@ export function PersonalInfoPage() {
   useEffect(() => {
     if (isLoading || error || !incompleteContactMessage || isEditing) return
     toast.warning(t('profile.personal.incompleteContact.title'), {
-      id: 'profile-incomplete-contact',
+      id: INCOMPLETE_TOAST_ID,
       description: incompleteContactMessage,
     })
   }, [error, incompleteContactMessage, isEditing, isLoading, t])
 
   const startEditing = () => {
     reset(profileData)
+    setPendingDocuments(emptyDocumentUploads())
     setIsEditing(true)
   }
 
   const cancelEditing = () => {
     reset(profileData)
+    setPendingDocuments(emptyDocumentUploads())
     setIsEditing(false)
+  }
+
+  const addDocumentFiles = (collection: StudentDocumentCollection, fileList: FileList | null) => {
+    if (!fileList?.length) return
+    try {
+      const next = Array.from(fileList)
+      next.forEach((file) => assertDocumentFile(collection, file))
+      setPendingDocuments((current) => ({
+        ...current,
+        [collection]: [...(current[collection] ?? []), ...next],
+      }))
+    } catch (err) {
+      const message =
+        err instanceof Error && err.message === 'INVALID_DOCUMENT_TYPE'
+          ? t('profile.personal.documents.invalidType')
+          : err instanceof Error && err.message === 'INVALID_DOCUMENT_SIZE'
+            ? t('profile.personal.documents.tooLarge')
+            : t('profile.personal.documents.invalidType')
+      toast.error(message)
+    }
   }
 
   const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -212,7 +302,8 @@ export function PersonalInfoPage() {
       }
 
       try {
-        await updateProfile(data)
+        await updateProfile(data, pendingDocuments)
+        setPendingDocuments(emptyDocumentUploads())
         setIsEditing(false)
         toast.success(t('profile.personal.saveSuccess'))
       } catch (err) {
@@ -231,7 +322,9 @@ export function PersonalInfoPage() {
           return
         }
 
-        toast.error(getErrorMessage(err, t('profile.personal.saveError')))
+        toast.error(
+          firstValidationMessage(err) ?? getErrorMessage(err, t('profile.personal.saveError')),
+        )
       }
     },
     (formErrors) => {
@@ -265,6 +358,15 @@ export function PersonalInfoPage() {
     )
   }
 
+  const visibleFields = isEditing
+    ? fields
+    : fields.filter((field) => {
+        if (field.key.startsWith('father') || field.key.startsWith('guardian')) {
+          return !isEmptyDisplayValue(profileData[field.key])
+        }
+        return true
+      })
+
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -292,7 +394,9 @@ export function PersonalInfoPage() {
             className="h-10 gap-2 rounded-xl bg-brand-primary px-4 text-white hover:bg-brand-dark"
           >
             <Pencil className="size-4" aria-hidden />
-            {t('profile.personal.edit')}
+            {contactCompleteness.incomplete
+              ? t('profile.personal.incompleteContact.action')
+              : t('profile.personal.edit')}
           </Button>
         ) : null}
       </div>
@@ -317,7 +421,7 @@ export function PersonalInfoPage() {
       ) : null}
 
       {isEditing ? (
-        <form onSubmit={onSubmit} className="mt-8 space-y-8">
+        <form onSubmit={onSubmit} className="mt-8 flex flex-col gap-8">
           <div className="rounded-2xl border border-brand-dark/10 bg-muted/20 p-5 sm:p-6">
             <p className="text-sm font-medium text-brand-dark">{t('profile.personal.photo')}</p>
             <p className="mt-1 text-sm text-brand-dark/55">{t('profile.personal.photoHint')}</p>
@@ -355,10 +459,11 @@ export function PersonalInfoPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {profileFieldKeys.map((key) => {
+            {profileFieldKeys.filter((key) => !addressFieldSet.has(key)).map((key) => {
               const readOnly = readOnlyProfileFields.includes(key)
               const required = requiredContactFieldSet.has(key)
-              const showTranslated = readOnly && key === 'registrationStatus'
+              const showTranslated =
+                readOnly && (key === 'religion' || key === 'registrationStatus')
 
               return (
                 <div key={key}>
@@ -406,6 +511,55 @@ export function PersonalInfoPage() {
             })}
           </div>
 
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold text-brand-dark">
+              {t('profile.personal.address.title')}
+            </h2>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {addressProfileFields.map((key) => (
+                <div key={key} className={key === 'detailedAddress' ? 'sm:col-span-2' : undefined}>
+                  <label
+                    className="mb-1.5 block text-sm font-medium text-brand-dark"
+                    htmlFor={`profile-${key}`}
+                  >
+                    {t(`profile.personal.fields.${key}.label`)}
+                  </label>
+                  <input
+                    id={`profile-${key}`}
+                    aria-invalid={Boolean(errors[key])}
+                    className={cn(
+                      authFieldClass,
+                      errors[key] && 'border-destructive/50 focus-visible:ring-destructive/30',
+                    )}
+                    {...register(key)}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <div>
+              <h2 className="text-lg font-bold text-brand-dark">
+                {t('profile.personal.documents.title')}
+              </h2>
+              <p className="mt-1 text-sm text-brand-dark/55">
+                {t('profile.personal.documents.hint')}
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {studentDocumentCollections.map((collection) => (
+                <DocumentSlot
+                  key={collection}
+                  collection={collection}
+                  existing={documents[collection]}
+                  pending={pendingDocuments[collection] ?? []}
+                  onAdd={(files) => addDocumentFiles(collection, files)}
+                />
+              ))}
+            </div>
+          </section>
+
           <div className="flex flex-col-reverse gap-2 border-t border-brand-dark/10 pt-6 sm:flex-row sm:justify-end">
             <Button
               type="button"
@@ -425,31 +579,167 @@ export function PersonalInfoPage() {
           </div>
         </form>
       ) : (
-        <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
-          {fields
-            .filter((field) => {
-              const isContactField =
-                field.key.startsWith('father') || field.key.startsWith('guardian')
-              if (!isContactField) return true
-              const value = profileData[field.key]?.trim()
-              return Boolean(value) && value !== '—'
-            })
-            .map((field) => (
-            <article
-              key={field.key}
-              className="flex flex-col items-start gap-1.5 rounded-xl border border-brand-dark/10 bg-white px-3.5 py-3.5 shadow-sm"
-            >
-              <field.icon className="size-4 text-brand-primary" aria-hidden />
-              <span className="text-xs font-medium text-brand-dark/50">
-                {t(`profile.personal.fields.${field.key}.label`)}
-              </span>
-              <p className="text-sm font-semibold text-brand-dark" dir="auto">
-                {formatProfileFieldValue(field.key, profileData[field.key], t)}
+        <div className="mt-8 space-y-8">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
+            {visibleFields.map((field) => (
+              <article
+                key={field.key}
+                className="flex flex-col items-start gap-1.5 rounded-2xl border border-brand-dark/10 bg-white px-3.5 py-3.5 shadow-sm"
+              >
+                <field.icon className="size-4 text-brand-primary" aria-hidden />
+                <span className="text-xs font-medium text-brand-dark/50">
+                  {t(`profile.personal.fields.${field.key}.label`)}
+                </span>
+                <p className="text-sm font-semibold text-brand-dark" dir="auto">
+                  {formatProfileFieldValue(field.key, profileData[field.key], t)}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <section>
+            <h2 className="mb-3 text-lg font-bold text-brand-dark">
+              {t('profile.personal.address.title')}
+            </h2>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
+              {addressFields
+                .filter((field) => !isEmptyDisplayValue(profileData[field.key]))
+                .map((field) => (
+                  <article
+                    key={field.key}
+                    className="flex flex-col items-start gap-1.5 rounded-2xl border border-brand-dark/10 bg-white px-3.5 py-3.5 shadow-sm"
+                  >
+                    <field.icon className="size-4 text-brand-primary" aria-hidden />
+                    <span className="text-xs font-medium text-brand-dark/50">
+                      {t(`profile.personal.fields.${field.key}.label`)}
+                    </span>
+                    <p className="text-sm font-semibold text-brand-dark" dir="auto">
+                      {profileData[field.key]}
+                    </p>
+                  </article>
+                ))}
+            </div>
+            {addressFields.every((field) => isEmptyDisplayValue(profileData[field.key])) ? (
+              <p className="rounded-2xl border border-dashed border-brand-dark/15 bg-muted/20 px-5 py-8 text-center text-sm text-brand-dark/45">
+                {t('profile.personal.address.empty')}
               </p>
-            </article>
-          ))}
+            ) : null}
+          </section>
+
+          <section>
+            <h2 className="mb-3 text-lg font-bold text-brand-dark">
+              {t('profile.personal.documents.title')}
+            </h2>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {studentDocumentCollections.map((collection) => (
+                <article
+                  key={collection}
+                  className="rounded-2xl border border-brand-dark/10 bg-white px-4 py-4 shadow-sm"
+                >
+                  <p className="text-sm font-semibold text-brand-dark">
+                    {t(`profile.personal.documents.collections.${collection}`)}
+                  </p>
+                  <DocumentList files={documents[collection]} />
+                </article>
+              ))}
+            </div>
+          </section>
         </div>
       )}
+    </div>
+  )
+}
+
+function DocumentList({ files }: { files: StudentDocumentFile[] }) {
+  const { t } = useTranslation()
+  if (files.length === 0) {
+    return (
+      <p className="mt-2 text-sm text-brand-dark/45">{t('profile.personal.documents.empty')}</p>
+    )
+  }
+
+  return (
+    <ul className="mt-2 space-y-1.5">
+      {files.map((file, index) => {
+        const href = file.urls?.original?.trim()
+        const name = file.fileName?.trim() || t('profile.personal.documents.unnamed')
+        return (
+          <li key={`${file.id ?? name}-${index}`}>
+            {href ? (
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-brand-primary hover:underline"
+              >
+                <FileText className="size-3.5" aria-hidden />
+                {name}
+                {file.size ? (
+                  <span className="text-xs font-normal text-brand-dark/45">{file.size}</span>
+                ) : null}
+              </a>
+            ) : (
+              <span className="inline-flex items-center gap-2 text-sm text-brand-dark">
+                <FileText className="size-3.5" aria-hidden />
+                {name}
+              </span>
+            )}
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function DocumentSlot({
+  collection,
+  existing,
+  pending,
+  onAdd,
+}: {
+  collection: StudentDocumentCollection
+  existing: StudentDocumentFile[]
+  pending: File[]
+  onAdd: (files: FileList | null) => void
+}) {
+  const { t } = useTranslation()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  return (
+    <div className="rounded-2xl border border-brand-dark/10 bg-muted/20 p-4">
+      <p className="text-sm font-semibold text-brand-dark">
+        {t(`profile.personal.documents.collections.${collection}`)}
+      </p>
+      <DocumentList files={existing} />
+      {pending.length > 0 ? (
+        <ul className="mt-2 space-y-1">
+          {pending.map((file, index) => (
+            <li key={`${file.name}-${index}`} className="text-xs text-brand-dark/60">
+              + {file.name}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <input
+        ref={inputRef}
+        type="file"
+        accept={acceptForCollection(collection)}
+        className="hidden"
+        multiple
+        onChange={(event) => {
+          onAdd(event.target.files)
+          event.target.value = ''
+        }}
+      />
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => inputRef.current?.click()}
+        className="mt-3 h-9 gap-2 rounded-xl border-brand-dark/15"
+      >
+        <Upload className="size-3.5" aria-hidden />
+        {t('profile.personal.documents.add')}
+      </Button>
     </div>
   )
 }

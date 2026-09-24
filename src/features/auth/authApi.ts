@@ -44,6 +44,12 @@ export type AuthUser = {
   father_address?: string
   father_job?: string
   father_phone?: string
+  guardian_name?: string
+  guardian_relation?: string
+  guardian_national_id?: string
+  guardian_qualification?: string
+  guardian_job?: string
+  guardian_address?: string
   transfers?: string
   fees?: string
   payment_voucher?: string

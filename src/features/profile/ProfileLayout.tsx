@@ -13,6 +13,7 @@ import {
   Menu,
   Phone,
   UserRound,
+  Wallet,
   X,
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -31,6 +32,7 @@ const mainLinks = [
   { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },
   { to: '/profile/schedule', key: 'schedule', icon: CalendarDays },
   { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },
+  { to: '/profile/fees', key: 'fees', icon: Wallet },
   { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
   { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
 ] as const

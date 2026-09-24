@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, BookX, CalendarDays, CheckCircle2, Percent } from 'lucide-react'
 import {
-  getStudentAnnualReport,
+  getStudentLessonAbsences,
   type StudentLessonAbsencesPayload,
 } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
@@ -80,8 +80,7 @@ export function AttendancePage() {
     setError(null)
 
     try {
-      const report = await getStudentAnnualReport()
-      setLessons(report.attendance?.lessons ?? null)
+      setLessons(await getStudentLessonAbsences())
     } catch (err) {
       setLessons(null)
       setError(err instanceof Error ? err.message : t('profile.attendance.loadError'))

@@ -369,6 +369,7 @@
       "weeklyEvaluations": "Weekly evaluations",
       "schedule": "School schedule",
       "attendance": "Attendance",
+      "fees": "Fees",
       "parentSummon": "Parent summon",
       "statistics": "Statistics"
     },
@@ -463,6 +464,43 @@
         },
         "guardianAddress": {
           "label": "Guardian address"
+        },
+        "governorate": {
+          "label": "Governorate"
+        },
+        "district": {
+          "label": "Education district"
+        },
+        "city": {
+          "label": "City / center"
+        },
+        "area": {
+          "label": "Area"
+        },
+        "detailedAddress": {
+          "label": "Detailed address"
+        },
+        "alternativePhone": {
+          "label": "Alternative phone"
+        }
+      },
+      "address": {
+        "title": "Address",
+        "empty": "No address has been entered yet."
+      },
+      "documents": {
+        "title": "Documents",
+        "hint": "You can add a new file only. Existing files stay as they are.",
+        "add": "Add file",
+        "empty": "No files uploaded.",
+        "unnamed": "File",
+        "invalidType": "This file type is not allowed.",
+        "tooLarge": "File size must be 5MB or smaller.",
+        "collections": {
+          "student_photo": "Personal photo",
+          "birth_certificate": "Birth certificate",
+          "father_id_card": "Father ID card",
+          "mother_id_card": "Mother ID card"
         }
       },
       "values": {
@@ -622,6 +660,25 @@
         "period": "Period"
       }
     },
+    "fees": {
+      "loadError": "Could not load fees.",
+      "academicYear": "Academic year {{year}}",
+      "amount": "{{amount}} EGP",
+      "tuition": {
+        "title": "Tuition fees",
+        "hint": "Net, paid, and remaining amounts are for tuition only.",
+        "net": "Net",
+        "paid": "Paid",
+        "remaining": "Remaining"
+      },
+      "separate": {
+        "title": "Separate fees",
+        "hint": "These amounts are not deducted from remaining tuition.",
+        "total": "Total: {{amount}}",
+        "empty": "No separate fees recorded.",
+        "unnamed": "Fee"
+      }
+    },
     "parentSummon": {
       "viewDetails": "View details",
       "backToList": "Back to list",
@@ -660,6 +717,9 @@
     },
     "monthlyEvaluations": {
       "selectMonth": "Select month",
+      "selectTerm": "Select term",
+      "allMonths": "All months",
+      "allTerms": "All terms",
       "studentName": "Student name",
       "grade": "Grade level",
       "className": "Class",
@@ -669,7 +729,8 @@
       "emptyDescription": "Monthly assessments appear here after weekly scores are published for the month.",
       "grandTotal": "Total",
       "summary": {
-        "percentage": "Overall percentage",
+        "percentage": "Percentage: {{value}}",
+        "score": "Total: {{score}} / {{max}}",
         "subjects": "Subjects",
         "totalScore": "Total score"
       },
@@ -679,7 +740,20 @@
         "sessions": "Sessions",
         "score": "Score",
         "max": "Max",
+        "total": "Total",
         "percentage": "Percentage"
+      },
+      "scoreColumns": {
+        "performanceTasks": "Performance tasks",
+        "homeworkNotebook": "Homework notebook",
+        "activityNotebook": "Activity notebook",
+        "weeklyEvaluation": "Weekly assessment",
+        "attendanceBehavior": "Attendance and behavior",
+        "weekly": "Weekly",
+        "notebook": "Notebook",
+        "homework": "Homework",
+        "participation": "Participation",
+        "behavior": "Attendance and behavior"
       }
     },
     "weeklyEvaluations": {
@@ -694,6 +768,7 @@
       "emptyDescription": "Weekly assessments will appear here when the school publishes them.",
       "emptySubjects": "No subject breakdown yet.",
       "noScores": "No detailed scores for this assessment.",
+      "absent": "Absent",
       "weekNumber": "Week {{n}}",
       "weekDate": "Week date",
       "subjectSessions": "{{count}} assessment(s)",
@@ -732,7 +807,8 @@
         "weekly": "Weekly assessment",
         "notebook": "Notebook",
         "homework": "Homework",
-        "participation": "Participation"
+        "participation": "Participation",
+        "behavior": "Attendance and behavior"
       }
     },
     "placeholders": {
@@ -740,6 +816,7 @@
       "monthlyEvaluations": "Monthly evaluations will appear here.",
       "weeklyEvaluations": "Weekly evaluations will appear here.",
       "schedule": "The school schedule will appear here.",
+      "fees": "Fees will appear here.",
       "parentSummon": "Parent summon records will appear here.",
       "statistics": "Student statistics will appear here."
     },

@@ -22,6 +22,7 @@ import { SchedulePage } from '@/features/profile/SchedulePage'
 import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
 import { StatisticsPage } from '@/features/profile/StatisticsPage'
 import { AttendancePage } from '@/features/profile/AttendancePage'
+import { FeesPage } from '@/features/profile/FeesPage'
 import { NotificationsPage } from '@/features/notifications/NotificationsPage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
               {
                 path: 'attendance',
                 element: <AttendancePage />,
+              },
+              {
+                path: 'fees',
+                element: <FeesPage />,
               },
               {
                 path: 'parent-summon',
