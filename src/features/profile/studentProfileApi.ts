@@ -521,10 +521,14 @@ export type StudentWeeklyAssessmentsQuery = {
   month?: StudentWeeklyAssessmentMonth | string
 }
 
-export async function getStudentProfile() {
-  const response = await apiGet<StudentProfilePayload>('/v1/auth/student/profile', {
-    requiresAuth: true,
-  })
+/** Pass `token` to authenticate with a session that isn't stored yet (e.g. mid-login). */
+export async function getStudentProfile(token?: string) {
+  const response = await apiGet<StudentProfilePayload>(
+    '/v1/auth/student/profile',
+    token
+      ? { skipAuth: true, requiresAuth: false, headers: { Authorization: `Bearer ${token}` } }
+      : { requiresAuth: true },
+  )
   return unwrapData(response)
 }
 

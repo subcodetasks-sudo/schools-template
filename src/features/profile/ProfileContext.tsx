@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -55,6 +56,11 @@ type ProfileContextValue = {
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
+
+/** False when the user logged out or switched accounts (e.g. in another tab) mid-request. */
+function isSameSession(token: string | null) {
+  return Boolean(token) && useUserStore.getState().token === token
+}
 
 function normalizeCallups(callups: StudentCallup[] | null | undefined) {
   return Array.isArray(callups) ? callups : []
@@ -150,7 +156,10 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     [syncAuthUser],
   )
 
+  const latestRequest = useRef(0)
+
   const refreshProfile = useCallback(async () => {
+    const requestId = ++latestRequest.current
     const currentToken = useUserStore.getState().token
     if (!currentToken) {
       setIsLoading(false)
@@ -160,14 +169,20 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     setIsLoading(true)
     setError(null)
 
+    // Ignore responses that finish after a newer request or a session change.
+    const isStale = () =>
+      requestId !== latestRequest.current || useUserStore.getState().token !== currentToken
+
     try {
       const payload = await getStudentProfile()
+      if (isStale()) return
       applyProfilePayload(payload, payloadSetters)
     } catch (err) {
+      if (isStale()) return
       const message = err instanceof Error ? err.message : 'Failed to load profile'
       setError(message)
     } finally {
-      setIsLoading(false)
+      if (!isStale()) setIsLoading(false)
     }
   }, [payloadSetters])
 
@@ -177,21 +192,25 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = useCallback(
     async (data: ProfileData, files?: StudentDocumentUploads) => {
+      const sessionToken = useUserStore.getState().token
       const payload = await updateStudentProfile(mapProfileDataToUpdatePayload(data), files)
-      applyProfilePayload(payload, payloadSetters)
+      if (isSameSession(sessionToken)) applyProfilePayload(payload, payloadSetters)
     },
     [payloadSetters],
   )
 
   const uploadAvatar = useCallback(
     async (file: File) => {
+      const sessionToken = useUserStore.getState().token
       const { url } = await uploadProfileAvatar(file)
+      // Never save this student's form data into a session that changed meanwhile.
+      if (!isSameSession(sessionToken)) return
 
       if (url) {
         const payload = await updateStudentProfile(
           mapProfileDataToUpdatePayload(profileData, url),
         )
-        applyProfilePayload(payload, payloadSetters)
+        if (isSameSession(sessionToken)) applyProfilePayload(payload, payloadSetters)
         return
       }
 
@@ -201,8 +220,9 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   )
 
   const removeAvatar = useCallback(async () => {
+    const sessionToken = useUserStore.getState().token
     await deleteProfileAvatar()
-    await refreshProfile()
+    if (isSameSession(sessionToken)) await refreshProfile()
   }, [refreshProfile])
 
   const value = useMemo(

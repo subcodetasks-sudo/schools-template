@@ -89,6 +89,12 @@ const PHOTO_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const DOCUMENT_TYPES = new Set([...PHOTO_TYPES, 'application/pdf'])
 const MAX_DOCUMENT_BYTES = 5 * 1024 * 1024
 const addressFieldSet = new Set<ProfileFieldKey>(addressProfileFields)
+const readOnlyFieldSet = new Set<ProfileFieldKey>(readOnlyProfileFields)
+
+/** School-owned fields are hidden from the edit form; the student code is shown beside the photo. */
+const editableFormFields = profileFieldKeys.filter(
+  (key) => !addressFieldSet.has(key) && !readOnlyFieldSet.has(key),
+)
 
 function emptyDocumentUploads(): StudentDocumentUploads {
   return {
@@ -177,7 +183,7 @@ export function PersonalInfoPage() {
     refreshProfile,
     documents,
   } = useProfile()
-  const [isEditing, setIsEditing] = useState(false)
+  const [editRequested, setEditRequested] = useState(false)
   const [isUploadingPhoto, setIsUploadingPhoto] = useState(false)
   const [pendingDocuments, setPendingDocuments] = useState<StudentDocumentUploads>(
     emptyDocumentUploads,
@@ -217,24 +223,28 @@ export function PersonalInfoPage() {
     reset(profileData)
   }, [profileData, reset])
 
+  // Incomplete father/guardian data forces the student into edit mode until it is saved.
+  const mustComplete = !isLoading && !error && contactCompleteness.incomplete
+  const isEditing = editRequested || mustComplete
+
   useEffect(() => {
-    if (isLoading || error || !incompleteContactMessage || isEditing) return
+    if (!mustComplete) return
     toast.warning(t('profile.personal.incompleteContact.title'), {
       id: INCOMPLETE_TOAST_ID,
-      description: incompleteContactMessage,
+      description: t('profile.personal.incompleteContact.required'),
     })
-  }, [error, incompleteContactMessage, isEditing, isLoading, t])
+  }, [mustComplete, t])
 
   const startEditing = () => {
     reset(profileData)
     setPendingDocuments(emptyDocumentUploads())
-    setIsEditing(true)
+    setEditRequested(true)
   }
 
   const cancelEditing = () => {
     reset(profileData)
     setPendingDocuments(emptyDocumentUploads())
-    setIsEditing(false)
+    setEditRequested(false)
   }
 
   const addDocumentFiles = (collection: StudentDocumentCollection, fileList: FileList | null) => {
@@ -304,7 +314,7 @@ export function PersonalInfoPage() {
       try {
         await updateProfile(data, pendingDocuments)
         setPendingDocuments(emptyDocumentUploads())
-        setIsEditing(false)
+        setEditRequested(false)
         toast.success(t('profile.personal.saveSuccess'))
       } catch (err) {
         const fieldErrors = getFieldErrors(err)
@@ -401,22 +411,27 @@ export function PersonalInfoPage() {
         ) : null}
       </div>
 
-      {incompleteContactMessage && !isEditing ? (
+      {incompleteContactMessage ? (
         <Alert className="mt-6 border-amber-500/30 bg-amber-50 text-amber-950">
           <AlertTriangle aria-hidden />
           <AlertTitle>{t('profile.personal.incompleteContact.title')}</AlertTitle>
-          <AlertDescription>{incompleteContactMessage}</AlertDescription>
-          <AlertAction>
-            <Button
-              type="button"
-              size="sm"
-              onClick={startEditing}
-              className="h-8 gap-1.5 rounded-lg bg-amber-700 text-white hover:bg-amber-800"
-            >
-              <Pencil className="size-3.5" aria-hidden />
-              {t('profile.personal.incompleteContact.action')}
-            </Button>
-          </AlertAction>
+          <AlertDescription>
+            {incompleteContactMessage}
+            {isEditing ? ` ${t('profile.personal.incompleteContact.required')}` : null}
+          </AlertDescription>
+          {!isEditing ? (
+            <AlertAction>
+              <Button
+                type="button"
+                size="sm"
+                onClick={startEditing}
+                className="h-8 gap-1.5 rounded-lg bg-amber-700 text-white hover:bg-amber-800"
+              >
+                <Pencil className="size-3.5" aria-hidden />
+                {t('profile.personal.incompleteContact.action')}
+              </Button>
+            </AlertAction>
+          ) : null}
         </Alert>
       ) : null}
 
@@ -428,11 +443,20 @@ export function PersonalInfoPage() {
 
             <div className="mt-5 flex flex-col items-center gap-4 sm:flex-row sm:items-center">
               <Avatar className="size-24 ring-4 ring-white shadow-sm">
-                <AvatarImage src={profilePhoto} alt={studentName} />
+                {profilePhoto ? <AvatarImage src={profilePhoto} alt={studentName} /> : null}
                 <AvatarFallback className="text-lg">{studentInitials}</AvatarFallback>
               </Avatar>
 
-              <div className="flex flex-col items-center gap-2 sm:items-start">
+              <div className="flex flex-col items-center gap-3 text-center sm:items-start sm:text-start">
+                <div>
+                  <p className="text-base font-bold text-brand-dark">{studentName}</p>
+                  <p className="mt-1 text-sm text-brand-dark/55">
+                    {t('profile.personal.fields.studentCode.label')}:{' '}
+                    <span className="font-semibold text-brand-dark" dir="ltr">
+                      {formatProfileFieldValue('studentCode', profileData.studentCode, t)}
+                    </span>
+                  </p>
+                </div>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -459,11 +483,8 @@ export function PersonalInfoPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {profileFieldKeys.filter((key) => !addressFieldSet.has(key)).map((key) => {
-              const readOnly = readOnlyProfileFields.includes(key)
+            {editableFormFields.map((key) => {
               const required = requiredContactFieldSet.has(key)
-              const showTranslated =
-                readOnly && (key === 'religion' || key === 'registrationStatus')
 
               return (
                 <div key={key}>
@@ -478,29 +499,15 @@ export function PersonalInfoPage() {
                       </span>
                     ) : null}
                   </label>
-                  {showTranslated ? (
-                    <input
-                      id={`profile-${key}`}
-                      disabled
-                      value={formatProfileFieldValue(key, profileData[key], t)}
-                      className={cn(
-                        authFieldClass,
-                        'cursor-not-allowed bg-muted/50 text-brand-dark/55',
-                      )}
-                    />
-                  ) : (
-                    <input
-                      id={`profile-${key}`}
-                      disabled={readOnly}
-                      aria-invalid={Boolean(errors[key])}
-                      className={cn(
-                        authFieldClass,
-                        readOnly && 'cursor-not-allowed bg-muted/50 text-brand-dark/55',
-                        errors[key] && 'border-destructive/50 focus-visible:ring-destructive/30',
-                      )}
-                      {...register(key)}
-                    />
-                  )}
+                  <input
+                    id={`profile-${key}`}
+                    aria-invalid={Boolean(errors[key])}
+                    className={cn(
+                      authFieldClass,
+                      errors[key] && 'border-destructive/50 focus-visible:ring-destructive/30',
+                    )}
+                    {...register(key)}
+                  />
                   {errors[key] ? (
                     <p className="mt-1 text-xs text-destructive">
                       {t('profile.personal.fieldRequired')}
@@ -561,14 +568,16 @@ export function PersonalInfoPage() {
           </section>
 
           <div className="flex flex-col-reverse gap-2 border-t border-brand-dark/10 pt-6 sm:flex-row sm:justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={cancelEditing}
-              className="h-11 rounded-xl border-brand-dark/15 sm:px-6"
-            >
-              {t('profile.personal.cancel')}
-            </Button>
+            {!contactCompleteness.incomplete ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={cancelEditing}
+                className="h-11 rounded-xl border-brand-dark/15 sm:px-6"
+              >
+                {t('profile.personal.cancel')}
+              </Button>
+            ) : null}
             <Button
               type="submit"
               disabled={isSubmitting}

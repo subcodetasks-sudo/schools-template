@@ -31,7 +31,8 @@ export const profileFieldKeys = [
 export type ProfileFieldKey = (typeof profileFieldKeys)[number]
 export type ProfileData = Record<ProfileFieldKey, string>
 
-export const defaultProfilePhoto = '/student-1.png'
+/** No stock placeholder — avatars fall back to the student's initials. */
+export const defaultProfilePhoto = ''
 
 export const defaultProfileData: ProfileData = {
   nationalId: '',

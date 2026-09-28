@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   BarChart3,
@@ -8,11 +8,14 @@ import {
   CalendarDays,
   ClipboardList,
   FileBadge,
+  HeartHandshake,
   ListChecks,
   LogOut,
   Menu,
+  MessageSquareWarning,
   Phone,
   UserRound,
+  UsersRound,
   Wallet,
   X,
 } from 'lucide-react'
@@ -22,10 +25,12 @@ import { Separator } from '@/components/ui/separator'
 import { getUserInitials } from '@/features/auth/authApi'
 import { useAuth } from '@/features/auth/userStore'
 import { ProfileProvider, useProfile } from '@/features/profile/ProfileContext'
+import { getContactCompleteness } from '@/features/profile/profileData'
 import { cn } from '@/lib/utils'
 
 const mainLinks = [
   { to: '/profile', key: 'personal', icon: UserRound, end: true },
+  { to: '/profile/introduction-card', key: 'introductionCard', icon: HeartHandshake },
   { to: '/profile/notifications', key: 'notifications', icon: Bell },
   { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
   { to: '/profile/weekly-evaluations', key: 'weeklyEvaluations', icon: ListChecks },
@@ -35,6 +40,8 @@ const mainLinks = [
   { to: '/profile/fees', key: 'fees', icon: Wallet },
   { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
   { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
+  { to: '/profile/groups', key: 'groups', icon: UsersRound },
+  { to: '/profile/complaint-tickets', key: 'complaintTickets', icon: MessageSquareWarning },
 ] as const
 
 export function ProfileLayout() {
@@ -47,25 +54,39 @@ export function ProfileLayout() {
 
 function ProfileLayoutContent() {
   const { t } = useTranslation()
-  const { profilePhoto, personalName, personalInitials, gradeLabel } = useProfile()
+  const {
+    profileData,
+    profilePhoto,
+    personalName,
+    personalInitials,
+    gradeLabel,
+    isLoading,
+    error,
+  } = useProfile()
   const { logout } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  // Keep the student on the personal info form until father/guardian data is complete.
+  const mustCompleteProfile =
+    !isLoading && !error && getContactCompleteness(profileData).incomplete
+  const onPersonalPage = pathname.replace(/\/+$/, '') === '/profile'
 
   const studentName = personalName || t('profile.studentName')
   const studentGrade = gradeLabel || t('profile.studentGrade')
   const studentInitials = personalInitials || getUserInitials(studentName)
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/login')
+  const handleLogout = () => {
+    logout()
+    navigate('/login', { replace: true })
   }
 
   const sidebar = (
     <aside className="flex h-full w-full flex-col bg-muted/40 lg:w-64 lg:border-e lg:border-brand-dark/10">
       <div className="flex flex-col items-center px-5 pt-8 pb-6 text-center">
         <Avatar className="size-20 ring-4 ring-white shadow-sm">
-          <AvatarImage src={profilePhoto} alt={studentName} />
+          {profilePhoto ? <AvatarImage src={profilePhoto} alt={studentName} /> : null}
           <AvatarFallback>{studentInitials}</AvatarFallback>
         </Avatar>
         <h2 className="mt-4 text-lg font-bold text-brand-dark">{studentName}</h2>
@@ -130,7 +151,7 @@ function ProfileLayoutContent() {
         <div className={cn('lg:block', mobileOpen ? 'block' : 'hidden')}>{sidebar}</div>
 
         <div className="min-w-0 flex-1 bg-white p-5 sm:p-8">
-          <Outlet />
+          {mustCompleteProfile && !onPersonalPage ? <Navigate to="/profile" replace /> : <Outlet />}
         </div>
       </div>
     </section>
