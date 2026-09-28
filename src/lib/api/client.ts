@@ -22,7 +22,25 @@ declare module 'axios' {
   export interface InternalAxiosRequestConfig {
     skipAuth?: boolean
     requiresAuth?: boolean
+    /** The token this request was actually sent with (set by the request interceptor). */
+    sentWithToken?: string
   }
+}
+
+type AuthBridge = {
+  getToken: () => string | null
+  /** Called when the API rejects `token` with 401 (revoked, expired, or account deleted). */
+  onUnauthorized: (token: string) => void
+}
+
+let authBridge: AuthBridge = {
+  getToken: readStoredToken,
+  onUnauthorized: () => clearAuthStorage(),
+}
+
+/** Lets the auth store own the token and react to 401s without a circular import. */
+export function registerAuthBridge(bridge: AuthBridge) {
+  authBridge = bridge
 }
 
 function readStoredToken(): string | null {
@@ -57,14 +75,11 @@ function isPublicApiPath(url = '') {
 }
 
 function clearAuthStorage() {
-  localStorage.removeItem(AUTH_STORAGE_KEY)
-}
-
-function redirectToLogin() {
-  if (typeof window === 'undefined') return
-  const path = window.location.pathname
-  if (path === '/login' || path === '/register') return
-  window.location.assign(`/login?redirect=${encodeURIComponent(path)}`)
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY)
+  } catch {
+    // Storage can be unavailable (private mode / blocked site data).
+  }
 }
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/$/, '') ||
@@ -90,10 +105,11 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
   const publicPath = isPublicApiPath(config.url)
   const requiresAuth = config.requiresAuth ?? !publicPath
-  const token = readStoredToken()
+  const token = authBridge.getToken()
 
   if (token && !config.skipAuth) {
     config.headers.set('Authorization', `Bearer ${token}`)
+    config.sentWithToken = token
   } else if (requiresAuth && !config.skipAuth) {
     return Promise.reject(
       new ApiError('Unauthenticated.', {
@@ -118,16 +134,10 @@ api.interceptors.response.use(
     const message = body?.message || error.message || 'Request failed'
     const publicPath = isPublicApiPath(config?.url)
 
-    if (status === 401 && !publicPath && !config?.skipAuth) {
-      clearAuthStorage()
-      void import('@/features/auth/userStore').then(({ useUserStore }) => {
-        useUserStore.setState({
-          token: null,
-          user: null,
-          isAuthenticated: false,
-        })
-      })
-      redirectToLogin()
+    // Only end the session this request was sent with, so a late 401 from an
+    // old token can't wipe a newer login. Route guards handle the redirect.
+    if (status === 401 && !publicPath && !config?.skipAuth && config?.sentWithToken) {
+      authBridge.onUnauthorized(config.sentWithToken)
     }
 
     return Promise.reject(

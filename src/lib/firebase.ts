@@ -1,5 +1,12 @@
 import { initializeApp } from 'firebase/app'
-import { getMessaging, getToken, isSupported, onMessage, type Messaging } from 'firebase/messaging'
+import {
+  deleteToken,
+  getMessaging,
+  getToken,
+  isSupported,
+  onMessage,
+  type Messaging,
+} from 'firebase/messaging'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDzYpCOhVL6CSsjBlM4mImWcjTwtgwI71E',
@@ -31,6 +38,9 @@ export function getFirebaseMessaging() {
 export async function getFcmToken() {
   if (typeof window === 'undefined' || typeof Notification === 'undefined') return null
 
+  // A quick logout → login must not have the revoke delete the freshly issued token.
+  await pendingRevoke
+
   const messaging = await getFirebaseMessaging()
   if (!messaging) return null
   if (Notification.permission === 'denied') return null
@@ -44,6 +54,24 @@ export async function getFcmToken() {
   })
 
   return token || null
+}
+
+let pendingRevoke: Promise<void> = Promise.resolve()
+
+/** Invalidates this browser's push token so a signed-out user stops receiving pushes. */
+export function revokeFcmToken() {
+  if (typeof window === 'undefined' || typeof Notification === 'undefined') return pendingRevoke
+  if (Notification.permission !== 'granted') return pendingRevoke
+
+  pendingRevoke = pendingRevoke.then(async () => {
+    try {
+      const messaging = await getFirebaseMessaging()
+      if (messaging) await deleteToken(messaging)
+    } catch (error) {
+      console.warn('Could not revoke push token', error)
+    }
+  })
+  return pendingRevoke
 }
 
 export { onMessage }

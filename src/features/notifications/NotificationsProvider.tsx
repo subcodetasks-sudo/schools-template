@@ -10,12 +10,13 @@ import {
 } from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
-import { useAuth } from '@/features/auth/userStore'
+import { useAuth, useUserStore } from '@/features/auth/userStore'
 import {
   getUnreadCount,
   registerDeviceToken,
 } from '@/features/notifications/notificationsApi'
 import { getFcmToken, getFirebaseMessaging, onMessage } from '@/lib/firebase'
+import { playNotificationSound, unlockNotificationSound } from '@/lib/notificationSound'
 
 type NotificationsContextValue = {
   unreadCount: number
@@ -29,7 +30,7 @@ const NotificationsContext = createContext<NotificationsContextValue | null>(nul
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { t } = useTranslation()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, token: authToken } = useAuth()
   const [unreadCount, setUnreadCount] = useState(0)
   const [revision, setRevision] = useState(0)
   const registeredFor = useRef<string | null>(null)
@@ -39,27 +40,27 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const refreshUnread = useCallback(async () => {
-    if (!isAuthenticated) {
+    if (!authToken) {
       setUnreadCount(0)
       return
     }
 
     try {
       const count = await getUnreadCount()
-      setUnreadCount(count)
+      // Ignore a count that arrives after the session changed.
+      if (useUserStore.getState().token === authToken) setUnreadCount(count)
     } catch {
       // Keep the last known count if the badge request fails.
     }
-  }, [isAuthenticated])
+  }, [authToken])
 
+  // Every session change (login, logout, account switch in another tab) starts fresh,
+  // and the device is re-registered for the new student.
   useEffect(() => {
-    if (!isAuthenticated) {
-      registeredFor.current = null
-      return
-    }
-
-    void refreshUnread()
-  }, [isAuthenticated, refreshUnread])
+    registeredFor.current = null
+    setUnreadCount(0)
+    if (authToken) void refreshUnread()
+  }, [authToken, refreshUnread])
 
   useEffect(() => {
     if (!isAuthenticated) return
@@ -99,6 +100,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true
     }
+  }, [authToken, isAuthenticated])
+
+  useEffect(() => {
+    if (isAuthenticated) unlockNotificationSound()
   }, [isAuthenticated])
 
   useEffect(() => {
@@ -119,6 +124,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         const body = payload.notification?.body || payload.data?.body
 
         toast(title, { description: body })
+        playNotificationSound()
         setUnreadCount((count) => count + 1)
         bumpRevision()
         void refreshUnread()
