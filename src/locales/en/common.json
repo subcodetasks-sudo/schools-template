@@ -211,6 +211,9 @@
       "error": "Could not send your message. Please try again"
     }
   },
+  "auth": {
+    "sessionExpired": "Your session has ended. Please log in again"
+  },
   "login": {
     "title": "Log in",
     "body": "Sign in to your account to continue.",
@@ -339,6 +342,7 @@
     "success": "Account created successfully",
     "error": "Could not create the account. Please try again",
     "step1Error": "Could not verify identity and code",
+    "sessionExpired": "Your registration session has expired. Please verify your details again",
     "phone": "Phone number",
     "phonePlaceholder": "10xxxxxxx",
     "phoneNoLeadingZero": "You cannot add 0 after the country code",
@@ -363,6 +367,7 @@
     "logout": "Log out",
     "nav": {
       "personal": "Personal profile",
+      "introductionCard": "Student introduction card",
       "notifications": "Notifications",
       "certificate": "Student certificate",
       "monthlyEvaluations": "Monthly evaluations",
@@ -371,7 +376,9 @@
       "attendance": "Attendance",
       "fees": "Fees",
       "parentSummon": "Parent summon",
-      "statistics": "Statistics"
+      "statistics": "Statistics",
+      "groups": "Groups & activities",
+      "complaintTickets": "Complaint tickets"
     },
     "personal": {
       "title": "Personal information",
@@ -390,7 +397,8 @@
         "both": "Father and guardian details are incomplete. Please complete them now.",
         "father": "Father details are incomplete. Please complete them now.",
         "guardian": "Guardian details are incomplete. Please complete them now.",
-        "action": "Complete details"
+        "action": "Complete details",
+        "required": "You must complete the father and guardian details before using the rest of your profile."
       },
       "photo": "Profile photo",
       "photoHint": "Choose a clear photo (jpeg/png/webp/gif, max 2MB).",
@@ -844,6 +852,238 @@
           "label": "Number of absences",
           "value": "7"
         }
+      }
+    },
+    "groups": {
+      "untitledGroup": "Untitled group",
+      "untitledTask": "Untitled task",
+      "list": {
+        "title": "Groups & activities",
+        "subtitle": "The school groups you belong to, with their tasks and activities.",
+        "count": "Groups: {{count}}",
+        "emptyTitle": "You are not in any group yet",
+        "emptyDescription": "Once the school adds you to a group, it will appear here with its tasks and activities.",
+        "openGroup": "Open group",
+        "loadError": "Could not load groups."
+      },
+      "switcher": {
+        "label": "Your groups",
+        "ariaLabel": "Choose a group"
+      },
+      "info": {
+        "sectionTitle": "Group details",
+        "name": "Group name",
+        "description": "Description",
+        "supervisor": "Supervisor",
+        "studentsCount": "Enrolled students",
+        "noDescription": "This group has no description.",
+        "noSupervisor": "No supervisor assigned yet",
+        "loadError": "Could not load the group details."
+      },
+      "tasks": {
+        "sectionTitle": "Tasks & activities",
+        "sectionHint": "Sorted newest to oldest by upload date.",
+        "total": "Total tasks: {{count}}",
+        "columns": {
+          "title": "Task",
+          "uploadedAt": "Uploaded on",
+          "dueDate": "Due date",
+          "attachments": "Attachments",
+          "details": "Details"
+        },
+        "viewDetails": "View details",
+        "viewDetailsFor": "View details of task: {{title}}",
+        "noDueDate": "No deadline",
+        "attachmentsCount": "Files: {{count}}",
+        "hasAttachments": "Has attachments",
+        "noAttachments": "None",
+        "emptyTitle": "No tasks or activities yet",
+        "emptyDescription": "Tasks and activities posted by the group supervisor will appear here.",
+        "loadError": "Could not load tasks.",
+        "dueStatus": {
+          "overdue": "Past due",
+          "today": "Due today",
+          "soon": "Due soon",
+          "upcoming": "Open"
+        }
+      },
+      "taskDetail": {
+        "backToGroup": "Back to group",
+        "group": "Group",
+        "description": "Task description",
+        "noDescription": "This task has no description.",
+        "uploadedAt": "Uploaded on",
+        "dueDate": "Due date",
+        "attachments": "Attachments",
+        "noAttachments": "This task has no attachments.",
+        "open": "Open",
+        "download": "Download",
+        "openFile": "Open file {{name}}",
+        "downloadFile": "Download file {{name}}",
+        "fileUnavailable": "File unavailable",
+        "unnamedFile": "Attachment",
+        "loadError": "Could not load the task details."
+      },
+      "errors": {
+        "forbiddenTitle": "You are not a member of this group",
+        "forbiddenDescription": "You can't view the details or tasks of a group you don't belong to.",
+        "groupNotFoundTitle": "Group not found",
+        "groupNotFoundDescription": "This group may have been removed, or the link is incorrect.",
+        "taskNotFoundTitle": "Task not found",
+        "taskNotFoundDescription": "This task may have been removed, or the link is incorrect.",
+        "genericTitle": "Something went wrong",
+        "genericDescription": "We could not load the data. Please try again.",
+        "backToGroups": "Back to groups"
+      }
+    },
+    "introductionCard": {
+      "title": "Student introduction card",
+      "subtitle": "Tell the school about any special circumstances (health, psychological, social or other) so staff can support the student appropriately. This information is treated confidentially and is shared only with the school's psychologist and social specialist.",
+      "student": {
+        "title": "Student details",
+        "name": "Student name",
+        "code": "School code",
+        "stage": "Educational stage",
+        "grade": "Grade",
+        "classroom": "Class"
+      },
+      "types": {
+        "health": "Health",
+        "psychological": "Psychological",
+        "social": "Social",
+        "other": "Other"
+      },
+      "list": {
+        "title": "Student-specific information",
+        "count": "Entries: {{value}}",
+        "emptyTitle": "No information added yet",
+        "emptyDescription": "You can add any information or special circumstance about the student using the form below.",
+        "edit": "Edit",
+        "createdAt": "Added",
+        "updatedAt": "Last edited"
+      },
+      "form": {
+        "addTitle": "Add new information",
+        "addSubtitle": "You can add several entries at once. Saved entries cannot be deleted, but they can be edited at any time.",
+        "rowTitle": "Entry {{number}}",
+        "type": "Circumstance / information type",
+        "typePlaceholder": "Select a type",
+        "description": "Description of the circumstance or information",
+        "descriptionPlaceholder": "Describe the circumstance or information clearly…",
+        "notes": "Additional notes",
+        "notesPlaceholder": "Any additional notes or recommendations (optional)…",
+        "optional": "(optional)",
+        "charCount": "{{value}} / {{max}}",
+        "addRow": "Add another entry",
+        "removeRow": "Remove",
+        "removeRowLabel": "Remove entry {{number}}",
+        "maxRows": "You can add up to {{max}} entries at a time.",
+        "submit": "Save information",
+        "submitting": "Saving…",
+        "editTitle": "Edit entry",
+        "save": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      },
+      "validation": {
+        "typeRequired": "Select a type.",
+        "descriptionRequired": "Description is required.",
+        "descriptionTooLong": "Description must not exceed {{max}} characters.",
+        "notesTooLong": "Notes must not exceed {{max}} characters."
+      },
+      "toasts": {
+        "addSuccess": "The information was saved and sent to the school.",
+        "addError": "Could not save the information. Please try again.",
+        "updateSuccess": "The entry was updated.",
+        "updateError": "Could not update the entry. Please try again."
+      },
+      "errors": {
+        "loadError": "Could not load the introduction card.",
+        "genericTitle": "Something went wrong",
+        "genericDescription": "Could not load the introduction card. Please try again.",
+        "forbiddenTitle": "Not allowed",
+        "forbiddenDescription": "You do not have permission to view the introduction card for this account."
+      }
+    },
+    "complaintTickets": {
+      "title": "Daily complaint tickets",
+      "subtitle": "File a complaint about something that happened to the student at school. It goes straight to the staff responsible for reviewing this type of complaint.",
+      "ticket": {
+        "number": "Ticket number",
+        "type": "Complaint type",
+        "title": "Complaint title",
+        "body": "Complaint details",
+        "createdAt": "Created at",
+        "unknownType": "Unspecified type",
+        "untitled": "Untitled complaint",
+        "noBody": "No details were provided."
+      },
+      "form": {
+        "heading": "New complaint ticket",
+        "title": "Complaint title",
+        "subtitle": "The ticket is linked to the student on this account automatically, so there is no need to enter their details.",
+        "type": "Complaint type",
+        "typePlaceholder": "Select a complaint type",
+        "typesLoading": "Loading complaint types...",
+        "typesLoadError": "Could not load complaint types.",
+        "typesEmpty": "No complaint types are available right now. Please try again later or contact the school.",
+        "reloadTypes": "Reload types",
+        "titlePlaceholder": "A short title describing the complaint",
+        "body": "Complaint details",
+        "bodyPlaceholder": "Describe what happened, when and where...",
+        "charCount": "{{value}} / {{max}}",
+        "submit": "Submit complaint",
+        "submitting": "Submitting...",
+        "reset": "Clear fields"
+      },
+      "validation": {
+        "typeRequired": "Please select a complaint type.",
+        "typeUnavailable": "The selected complaint type is no longer available. Please choose another one.",
+        "titleRequired": "Please enter a complaint title.",
+        "titleTooLong": "The title must not exceed {{max}} characters.",
+        "bodyRequired": "Please enter the complaint details.",
+        "bodyTooLong": "The details must not exceed {{max}} characters."
+      },
+      "toasts": {
+        "createSuccess": "Your complaint was submitted successfully.",
+        "createSuccessNumber": "Ticket number: {{number}}",
+        "createError": "Could not submit the complaint. Please try again.",
+        "typesRefreshed": "The complaint types list was updated. Please select a type again."
+      },
+      "list": {
+        "title": "Student complaint history",
+        "subtitle": "Every complaint you have submitted, newest first.",
+        "total": "{{count}} tickets",
+        "emptyTitle": "No complaints yet",
+        "emptyDescription": "Complaints you submit will appear here for future reference.",
+        "loadError": "Could not load the complaint history.",
+        "viewDetails": "View details",
+        "viewDetailsFor": "View details of complaint: {{title}}",
+        "columns": {
+          "details": "Details"
+        }
+      },
+      "details": {
+        "title": "Complaint ticket details",
+        "back": "Back to complaint tickets",
+        "studentSection": "Student details",
+        "complaintSection": "Complaint details",
+        "loadError": "Could not load the complaint details."
+      },
+      "student": {
+        "name": "Student name",
+        "code": "School code",
+        "stage": "Stage",
+        "grade": "Grade",
+        "classroom": "Classroom"
+      },
+      "errors": {
+        "genericTitle": "Something went wrong",
+        "genericDescription": "We could not load the data. Please try again.",
+        "forbiddenTitle": "Access denied",
+        "forbiddenDescription": "This ticket does not belong to the student on this account.",
+        "notFoundTitle": "Ticket not found",
+        "notFoundDescription": "This ticket may not exist, or the link is incorrect."
       }
     }
   }
