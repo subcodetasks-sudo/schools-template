@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, ChevronDown, LogOut, Menu, UserRound, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { formatStudentAccountId } from '@/features/auth/authApi'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { formatStudentAccountId, getUserInitials } from '@/features/auth/authApi'
 import { useAuth } from '@/features/auth/userStore'
 import { NotificationBell } from '@/features/notifications/NotificationBell'
 import { defaultProfilePhoto } from '@/features/profile/profileData'
@@ -59,7 +60,10 @@ function ProfileMenuDropdown({
   if (!session) return null
 
   const studentName = user?.name || t('profile.studentName')
-  const studentPhoto = user?.image || defaultProfilePhoto
+  // Same rule as the profile page: only trust real API image URLs, never a stock photo.
+  const studentPhoto = user?.image?.trim() && !user.image.includes('/storage/')
+    ? user.image.trim()
+    : defaultProfilePhoto
   const accountId = formatStudentAccountId(session.nationalId || user?.code || '')
 
   const closeMenu = () => setOpen(false)
@@ -70,11 +74,11 @@ function ProfileMenuDropdown({
     navigate('/profile')
   }
 
-  const handleLogout = async () => {
-    await logout()
+  const handleLogout = () => {
     closeMenu()
     onNavigate?.()
-    navigate('/login')
+    logout()
+    navigate('/login', { replace: true })
   }
 
   return (
@@ -90,11 +94,14 @@ function ProfileMenuDropdown({
           fullWidth ? 'w-full max-w-none' : 'max-w-60 sm:max-w-68',
         )}
       >
-        <img
-          src={studentPhoto}
-          alt=""
-          className="size-8 shrink-0 rounded-lg object-cover ring-2 ring-white/15"
-        />
+        <Avatar className="size-8 rounded-lg ring-2 ring-white/15 after:hidden">
+          {studentPhoto ? (
+            <AvatarImage src={studentPhoto} alt="" className="rounded-lg" />
+          ) : null}
+          <AvatarFallback className="rounded-lg bg-white/15 text-xs font-bold text-white">
+            {getUserInitials(user?.name)}
+          </AvatarFallback>
+        </Avatar>
         <span className="min-w-0 flex-1 text-start">
           <span className="block truncate text-sm font-bold leading-tight text-white">
             {studentName}

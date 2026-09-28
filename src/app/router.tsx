@@ -12,6 +12,7 @@ import { ContactPage } from '@/features/contact/ContactPage'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RegisterPage } from '@/features/auth/RegisterPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
+import { GuestRoute } from '@/features/auth/GuestRoute'
 import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
 import { ProfileLayout } from '@/features/profile/ProfileLayout'
 import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
@@ -24,6 +25,12 @@ import { StatisticsPage } from '@/features/profile/StatisticsPage'
 import { AttendancePage } from '@/features/profile/AttendancePage'
 import { FeesPage } from '@/features/profile/FeesPage'
 import { NotificationsPage } from '@/features/notifications/NotificationsPage'
+import { GroupsPage } from '@/features/groups/GroupsPage'
+import { GroupDetailPage } from '@/features/groups/GroupDetailPage'
+import { GroupTaskDetailPage } from '@/features/groups/GroupTaskDetailPage'
+import { IntroductionCardPage } from '@/features/introduction-card/IntroductionCardPage'
+import { ComplaintTicketsPage } from '@/features/complaint-tickets/ComplaintTicketsPage'
+import { ComplaintTicketDetailPage } from '@/features/complaint-tickets/ComplaintTicketDetailPage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 
 export const router = createBrowserRouter([
@@ -41,8 +48,13 @@ export const router = createBrowserRouter([
       { path: 'blog/:id', element: <BlogDetailPage /> },
       { path: 'contact', element: <ContactPage /> },
       { path: 'terms-of-applying', element: <TermsOfApplyingPage /> },
-      { path: 'login', element: <LoginPage /> },
-      { path: 'register', element: <RegisterPage /> },
+      {
+        element: <GuestRoute />,
+        children: [
+          { path: 'login', element: <LoginPage /> },
+          { path: 'register', element: <RegisterPage /> },
+        ],
+      },
       {
         path: 'profile',
         element: <ProtectedRoute />,
@@ -86,6 +98,30 @@ export const router = createBrowserRouter([
               {
                 path: 'notifications',
                 element: <NotificationsPage />,
+              },
+              {
+                path: 'groups',
+                element: <GroupsPage />,
+              },
+              {
+                path: 'groups/:groupId',
+                element: <GroupDetailPage />,
+              },
+              {
+                path: 'groups/:groupId/tasks/:taskId',
+                element: <GroupTaskDetailPage />,
+              },
+              {
+                path: 'introduction-card',
+                element: <IntroductionCardPage />,
+              },
+              {
+                path: 'complaint-tickets',
+                element: <ComplaintTicketsPage />,
+              },
+              {
+                path: 'complaint-tickets/:ticketId',
+                element: <ComplaintTicketDetailPage />,
               },
               { path: '*', element: <Navigate to="/404" replace /> },
             ],
