@@ -289,21 +289,30 @@ export async function loginRequest(payload: LoginPayload) {
   })
 }
 
-export async function fetchCurrentUser() {
+export async function fetchCurrentUser(token?: string) {
   try {
     const { getStudentProfile, mapPersonalToAuthUser } = await import(
       '@/features/profile/studentProfileApi'
     )
-    const profile = await getStudentProfile()
+    const profile = await getStudentProfile(token)
     return mapPersonalToAuthUser(profile.personal)
   } catch {
     return null
   }
 }
 
-export async function logoutRequest() {
+/**
+ * Revokes `token` on the server. Sent with an explicit header (and `skipAuth`) so it
+ * still works after the local session is cleared, and a 401 here never re-triggers
+ * the global "session expired" handling.
+ */
+export async function logoutRequest(token: string) {
   try {
-    await apiPost('/v1/auth/logout', undefined, { requiresAuth: true })
+    await apiPost('/v1/auth/logout', undefined, {
+      skipAuth: true,
+      requiresAuth: false,
+      headers: { Authorization: `Bearer ${token}` },
+    })
   } catch {
     // Local logout should still succeed if the token is already invalid.
   }

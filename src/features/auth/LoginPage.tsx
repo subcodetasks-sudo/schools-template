@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
 import { useAuth } from '@/features/auth/userStore'
+import type { AuthRedirectState } from '@/features/auth/redirect'
 import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
@@ -21,15 +22,11 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export function LoginPage() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
 
-  const redirectTo =
-    (location.state as { from?: { pathname?: string } } | null)?.from?.pathname ||
-    new URLSearchParams(location.search).get('redirect') ||
-    '/profile'
+  const prefilledCode = (location.state as AuthRedirectState | null)?.code
 
   const {
     register,
@@ -37,16 +34,20 @@ export function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      code: prefilledCode && /^\d{9}$/.test(prefilledCode) ? prefilledCode : '',
+      password: '',
+    },
   })
 
   const onSubmit = handleSubmit(async (values) => {
     try {
+      // On success GuestRoute redirects to where the user came from (or the profile).
       await login({
         code: values.code.trim(),
         password: values.password,
       })
       toast.success(t('login.success'))
-      navigate(redirectTo, { replace: true })
     } catch (error) {
       toast.error(getErrorMessage(error, t('login.error')))
     }
@@ -120,7 +121,7 @@ export function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-brand-dark/55">
         {t('login.noAccount')}{' '}
-        <Link to="/register" className="font-semibold text-brand-primary hover:underline">
+        <Link to="/register" state={location.state} className="font-semibold text-brand-primary hover:underline">
           {t('login.register')}
         </Link>
       </p>

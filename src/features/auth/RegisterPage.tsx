@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
@@ -14,8 +14,19 @@ import {
   registerStep2,
   toE164EgyptPhone,
 } from '@/features/auth/authApi'
-import { getErrorMessage } from '@/lib/api'
+import type { AuthRedirectState } from '@/features/auth/redirect'
+import { ApiError, getErrorMessage, getFieldErrors } from '@/lib/api'
 import { cn } from '@/lib/utils'
+
+/** The step-1 registration token was rejected (expired, already used, or invalid). */
+function isRegistrationTokenError(error: unknown) {
+  if (getFieldErrors(error)?.token?.length) return true
+  return error instanceof ApiError && [401, 410, 419].includes(error.status)
+}
+
+function firstFieldError(error: unknown, field: string) {
+  return getFieldErrors(error)?.[field]?.[0]
+}
 
 type StudentIdentityType = 'egyptian' | 'foreigner'
 
@@ -70,8 +81,10 @@ type StepTwoForm = z.infer<typeof stepTwoSchema>
 export function RegisterPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const [step, setStep] = useState<1 | 2>(1)
   const [registrationToken, setRegistrationToken] = useState<string | null>(null)
+  const [studentCode, setStudentCode] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -120,6 +133,15 @@ export function RegisterPage() {
     stepOneForm.clearErrors(['nationalId', 'passportNumber'])
   }
 
+  /** Drops the step-1 token and returns to step 1, keeping what the user typed there. */
+  const restartFromStepOne = () => {
+    setRegistrationToken(null)
+    setStudentCode(null)
+    stepTwoForm.resetField('password')
+    stepTwoForm.resetField('confirmPassword')
+    setStep(1)
+  }
+
   const onStepOne = stepOneForm.handleSubmit(async (data) => {
     try {
       const code = data.code.trim()
@@ -134,6 +156,7 @@ export function RegisterPage() {
               code,
             })
       setRegistrationToken(result.token)
+      setStudentCode(result.student.code ?? code)
       setStep(2)
     } catch (error) {
       toast.error(getErrorMessage(error, t('register.step1Error')))
@@ -142,8 +165,8 @@ export function RegisterPage() {
 
   const onStepTwo = stepTwoForm.handleSubmit(async (data) => {
     if (!registrationToken) {
-      toast.error(t('register.step1Error'))
-      setStep(1)
+      toast.error(t('register.sessionExpired'))
+      restartFromStepOne()
       return
     }
 
@@ -156,8 +179,28 @@ export function RegisterPage() {
       })
 
       toast.success(t('register.success'))
-      navigate('/login')
+      // Replace so "back" can't return to a finished registration.
+      const state: AuthRedirectState = {
+        from: (location.state as AuthRedirectState | null)?.from,
+        code: studentCode ?? undefined,
+      }
+      navigate('/login', { replace: true, state })
     } catch (error) {
+      if (isRegistrationTokenError(error)) {
+        toast.error(getErrorMessage(error, t('register.sessionExpired')))
+        restartFromStepOne()
+        return
+      }
+
+      for (const field of ['phone', 'password'] as const) {
+        const message = firstFieldError(error, field)
+        if (message) stepTwoForm.setError(field, { type: 'server', message })
+      }
+      const confirmMessage = firstFieldError(error, 'confirm_password')
+      if (confirmMessage) {
+        stepTwoForm.setError('confirmPassword', { type: 'server', message: confirmMessage })
+      }
+
       toast.error(getErrorMessage(error, t('register.error')))
     }
   })
@@ -272,7 +315,11 @@ export function RegisterPage() {
 
           <p className="text-center text-sm text-brand-dark/55">
             {t('register.hasAccount')}{' '}
-            <Link to="/login" className="font-semibold text-brand-primary hover:underline">
+            <Link
+              to="/login"
+              state={{ from: (location.state as AuthRedirectState | null)?.from }}
+              className="font-semibold text-brand-primary hover:underline"
+            >
               {t('register.login')}
             </Link>
           </p>
@@ -283,9 +330,11 @@ export function RegisterPage() {
             id="phone"
             label={t('register.phone')}
             error={
-              stepTwoForm.formState.errors.phone?.message
-                ? t('register.phoneInvalid')
-                : undefined
+              stepTwoForm.formState.errors.phone?.type === 'server'
+                ? stepTwoForm.formState.errors.phone.message
+                : stepTwoForm.formState.errors.phone
+                  ? t('register.phoneInvalid')
+                  : undefined
             }
           >
             <div
@@ -344,9 +393,11 @@ export function RegisterPage() {
             id="confirmPassword"
             label={t('register.confirmPassword')}
             error={
-              stepTwoForm.formState.errors.confirmPassword
-                ? t('register.passwordMismatch')
-                : undefined
+              stepTwoForm.formState.errors.confirmPassword?.type === 'server'
+                ? stepTwoForm.formState.errors.confirmPassword.message
+                : stepTwoForm.formState.errors.confirmPassword
+                  ? t('register.passwordMismatch')
+                  : undefined
             }
           >
             <div className="relative">
@@ -392,6 +443,17 @@ export function RegisterPage() {
             className="h-12 w-full rounded-xl bg-brand-primary text-base font-semibold text-white hover:bg-brand-dark"
           >
             {t('register.submit')}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="lg"
+            disabled={stepTwoForm.formState.isSubmitting}
+            onClick={restartFromStepOne}
+            className="h-12 w-full rounded-xl text-base font-semibold text-brand-dark/70 hover:text-brand-primary"
+          >
+            {t('register.back')}
           </Button>
         </form>
       )}
