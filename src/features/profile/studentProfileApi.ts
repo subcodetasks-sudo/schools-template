@@ -338,7 +338,6 @@ export function mapProfileDataToUpdatePayload(
   const payload: UpdateStudentProfilePayload = {}
 
   assignFilled(payload, 'phone', data.phone)
-  assignFilled(payload, 'religion', data.religion)
   assignFilled(payload, 'father_national_id', data.fatherNationalId)
   assignFilled(payload, 'father_address', data.fatherAddress)
   assignFilled(payload, 'father_job', data.fatherJob)

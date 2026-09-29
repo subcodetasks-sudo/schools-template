@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 
 const links = [
   { to: '/', key: 'home' },
-  { to: '/top-students', key: 'topStudents' },
+  // { to: '/top-students', key: 'topStudents' },
   { to: '/achievements', key: 'achievements' },
   { to: '/events', key: 'events' },
   { to: '/blog', key: 'blog' },

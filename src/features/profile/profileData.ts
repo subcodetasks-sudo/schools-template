@@ -68,6 +68,7 @@ export const defaultProfileData: ProfileData = {
 export const readOnlyProfileFields: ProfileFieldKey[] = [
   'nationalId',
   'studentCode',
+  'religion',
   'registrationStatus',
   'classNumber',
   'transfers',
@@ -79,7 +80,6 @@ export const readOnlyProfileFields: ProfileFieldKey[] = [
 
 export const editableProfileFields: ProfileFieldKey[] = [
   'phone',
-  'religion',
   'fatherNationalId',
   'fatherAddress',
   'fatherJob',

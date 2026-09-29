@@ -3,13 +3,13 @@ import { ApplyCtaSection } from '@/features/home/components/ApplyCtaSection'
 import { BlogSection } from '@/features/home/components/BlogSection'
 import { EventsSection } from '@/features/home/components/EventsSection'
 import { HeroSection } from '@/features/home/components/HeroSection'
-import { TopStudentsSection } from '@/features/home/components/TopStudentsSection'
+// import { TopStudentsSection } from '@/features/home/components/TopStudentsSection'
 
 export function HomePage() {
   return (
     <>
       <HeroSection />
-      <TopStudentsSection />
+      {/* <TopStudentsSection /> */}
       <AchievementsSection />
       <EventsSection />
       <BlogSection />

@@ -59,7 +59,7 @@ export function AchievementsSection() {
   if (achievements.length === 0) return null
 
   return (
-    <section className="bg-muted py-16 sm:py-20">
+    <section className="bg-background py-16 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <SectionHeader
           className="mb-12"
