@@ -376,6 +376,7 @@
       "attendance": "الحضور والغياب",
       "fees": "المصروفات",
       "parentSummon": "إستدعاء ولي الأمر",
+      "conduct": "المخالفات",
       "statistics": "الإحصائيات",
       "groups": "الجماعات والأنشطة",
       "complaintTickets": "تذاكر الشكاوى"
@@ -687,6 +688,38 @@
         "unnamed": "مصروف"
       }
     },
+    "conduct": {
+      "subtitle": "المخالفات المعتمدة الخاصة بالطالب. الصفحة للعرض فقط.",
+      "loadError": "تعذر تحميل سجل المخالفات.",
+      "suspendedTitle": "الدراسة موقوفة حالياً",
+      "suspendedBody": "توجد مخالفة من الدرجة الرابعة ما زالت مفتوحة، لذلك يظهر تعليق الدراسة.",
+      "emptyViolations": "لا توجد مخالفات معتمدة.",
+      "unnamedViolation": "مخالفة",
+      "violationCount": "{{count}} مخالفة",
+      "serial": "مسلسل {{n}}",
+      "typeNumber": "رقم المخالفة {{number}}",
+      "fields": {
+        "issuedOn": "تاريخ الإصدار",
+        "referralSource": "جهة الإحالة",
+        "classroom": "الفصل",
+        "repeatCount": "عدد التكرار",
+        "penalty": "الجزاء",
+        "approvedAt": "تاريخ الاعتماد",
+        "description": "الوصف",
+        "notes": "ملاحظات",
+        "protectionApproval": "اعتماد لجنة الحماية",
+        "authoritiesNotifiedOn": "إخطار الجهات",
+        "authoritiesDecision": "قرار الجهات",
+        "schoolDecision": "قرار المدرسة"
+      },
+      "degrees": {
+        "1": "الدرجة الأولى",
+        "2": "الدرجة الثانية",
+        "3": "الدرجة الثالثة",
+        "4": "الدرجة الرابعة",
+        "unknown": "درجة غير محددة"
+      }
+    },
     "parentSummon": {
       "viewDetails": "عرض التفاصيل",
       "backToList": "العودة للقائمة",
@@ -825,6 +858,7 @@
       "weeklyEvaluations": "ستظهر التقييمات الأسبوعية هنا.",
       "schedule": "سيظهر الجدول الدراسي هنا.",
       "fees": "ستظهر المصروفات هنا.",
+      "conduct": "سيظهر سجل المخالفات هنا.",
       "parentSummon": "ستظهر إستدعاءات ولي الأمر هنا.",
       "statistics": "ستظهر إحصائيات الطالب هنا."
     },

@@ -14,6 +14,7 @@ import {
   Menu,
   MessageSquareWarning,
   Phone,
+  ShieldAlert,
   UserRound,
   UsersRound,
   Wallet,
@@ -39,6 +40,7 @@ const mainLinks = [
   { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },
   { to: '/profile/fees', key: 'fees', icon: Wallet },
   { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
+  { to: '/profile/conduct', key: 'conduct', icon: ShieldAlert },
   { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
   { to: '/profile/groups', key: 'groups', icon: UsersRound },
   { to: '/profile/complaint-tickets', key: 'complaintTickets', icon: MessageSquareWarning },
@@ -95,7 +97,7 @@ function ProfileLayoutContent() {
 
       <Separator className="mx-5 bg-brand-dark/10" />
 
-      <nav className="flex flex-1 flex-col gap-1 px-3 py-5">
+      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5">
         {mainLinks.map((link) => (
           <NavLink
             key={link.key}

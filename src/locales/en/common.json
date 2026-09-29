@@ -376,6 +376,7 @@
       "attendance": "Attendance",
       "fees": "Fees",
       "parentSummon": "Parent summon",
+      "conduct": "Conduct",
       "statistics": "Statistics",
       "groups": "Groups & activities",
       "complaintTickets": "Complaint tickets"
@@ -687,6 +688,38 @@
         "unnamed": "Fee"
       }
     },
+    "conduct": {
+      "subtitle": "Approved violations for this student. This page is read-only.",
+      "loadError": "Could not load the conduct record.",
+      "suspendedTitle": "Studies are currently suspended",
+      "suspendedBody": "A fourth-degree case is still open, so studies appear as suspended.",
+      "emptyViolations": "No approved violations.",
+      "unnamedViolation": "Violation",
+      "violationCount": "{{count}} violation(s)",
+      "serial": "Serial {{n}}",
+      "typeNumber": "Violation no. {{number}}",
+      "fields": {
+        "issuedOn": "Issue date",
+        "referralSource": "Referral source",
+        "classroom": "Class",
+        "repeatCount": "Repeat count",
+        "penalty": "Penalty",
+        "approvedAt": "Approved at",
+        "description": "Description",
+        "notes": "Notes",
+        "protectionApproval": "Protection committee approval",
+        "authoritiesNotifiedOn": "Authorities notified",
+        "authoritiesDecision": "Authorities decision",
+        "schoolDecision": "School decision"
+      },
+      "degrees": {
+        "1": "First degree",
+        "2": "Second degree",
+        "3": "Third degree",
+        "4": "Fourth degree",
+        "unknown": "Unspecified degree"
+      }
+    },
     "parentSummon": {
       "viewDetails": "View details",
       "backToList": "Back to list",
@@ -825,6 +858,7 @@
       "weeklyEvaluations": "Weekly evaluations will appear here.",
       "schedule": "The school schedule will appear here.",
       "fees": "Fees will appear here.",
+      "conduct": "The conduct record will appear here.",
       "parentSummon": "Parent summon records will appear here.",
       "statistics": "Student statistics will appear here."
     },
