@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import {
   isFinalExamDanger,
   type FinalCertificateSheet,
-  type FinalCertificateSubjectCell,
 } from '@/features/final-results/finalCertificateSheet'
 import { cn } from '@/lib/utils'
 
@@ -68,6 +67,20 @@ function formatScore(value: number | null | undefined) {
   )
 }
 
+function formatScoreWithMax(
+  value: number | null | undefined,
+  max: number | null | undefined,
+) {
+  return (
+    <span className="inline-flex items-baseline gap-1 tabular-nums" dir="ltr">
+      {formatScore(value)}
+      {max !== null && max !== undefined ? (
+        <span className="text-xs font-normal text-brand-dark/45">/ {max}</span>
+      ) : null}
+    </span>
+  )
+}
+
 function ResultBadge({ result }: { result: 'passed' | 'failed' | 'pending' }) {
   const { t } = useTranslation()
 
@@ -82,35 +95,6 @@ function ResultBadge({ result }: { result: 'passed' | 'failed' | 'pending' }) {
     >
       {t(`finalResults.sheet.results.${result}`)}
     </span>
-  )
-}
-
-function SubjectCells({
-  cell,
-  borderClass,
-}: {
-  cell: FinalCertificateSubjectCell
-  borderClass: string
-}) {
-  const examDanger = isFinalExamDanger(cell)
-
-  return (
-    <>
-      <td className={cn('border-t border-brand-dark/8 px-2 py-2.5 text-center', borderClass)}>
-        {formatScore(cell.yearWork)}
-      </td>
-      <td
-        className={cn(
-          'border-t border-brand-dark/8 px-2 py-2.5 text-center',
-          examDanger && 'bg-destructive/10 font-semibold text-destructive',
-        )}
-      >
-        {formatScore(cell.finalExam)}
-      </td>
-      <td className="border-t border-brand-dark/8 px-2 py-2.5 text-center font-semibold text-brand-secondary">
-        {formatScore(cell.total)}
-      </td>
-    </>
   )
 }
 
@@ -143,124 +127,87 @@ export function FinalCertificateSheetTable({
 
   return (
     <div className={cn('overflow-x-auto rounded-lg border border-brand-dark/10', className)}>
-      <table className="w-full min-w-[48rem] border-collapse text-sm text-start">
+      <table className="w-full min-w-[42rem] border-collapse text-sm text-start">
         <thead>
           <tr>
-            {sheet.subjects.map((subject, index) => {
-              const tone = SUBJECT_TONES[index % SUBJECT_TONES.length]
-              return (
-                <th
-                  key={subject.id}
-                  colSpan={3}
-                  className={cn(
-                    'border-s-2 px-2 py-2.5 text-center text-xs font-bold sm:text-sm',
-                    tone.header,
-                    tone.border,
-                  )}
-                >
-                  {subject.name}
-                </th>
-              )
-            })}
-            <th
-              rowSpan={2}
-              className="bg-brand-secondary px-3 py-3 text-center align-middle text-xs font-bold whitespace-nowrap text-white sm:text-sm"
-            >
+            <th className="bg-brand-dark px-3 py-3 text-center text-xs font-bold text-white sm:text-sm">
+              {t('finalResults.sheet.subject')}
+            </th>
+            <th className="bg-brand-primary px-3 py-3 text-center text-xs font-bold whitespace-nowrap text-white sm:text-sm">
+              {t('finalResults.sheet.yearWork')}
+            </th>
+            <th className="bg-brand-primary px-3 py-3 text-center text-xs font-bold whitespace-nowrap text-white sm:text-sm">
+              {t('finalResults.sheet.finalExam')}
+            </th>
+            <th className="bg-brand-secondary px-3 py-3 text-center text-xs font-bold whitespace-nowrap text-white sm:text-sm">
+              {t('finalResults.sheet.subjectTotal')}
+            </th>
+            <th className="bg-brand-secondary px-3 py-3 text-center text-xs font-bold whitespace-nowrap text-white sm:text-sm">
               {t('finalResults.sheet.grandTotal')}
             </th>
-            <th
-              rowSpan={2}
-              className="bg-brand-primary px-3 py-3 text-center align-middle text-xs font-bold whitespace-nowrap text-white sm:text-sm"
-            >
+            <th className="bg-brand-primary px-3 py-3 text-center text-xs font-bold whitespace-nowrap text-white sm:text-sm">
               {t('finalResults.table.status')}
             </th>
           </tr>
-          <tr>
-            {sheet.subjects.map((subject, index) => {
-              const tone = SUBJECT_TONES[index % SUBJECT_TONES.length]
-              return (
-                <FragmentHeaders
-                  key={`${subject.id}-subs`}
-                  toneClass={tone.sub}
-                  borderClass={cn('border-s-2', tone.border)}
-                />
-              )
-            })}
-          </tr>
         </thead>
         <tbody>
-          {sheet.students.map((student, rowIndex) => (
-            <tr
-              key={student.studentId || student.code || rowIndex}
-              className={cn(rowIndex % 2 === 0 ? 'bg-white' : 'bg-muted/30')}
-            >
-              {sheet.subjects.map((subject, index) => {
-                const tone = SUBJECT_TONES[index % SUBJECT_TONES.length]
-                const cell = student.subjects[subject.id] ?? {
-                  yearWork: null,
-                  finalExam: null,
-                  total: null,
-                  totalMax: null,
-                  status: 'incomplete',
-                  finalExamPassed: null,
-                }
-                return (
-                  <SubjectCells
-                    key={`${student.studentId}-${subject.id}`}
-                    cell={cell}
-                    borderClass={cn('border-s-2', tone.border)}
-                  />
-                )
-              })}
-              <td className="border-t border-brand-dark/8 px-3 py-2.5 text-center font-semibold text-brand-secondary">
-                {formatScore(student.grandTotal)}
-              </td>
-              <td className="border-t border-brand-dark/8 px-3 py-2.5 text-center">
-                <ResultBadge result={student.result} />
-              </td>
-            </tr>
-          ))}
+          {sheet.students.flatMap((student, rowIndex) =>
+            sheet.subjects.map((subject, subjectIndex) => {
+              const tone = SUBJECT_TONES[subjectIndex % SUBJECT_TONES.length]
+              const cell = student.subjects[subject.id] ?? {
+                yearWork: null,
+                yearWorkMax: null,
+                finalExam: null,
+                finalExamMax: null,
+                total: null,
+                totalMax: null,
+                status: 'incomplete',
+                finalExamPassed: null,
+              }
+              const examDanger = isFinalExamDanger(cell)
+
+              return (
+                <tr
+                  key={`${student.studentId || student.code || rowIndex}-${subject.id}`}
+                  className={cn(subjectIndex % 2 === 0 ? 'bg-white' : 'bg-muted/30')}
+                >
+                  <th
+                    scope="row"
+                    className={cn(
+                      'border-t px-3 py-2.5 text-center text-xs font-bold text-white sm:text-sm',
+                      tone.header,
+                      tone.border,
+                    )}
+                  >
+                    {subject.name}
+                  </th>
+                  <td className="border-t border-brand-dark/8 px-2 py-2.5 text-center">
+                    {formatScoreWithMax(cell.yearWork, cell.yearWorkMax)}
+                  </td>
+                  <td
+                    className={cn(
+                      'border-t border-brand-dark/8 px-2 py-2.5 text-center',
+                      examDanger && 'bg-destructive/10 font-semibold text-destructive',
+                    )}
+                  >
+                    {formatScoreWithMax(cell.finalExam, cell.finalExamMax)}
+                  </td>
+                  <td className="border-t border-brand-dark/8 px-2 py-2.5 text-center font-semibold text-brand-secondary">
+                    {formatScoreWithMax(cell.total, cell.totalMax)}
+                  </td>
+                  <td className="border-t border-brand-dark/8 px-3 py-2.5 text-center font-semibold text-brand-secondary">
+                    {formatScore(student.grandTotal)}
+                  </td>
+                  <td className="border-t border-brand-dark/8 px-3 py-2.5 text-center">
+                    <ResultBadge result={student.result} />
+                  </td>
+                </tr>
+              )
+            }),
+          )}
         </tbody>
       </table>
     </div>
   )
 }
 
-function FragmentHeaders({
-  toneClass,
-  borderClass,
-}: {
-  toneClass: string
-  borderClass: string
-}) {
-  const { t } = useTranslation()
-  return (
-    <>
-      <th
-        className={cn(
-          'px-2 py-2 text-center text-[11px] font-semibold whitespace-nowrap sm:text-xs',
-          toneClass,
-          borderClass,
-        )}
-      >
-        {t('finalResults.sheet.yearWork')}
-      </th>
-      <th
-        className={cn(
-          'px-2 py-2 text-center text-[11px] font-semibold whitespace-nowrap sm:text-xs',
-          toneClass,
-        )}
-      >
-        {t('finalResults.sheet.finalExam')}
-      </th>
-      <th
-        className={cn(
-          'px-2 py-2 text-center text-[11px] font-semibold whitespace-nowrap sm:text-xs',
-          toneClass,
-        )}
-      >
-        {t('finalResults.sheet.subjectTotal')}
-      </th>
-    </>
-  )
-}

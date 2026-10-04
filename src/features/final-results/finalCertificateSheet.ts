@@ -5,7 +5,9 @@ export type FinalCertificateSubjectCol = {
 
 export type FinalCertificateSubjectCell = {
   yearWork: number | null
+  yearWorkMax: number | null
   finalExam: number | null
+  finalExamMax: number | null
   total: number | null
   totalMax: number | null
   status: 'pass' | 'fail' | 'incomplete' | string
@@ -30,7 +32,9 @@ export type FinalCertificateSheet = {
 
 export const EMPTY_SUBJECT_CELL: FinalCertificateSubjectCell = {
   yearWork: null,
+  yearWorkMax: null,
   finalExam: null,
+  finalExamMax: null,
   total: null,
   totalMax: null,
   status: 'incomplete',

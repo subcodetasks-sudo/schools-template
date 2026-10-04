@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import { isSchoolFinalCertificateBlocked } from '@/features/final-results/finalC
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
   buildSheetFromSuccessCertificate,
+  extractQrToken,
   getSuccessCertificate,
   unlockSuccessCertificate,
   type SuccessCertificatePayload,
@@ -35,25 +36,52 @@ function InfoField({ label, value }: { label: string; value: string }) {
   )
 }
 
+const CERTIFICATE_QR_STORAGE_KEY = 'school-frontend:success-certificate-qr'
+
+function readSavedQrToken() {
+  try {
+    return localStorage.getItem(CERTIFICATE_QR_STORAGE_KEY) || ''
+  } catch {
+    return ''
+  }
+}
+
+function saveQrToken(token: string) {
+  try {
+    localStorage.setItem(CERTIFICATE_QR_STORAGE_KEY, token)
+  } catch {
+    // Storage can be unavailable in private mode or when site data is blocked.
+  }
+}
+
+function clearSavedQrToken() {
+  try {
+    localStorage.removeItem(CERTIFICATE_QR_STORAGE_KEY)
+  } catch {
+    // Storage can be unavailable in private mode or when site data is blocked.
+  }
+}
+
 export function CertificatePage() {
   const { t } = useTranslation()
   const { personalName, profileData, gradeName, classroomLabel, stageName } = useProfile()
-  const [qrToken, setQrToken] = useState('')
+  const [qrToken, setQrToken] = useState(readSavedQrToken)
   const [isUnlocking, setIsUnlocking] = useState(false)
   const [error, setError] = useState<string | null>(null)
   /** In-memory only for this visit — never persisted to web storage. */
   const [sessionUnlocked, setSessionUnlocked] = useState(false)
   const [payload, setPayload] = useState<SuccessCertificatePayload | null>(null)
   const [selectedTerm, setSelectedTerm] = useState<SuccessCertificateTerm>('first')
+  const autoUnlockAttempted = useRef(false)
 
   const ministryBlocked = isSchoolFinalCertificateBlocked({
     name: gradeName,
     code: null,
   })
 
-  const handleUnlock = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!qrToken.trim()) {
+  const unlockCertificate = async (token: string, showToast: boolean) => {
+    const normalizedToken = token.trim()
+    if (!normalizedToken) {
       toast.error(t('profile.certificate.codeRequired'))
       return
     }
@@ -62,7 +90,7 @@ export function CertificatePage() {
     setError(null)
 
     try {
-      await unlockSuccessCertificate(qrToken)
+      await unlockSuccessCertificate(normalizedToken)
       const data = await getSuccessCertificate()
 
       if (!data.certificate) {
@@ -72,18 +100,33 @@ export function CertificatePage() {
       // Keep grades only in React state for this page visit.
       setPayload(data)
       setSessionUnlocked(true)
+      saveQrToken(extractQrToken(normalizedToken))
       setQrToken('')
-      toast.success(t('profile.certificate.unlockSuccess'))
+      if (showToast) toast.success(t('profile.certificate.unlockSuccess'))
     } catch (err) {
+      clearSavedQrToken()
       setPayload(null)
       setSessionUnlocked(false)
       const message = getErrorMessage(err, t('profile.certificate.unlockError'))
       setError(message)
-      toast.error(message)
+      if (showToast) toast.error(message)
     } finally {
       setIsUnlocking(false)
     }
   }
+
+  const handleUnlock = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    await unlockCertificate(qrToken, true)
+  }
+
+  useEffect(() => {
+    if (autoUnlockAttempted.current) return
+    autoUnlockAttempted.current = true
+
+    const savedToken = readSavedQrToken()
+    if (savedToken) void unlockCertificate(savedToken, false)
+  }, [])
 
   const sheet = useMemo(
     () => buildSheetFromSuccessCertificate(payload, selectedTerm),

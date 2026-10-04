@@ -277,6 +277,7 @@
     },
     "sheet": {
       "seatNumber": "Seat number",
+      "subject": "Subject",
       "yearWork": "Year work",
       "finalExam": "Final exam",
       "subjectTotal": "Subject total",
@@ -536,7 +537,7 @@
       "codePlaceholder": "QR token or verify link",
       "showResult": "Unlock certificate",
       "codeRequired": "Please enter the QR token.",
-      "unlockHint": "Your success certificate is shown only after you enter or scan the current student-card QR. Leaving this page or refreshing locks it again.",
+      "unlockHint": "Your success certificate opens after you enter or scan the current student-card QR. It is saved on this device and reused automatically after refresh.",
       "unlockSuccess": "Certificate unlocked successfully",
       "unlockError": "Could not unlock the certificate. Check the QR and try again.",
       "unlocking": "Unlocking...",

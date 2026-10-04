@@ -99,7 +99,9 @@ export async function getSuccessCertificate(academicYear?: string) {
 function mapSubjectCell(row: SuccessCertificateSubjectRow): FinalCertificateSubjectCell {
   return {
     yearWork: row.year_work?.score ?? null,
+    yearWorkMax: row.year_work?.max ?? null,
     finalExam: row.final_exam?.score ?? null,
+    finalExamMax: row.final_exam?.max ?? null,
     total: row.total ?? null,
     totalMax: row.total_max ?? null,
     status: row.status || 'incomplete',
