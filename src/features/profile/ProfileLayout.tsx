@@ -134,9 +134,9 @@ function ProfileLayoutContent() {
   )
 
   return (
-    <section className="bg-muted/40 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mx-auto flex min-h-[40rem] max-w-6xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_18px_50px_rgba(31,83,111,0.1)] lg:min-h-[44rem] lg:flex-row">
-        <div className="flex items-center justify-between border-b border-brand-dark/10 px-4 py-3 lg:hidden">
+    <section className="bg-muted/40 px-4 py-8 sm:px-6 sm:py-10 print:bg-white print:p-0">
+      <div className="mx-auto flex min-h-[40rem] max-w-6xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_18px_50px_rgba(31,83,111,0.1)] lg:min-h-[44rem] lg:flex-row print:min-h-0 print:max-w-none print:overflow-visible print:rounded-none print:shadow-none">
+        <div className="flex items-center justify-between border-b border-brand-dark/10 px-4 py-3 lg:hidden print:hidden">
           <p className="text-sm font-semibold text-brand-dark">{t('profile.title')}</p>
           <Button
             type="button"
@@ -150,9 +150,9 @@ function ProfileLayoutContent() {
           </Button>
         </div>
 
-        <div className={cn('lg:block', mobileOpen ? 'block' : 'hidden')}>{sidebar}</div>
+        <div className={cn('lg:block print:hidden', mobileOpen ? 'block' : 'hidden')}>{sidebar}</div>
 
-        <div className="min-w-0 flex-1 bg-white p-5 sm:p-8">
+        <div className="min-w-0 flex-1 bg-white p-5 sm:p-8 print:p-0">
           {mustCompleteProfile && !onPersonalPage ? <Navigate to="/profile" replace /> : <Outlet />}
         </div>
       </div>

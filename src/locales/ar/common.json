@@ -543,26 +543,56 @@
       "unlocking": "جاري الفتح...",
       "loadError": "تعذر تحميل شهادة النجاح.",
       "academicYear": "العام الدراسي {{year}}",
+      "academicYearLabel": "العام الدراسي",
       "formTitle": "استمارة تقييم طالب وفقا للقرار الوزاري ١٣٦ لسنة ٢٠٢٤ الترم الأول للعام الدراسي ٢٠٢٥ / ٢٠٢٦",
+      "formTitleDynamic": "استمارة تقييم طالب — {{term}} — العام الدراسي {{year}}",
       "gradeLevel": "الصف الأول الابتدائي",
       "studentName": "اسم الطالب",
+      "nationalId": "الرقم القومي",
+      "studentCode": "كود الطالب",
+      "studentId": "معرّف الطالب",
       "seatNumber": "رقم الجلوس",
       "className": "الفصل",
+      "classroomSection": "الشعبة",
+      "classroomId": "معرّف الفصل",
+      "stage": "المرحلة",
+      "grade": "الصف",
+      "term": "الفصل الدراسي",
+      "attendanceRate": "نسبة الحضور",
+      "unlockedAt": "تاريخ الفتح",
       "basicTotal": "المجموع الأساسي",
       "grandTotal": "المجموع الكلي (بالمواد الإضافية)",
       "activitiesTitle": "الأنشطة",
+      "legendTitle": "دليل الألوان",
+      "noSubjects": "لا توجد مواد في شهادة النجاح حالياً.",
+      "print": "طباعة الشهادة",
       "summary": {
         "totalSubjects": "عدد المواد: {{count}}",
         "successSubjects": "عدد مواد النجاح: {{count}}",
-        "failureSubjects": "عدد مواد الرسوب: {{count}}"
+        "failureSubjects": "عدد مواد الرسوب: {{count}}",
+        "incompleteSubjects": "عدد المواد غير المكتملة: {{count}}"
       },
       "columns": {
         "subject": "المادة",
         "assessment": "درجة التقييمات",
         "written": "درجة التحريري",
         "final": "الدرجة النهائية",
+        "total": "المجموع",
+        "percentage": "النسبة",
         "color": "اللون",
-        "score": "الدرجة"
+        "score": "الدرجة",
+        "status": "الحالة",
+        "term": "الترم"
+      },
+      "status": {
+        "pass": "ناجح",
+        "fail": "راسب",
+        "incomplete": "غير مكتمل"
+      },
+      "componentStatus": {
+        "approved": "معتمد",
+        "auto": "تلقائي",
+        "pending": "قيد المراجعة"
       },
       "subjects": {
         "arabic": "اللغة العربية",

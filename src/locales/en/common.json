@@ -543,26 +543,56 @@
       "unlocking": "Unlocking...",
       "loadError": "Could not load the success certificate.",
       "academicYear": "Academic year {{year}}",
+      "academicYearLabel": "Academic year",
       "formTitle": "Student evaluation form according to Ministerial Decree 136 of 2024, first term for the academic year 2025/2026",
+      "formTitleDynamic": "Student evaluation form — {{term}} — academic year {{year}}",
       "gradeLevel": "First grade primary",
       "studentName": "Student name",
+      "nationalId": "National ID",
+      "studentCode": "Student code",
+      "studentId": "Student ID",
       "seatNumber": "Seat number",
       "className": "Class",
+      "classroomSection": "Section",
+      "classroomId": "Classroom ID",
+      "stage": "Stage",
+      "grade": "Grade",
+      "term": "Term",
+      "attendanceRate": "Attendance rate",
+      "unlockedAt": "Unlocked at",
       "basicTotal": "Basic total",
       "grandTotal": "Grand total (including additional subjects)",
       "activitiesTitle": "Activities",
+      "legendTitle": "Color legend",
+      "noSubjects": "No subjects available on this certificate yet.",
+      "print": "Print certificate",
       "summary": {
         "totalSubjects": "Number of subjects: {{count}}",
         "successSubjects": "Success subjects: {{count}}",
-        "failureSubjects": "Failure subjects: {{count}}"
+        "failureSubjects": "Failure subjects: {{count}}",
+        "incompleteSubjects": "Incomplete subjects: {{count}}"
       },
       "columns": {
         "subject": "Subject",
         "assessment": "Assessment grade",
         "written": "Written grade",
         "final": "Final grade",
+        "total": "Total",
+        "percentage": "Percentage",
         "color": "Color",
-        "score": "Score"
+        "score": "Score",
+        "status": "Status",
+        "term": "Term"
+      },
+      "status": {
+        "pass": "Pass",
+        "fail": "Fail",
+        "incomplete": "Incomplete"
+      },
+      "componentStatus": {
+        "approved": "Approved",
+        "auto": "Auto",
+        "pending": "Pending"
       },
       "subjects": {
         "arabic": "Arabic",

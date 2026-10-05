@@ -1,60 +1,73 @@
 import { apiGet, apiPost, unwrapData } from '@/lib/api'
-import {
-  EMPTY_SUBJECT_CELL,
-  resolveSheetResult,
-  sumGrandTotal,
-  type FinalCertificateSheet,
-  type FinalCertificateSubjectCell,
-  type FinalCertificateSubjectCol,
-} from '@/features/final-results/finalCertificateSheet'
 import type { StudentNamedRef } from '@/features/profile/studentProfileApi'
 
 export type SuccessCertificateTerm = 'first' | 'second'
 
+export type SuccessCertificateEvaluationColor = 'blue' | 'green' | 'yellow' | 'red' | string
+
+export type SuccessCertificateComponent = {
+  key: string
+  name: string
+  score: number | null
+  max: number | null
+  status?: string | null
+}
+
+export type SuccessCertificateEvaluation = {
+  key?: string | null
+  color?: SuccessCertificateEvaluationColor | null
+  color_ar?: string | null
+  name?: string | null
+}
+
 export type SuccessCertificateSubjectRow = {
   term?: SuccessCertificateTerm | string | null
   subject?: { id?: number | string; name?: string | null; code?: string | null } | null
-  year_work?: { score?: number | null; max?: number | null } | null
-  final_exam?: { score?: number | null; max?: number | null } | null
+  components?: SuccessCertificateComponent[] | null
   total?: number | null
   total_max?: number | null
   percentage?: number | null
+  evaluation?: SuccessCertificateEvaluation | null
   status?: string | null
-  approval_status?: string | null
-  passing?: {
-    checks?: {
-      final_exam?: { passed?: boolean | null } | null
-    } | null
+  /** Legacy fields — kept for older payloads */
+  year_work?: { score?: number | null; max?: number | null } | null
+  final_exam?: { score?: number | null; max?: number | null } | null
+}
+
+export type SuccessCertificateData = {
+  student?: {
+    id?: string
+    name?: string | null
+    code?: string | null
+    national_id?: string | null
+    class_number?: string | number | null
+    grade?: StudentNamedRef | null
+    classroom?: StudentNamedRef | null
+    stage?: StudentNamedRef | null
+  } | null
+  academic_year?: string | null
+  term?: SuccessCertificateTerm | string | null
+  subjects?: SuccessCertificateSubjectRow[] | null
+  attendance_rate?: number | null
+  summary?: {
+    subjects_count?: number | null
+    subjects_passed?: number | null
+    subjects_failed?: number | null
+    subjects_incomplete?: number | null
   } | null
 }
 
 export type SuccessCertificatePayload = {
   unlocked: boolean
   unlocked_at?: string | null
-  certificate: {
-    student?: {
-      id?: string
-      name?: string | null
-      code?: string | null
-      class_number?: string | null
-      grade?: StudentNamedRef | null
-      classroom?: StudentNamedRef | null
-      stage?: StudentNamedRef | null
-    } | null
-    academic_year?: string | null
-    subjects?: SuccessCertificateSubjectRow[] | null
-    summary?: {
-      subjects_count?: number | null
-      subjects_passed?: number | null
-      subjects_failed?: number | null
-      subjects_incomplete?: number | null
-    } | null
-  } | null
+  certificate: SuccessCertificateData | null
 }
 
-export type UnlockSuccessCertificatePayload = {
-  unlocked: boolean
-  unlocked_at?: string | null
+export type UnlockSuccessCertificatePayload = SuccessCertificatePayload
+
+export type CertificateComponentColumn = {
+  key: string
+  name: string
 }
 
 /** Accept raw token or a scanned verify URL containing `/students/verify/{token}`. */
@@ -85,86 +98,52 @@ export async function unlockSuccessCertificate(qrToken: string) {
   return unwrapData(response)
 }
 
-export async function getSuccessCertificate(academicYear?: string) {
+export async function getSuccessCertificate(query?: {
+  academic_year?: string
+  term?: SuccessCertificateTerm | string
+}) {
+  const params = Object.fromEntries(
+    Object.entries(query ?? {}).filter(([, value]) => value != null && value !== ''),
+  )
+
   const response = await apiGet<SuccessCertificatePayload>(
     '/v1/auth/student/profile/success-certificate',
     {
       requiresAuth: true,
-      params: academicYear ? { academic_year: academicYear } : undefined,
+      params: Object.keys(params).length > 0 ? params : undefined,
     },
   )
   return unwrapData(response)
 }
 
-function mapSubjectCell(row: SuccessCertificateSubjectRow): FinalCertificateSubjectCell {
-  return {
-    yearWork: row.year_work?.score ?? null,
-    yearWorkMax: row.year_work?.max ?? null,
-    finalExam: row.final_exam?.score ?? null,
-    finalExamMax: row.final_exam?.max ?? null,
-    total: row.total ?? null,
-    totalMax: row.total_max ?? null,
-    status: row.status || 'incomplete',
-    finalExamPassed: row.passing?.checks?.final_exam?.passed ?? null,
-  }
-}
-
 /**
- * Build the one-row certificate sheet matrix for a selected term
- * from `GET …/success-certificate` subjects.
+ * Build dynamic score columns from every subject's `components[]`.
+ * Prefer API `name` for the header — do not hardcode paper columns.
  */
-export function buildSheetFromSuccessCertificate(
-  payload: SuccessCertificatePayload | null | undefined,
-  term: SuccessCertificateTerm,
-): FinalCertificateSheet {
-  const certificate = payload?.certificate
-  const rows = (certificate?.subjects ?? []).filter(
-    (row) => String(row.term || '') === term,
-  )
+export function collectComponentColumns(
+  subjects: SuccessCertificateSubjectRow[] | null | undefined,
+): CertificateComponentColumn[] {
+  const columns: CertificateComponentColumn[] = []
+  const seen = new Set<string>()
 
-  const subjectMap = new Map<string, FinalCertificateSubjectCol>()
-  for (const row of rows) {
-    const id = row.subject?.id != null ? String(row.subject.id) : ''
-    const name = row.subject?.name?.trim()
-    if (!id || !name) continue
-    if (!subjectMap.has(id)) {
-      subjectMap.set(id, { id, name })
+  for (const row of subjects ?? []) {
+    for (const component of row.components ?? []) {
+      const key = component.key?.trim()
+      if (!key || seen.has(key)) continue
+      seen.add(key)
+      columns.push({
+        key,
+        name: component.name?.trim() || key,
+      })
     }
   }
 
-  const subjects = Array.from(subjectMap.values()).sort((a, b) =>
-    a.name.localeCompare(b.name, 'ar'),
-  )
+  return columns
+}
 
-  const student = certificate?.student
-  const cells: Record<string, FinalCertificateSubjectCell> = {}
-  for (const subject of subjects) {
-    const match = rows.find((row) => String(row.subject?.id) === subject.id)
-    cells[subject.id] = match ? mapSubjectCell(match) : { ...EMPTY_SUBJECT_CELL }
-  }
-
-  const cellList = subjects.map((subject) => cells[subject.id] ?? EMPTY_SUBJECT_CELL)
-  const statuses = cellList.map((cell) => cell.status)
-
-  return {
-    subjects,
-    students:
-      subjects.length === 0
-        ? []
-        : [
-            {
-              studentId: student?.id || '',
-              name: student?.name?.trim() || '—',
-              code: student?.code?.trim() || '—',
-              seatNumber: student?.class_number?.trim() || '—',
-              classroomLabel:
-                student?.classroom?.label?.trim() ||
-                student?.classroom?.section?.trim() ||
-                '—',
-              subjects: cells,
-              grandTotal: sumGrandTotal(cellList),
-              result: resolveSheetResult(statuses),
-            },
-          ],
-  }
+export function findComponent(
+  row: SuccessCertificateSubjectRow,
+  key: string,
+): SuccessCertificateComponent | undefined {
+  return (row.components ?? []).find((component) => component.key === key)
 }

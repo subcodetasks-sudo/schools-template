@@ -1,0 +1,587 @@
+.pdf-template-page {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 210mm;
+  height: 297mm;
+  min-height: 297mm;
+  max-height: 297mm;
+  margin: 20px auto;
+  position: relative;
+  overflow: hidden;
+  padding: 16mm 14mm 18mm;
+  background: #ffffff;
+  color: #0e4f73;
+  font-family: Tahoma, Arial, sans-serif;
+  box-shadow: 0 0 20px rgb(0 0 0 / 12%);
+}
+
+.pdf-template-header {
+  display: grid;
+  flex-shrink: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  direction: ltr;
+  gap: 16px;
+  min-height: 95px;
+}
+
+.pdf-template-logo-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 90px;
+}
+
+.pdf-template-logo-box img {
+  max-width: 115px;
+  max-height: 90px;
+  object-fit: contain;
+}
+
+.pdf-template-authority {
+  width: 100%;
+  direction: rtl;
+  color: #105678;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.65;
+  text-align: right;
+}
+
+.pdf-template-authority p {
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+}
+
+.pdf-template-authority-school {
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.pdf-template-header-line {
+  position: relative;
+  flex-shrink: 0;
+  height: 2px;
+  margin-top: 10px;
+  background: #0d617f;
+}
+
+.pdf-template-header-line::after {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 110px;
+  height: 9px;
+  border-radius: 0 0 10px 10px;
+  background: #53b6b6;
+  content: '';
+  transform: translateX(-50%);
+}
+
+.pdf-template-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 35px;
+  padding: 15px 25px 12px;
+  overflow: hidden;
+}
+
+.pdf-template-document-title {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.pdf-template-document-title h2 {
+  margin: 0;
+  color: #0e4f73;
+  font-size: 24px;
+}
+
+.pdf-template-footer-line {
+  position: absolute;
+  right: 14mm;
+  bottom: 14mm;
+  left: 14mm;
+  height: 2px;
+  background: #21a6b2;
+}
+
+.pdf-template-footer-accent {
+  position: absolute;
+  bottom: 14mm;
+  left: 50%;
+  width: 110px;
+  height: 9px;
+  border-radius: 10px 10px 0 0;
+  background: #53b6b6;
+  transform: translateX(-50%);
+}
+
+.pdf-template-signatures {
+  display: flex;
+  direction: rtl;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 22px;
+  color: #0e4f73;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.pdf-template-sign {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.pdf-template-sign-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pdf-template-sign-name {
+  min-height: 1.4em;
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* المدير is always the last signer in the DOM → left side under dir=rtl. */
+.pdf-template-sign[data-signer='principal'] {
+  order: 3;
+}
+
+.pdf-template-sign[data-signer='schoolVice'] {
+  order: 2;
+}
+
+.pdf-template-sign[data-signer='affairsVice'] {
+  order: 1;
+}
+
+.pdf-template-sign-title,
+.pdf-template-sign-name,
+.pdf-template-sign-space {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.pdf-template-sign-space {
+  width: 72%;
+  height: 28px;
+  margin-top: 10px;
+  border-bottom: 1px solid #0e4f73;
+}
+
+.pdf-template-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #111111;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.pdf-template-table thead {
+  display: table-header-group;
+}
+
+.pdf-template-table tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.pdf-template-table th,
+.pdf-template-table td {
+  border: 1px solid #000000;
+  padding: 6px 8px;
+  vertical-align: middle;
+  text-align: start;
+  white-space: pre-line;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.pdf-template-table th {
+  background: #e7f2f6;
+  font-weight: 700;
+  text-align: center;
+}
+
+.pdf-template-table th:nth-child(1),
+.pdf-template-table td:nth-child(1),
+.pdf-template-col-serial {
+  width: 16%;
+}
+
+.pdf-template-table th:nth-child(2),
+.pdf-template-table td:nth-child(2),
+.pdf-template-col-name {
+  width: 22%;
+}
+
+.pdf-template-table th:nth-child(3),
+.pdf-template-table td:nth-child(3),
+.pdf-template-col-members {
+  width: 40%;
+}
+
+.pdf-template-table th:nth-child(4),
+.pdf-template-table td:nth-child(4),
+.pdf-template-col-notes {
+  width: 22%;
+}
+
+.pdf-template-period {
+  margin-bottom: 20px;
+  color: #0e4f73;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.pdf-template-period p {
+  margin: 0 0 6px;
+}
+
+.pdf-template-signatures {
+  display: flex;
+  direction: rtl;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 110px;
+  color: #0e4f73;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.pdf-template-signatures > div {
+  flex: 1;
+}
+
+.pdf-template-signatures > div:not(.pdf-template-sign)::after {
+  display: block;
+  width: 70%;
+  margin: 56px auto 0;
+  border-top: 1px solid #0e4f73;
+  content: '';
+}
+
+.pdf-template-table.pdf-template-table--summary th,
+.pdf-template-table.pdf-template-table--summary td {
+  width: auto;
+}
+
+.pdf-template-cell-serial {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pdf-print-root {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 210mm;
+}
+
+@page pdf-template {
+  size: A4;
+  margin: 0;
+}
+
+@page pdf-template-landscape {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  body.pdf-document-print {
+    margin: 0 !important;
+    background: #ffffff !important;
+  }
+
+  body.pdf-document-print #root {
+    display: none !important;
+  }
+
+  /* Dialogs / overlays portal outside #root — keep them out of PDF output. */
+  body.pdf-document-print [data-slot='dialog-overlay'],
+  body.pdf-document-print [data-slot='dialog-content'],
+  body.pdf-document-print [data-slot='dialog-portal'],
+  body.pdf-document-print [data-slot='alert-dialog-overlay'],
+  body.pdf-document-print [data-slot='alert-dialog-content'] {
+    display: none !important;
+  }
+
+  body.pdf-document-print .pdf-print-root {
+    display: block !important;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    width: auto !important;
+  }
+
+  body.pdf-document-print .pdf-template-page {
+    page: pdf-template;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    min-height: 297mm !important;
+    max-height: 297mm !important;
+    margin: 0 !important;
+    padding: 16mm 14mm 18mm !important;
+    overflow: hidden !important;
+    box-shadow: none !important;
+    break-before: page;
+    page-break-before: always;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.pdf-document-print .pdf-template-page:first-child {
+    break-before: auto;
+    page-break-before: auto;
+  }
+
+  body.pdf-document-print .pdf-template-content {
+    display: block !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 35px 0 0 !important;
+    padding: 15px 25px 12px !important;
+    overflow: hidden !important;
+  }
+
+  body.pdf-document-print .pdf-template-table thead {
+    display: table-header-group;
+  }
+
+  body.pdf-document-print .pdf-template-table th,
+  body.pdf-document-print .pdf-template-table td {
+    border: 1px solid #000000 !important;
+  }
+
+  body.pdf-document-print .pdf-template-page.pdf-template-page--landscape {
+    height: 210mm !important;
+    min-height: 210mm !important;
+    max-height: 210mm !important;
+    width: var(--pdf-page-width, 297mm) !important;
+    padding: 8mm 10mm 12mm !important;
+    page: pdf-template-landscape;
+  }
+
+  body.pdf-document-print .pdf-print-root > .pdf-template-page--landscape:first-of-type {
+    break-before: auto;
+    page-break-before: auto;
+  }
+
+  body.pdf-document-print .pdf-template-page--landscape .pdf-template-content {
+    margin: 6px 0 0 !important;
+    padding: 4px 2px 4px !important;
+  }
+
+  body.pdf-document-print .pdf-template-page--landscape .pdf-template-document-title {
+    margin-bottom: 8px !important;
+  }
+
+  body.pdf-document-print .pdf-template-page--landscape .pdf-template-table th,
+  body.pdf-document-print .pdf-template-page--landscape .pdf-template-table td {
+    border: 1px solid #000000 !important;
+  }
+}
+
+.pdf-template-page.pdf-template-page--landscape {
+  width: var(--pdf-page-width, 297mm);
+  height: 210mm;
+  min-height: 210mm;
+  max-height: 210mm;
+  padding: 8mm 10mm 12mm;
+}
+
+.pdf-template-page--landscape .pdf-template-header {
+  gap: 10px;
+  min-height: 0;
+}
+
+.pdf-template-page--landscape .pdf-template-logo-box {
+  min-height: 0;
+  gap: 6px;
+}
+
+.pdf-template-page--landscape .pdf-template-logo-box img {
+  max-width: 72px;
+  max-height: 56px;
+}
+
+.pdf-template-page--landscape .pdf-template-authority {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pdf-template-page--landscape .pdf-template-authority-school {
+  font-size: 14px;
+}
+
+.pdf-template-page--landscape .pdf-template-header-line {
+  margin-top: 4px;
+}
+
+.pdf-template-page--landscape .pdf-template-header-line::after {
+  height: 7px;
+  width: 88px;
+}
+
+.pdf-template-page--landscape .pdf-template-content {
+  margin-top: 6px;
+  padding: 4px 2px 4px;
+}
+
+.pdf-template-page--landscape .pdf-template-document-title {
+  margin-bottom: 8px;
+}
+
+.pdf-template-page--landscape .pdf-template-document-title h2 {
+  font-size: 16px;
+}
+
+.pdf-template-page--landscape .pdf-template-period {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.pdf-template-page--landscape .pdf-template-period--compact {
+  margin-bottom: 6px;
+}
+
+.pdf-template-page--landscape .pdf-template-period--compact p {
+  margin: 0 0 2px;
+}
+
+.pdf-template-page--landscape .pdf-template-period--compact p:last-child {
+  margin-bottom: 0;
+}
+
+.pdf-template-page--landscape .pdf-template-footer-line,
+.pdf-template-page--landscape .pdf-template-footer-accent {
+  bottom: 8mm;
+}
+
+.pdf-template-page--landscape .pdf-template-footer-line {
+  right: 10mm;
+  left: 10mm;
+}
+
+.pdf-template-page--landscape .pdf-template-signatures {
+  margin-top: 16px;
+}
+
+.pdf-template-page--landscape .pdf-template-signatures > div::after {
+  content: none;
+}
+
+.pdf-template-page--landscape .pdf-template-sign-space {
+  width: 78%;
+  height: 36px;
+}
+
+.pdf-template-table.pdf-template-table--fit {
+  font-size: 11px;
+}
+
+.pdf-template-table.pdf-template-table--fit th:nth-child(n),
+.pdf-template-table.pdf-template-table--fit td:nth-child(n) {
+  width: auto;
+  padding: 4px 5px;
+}
+
+.pdf-template-table.pdf-template-table--fit .pdf-template-cell-ltr {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: center;
+}
+
+/* Weekly timetable grid reused from the schedule details page. */
+.pdf-template-weekly-grid {
+  width: 100%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.pdf-template-weekly-grid > div {
+  gap: 0 !important;
+}
+
+.pdf-template-weekly-grid .overflow-x-auto {
+  overflow: visible !important;
+  border-radius: 8px;
+}
+
+.pdf-template-weekly-grid table {
+  min-width: 0 !important;
+  width: 100% !important;
+  table-layout: fixed;
+  font-size: 8.5px;
+  line-height: 1.25;
+}
+
+.pdf-template-weekly-grid th,
+.pdf-template-weekly-grid td {
+  min-width: 0 !important;
+  position: static !important;
+  padding: 3px 4px !important;
+  font-size: 8.5px !important;
+  vertical-align: top;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.pdf-template-weekly-grid td * {
+  font-size: 8.5px !important;
+}
+
+.pdf-template-weekly-grid thead th {
+  font-size: 9px !important;
+}
+
+.pdf-template-weekly-grid thead th span.text-xs {
+  font-size: 7.5px !important;
+}
+
+@media print {
+  body.pdf-document-print .pdf-template-weekly-grid table,
+  body.pdf-document-print .pdf-template-weekly-grid th,
+  body.pdf-document-print .pdf-template-weekly-grid td {
+    font-size: 8.5px !important;
+    line-height: 1.25 !important;
+  }
+
+  body.pdf-document-print .pdf-template-weekly-grid th,
+  body.pdf-document-print .pdf-template-weekly-grid td {
+    padding: 3px 4px !important;
+    min-width: 0 !important;
+  }
+
+  body.pdf-document-print .pdf-template-weekly-grid table {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  body.pdf-document-print .pdf-template-weekly-grid tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
