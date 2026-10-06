@@ -378,9 +378,16 @@
       "fees": "Fees",
       "parentSummon": "Parent summon",
       "conduct": "Conduct",
+      "bus": "Bus subscription",
       "statistics": "Statistics",
       "groups": "Groups & activities",
       "complaintTickets": "Complaint tickets"
+    },
+    "navGroups": {
+      "account": "Account",
+      "academic": "Academic",
+      "behavior": "Attendance & conduct",
+      "services": "Services & support"
     },
     "personal": {
       "title": "Personal information",
@@ -751,6 +758,44 @@
         "unknown": "Unspecified degree"
       }
     },
+    "bus": {
+      "subtitle": "The student's school bus subscription. This page is read-only.",
+      "loadError": "Could not load the bus subscription.",
+      "notSubscribed": "Not subscribed to school bus",
+      "academicYear": "Academic year: {{year}}",
+      "academicYearLabel": "Academic year",
+      "selectYear": "Select academic year",
+      "incomplete": "Incomplete details",
+      "incompleteHint": "Your subscription is still being completed; some details (such as the bus or stops) may appear later.",
+      "busTitle": "Bus",
+      "busNotAssigned": "No bus has been assigned yet.",
+      "code": "Bus code",
+      "plate": "Plate number",
+      "model": "Model",
+      "status": "Bus status",
+      "busStatuses": {
+        "inactive": "Inactive",
+        "maintenance": "In maintenance"
+      },
+      "supervisor": "Bus supervisor",
+      "supervisorName": "Name",
+      "supervisorPhone": "Phone",
+      "tripTitle": "Trip",
+      "pickup": "Pickup stop",
+      "dropoff": "Dropoff stop",
+      "notes": "Notes",
+      "routesTitle": "Route",
+      "noRoutes": "No routes available.",
+      "noStops": "This route has no stops.",
+      "unnamedRoute": "Route",
+      "yourPickup": "Your stop (pickup)",
+      "yourDropoff": "Your stop (dropoff)",
+      "directions": {
+        "to_school": "To school",
+        "from_school": "From school",
+        "round_trip": "Round trip"
+      }
+    },
     "parentSummon": {
       "viewDetails": "View details",
       "backToList": "Back to list",
@@ -842,6 +887,7 @@
       "noScores": "No detailed scores for this assessment.",
       "absent": "Absent",
       "weekNumber": "Week {{n}}",
+      "unknownWeek": "Other",
       "weekDate": "Week date",
       "subjectSessions": "{{count}} assessment(s)",
       "summary": {

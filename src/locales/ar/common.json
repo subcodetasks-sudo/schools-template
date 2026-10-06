@@ -378,9 +378,16 @@
       "fees": "المصروفات",
       "parentSummon": "إستدعاء ولي الأمر",
       "conduct": "المخالفات",
+      "bus": "اشتراك الباص",
       "statistics": "الإحصائيات",
       "groups": "الجماعات والأنشطة",
       "complaintTickets": "تذاكر الشكاوى"
+    },
+    "navGroups": {
+      "account": "الحساب",
+      "academic": "الأكاديمي",
+      "behavior": "الحضور والسلوك",
+      "services": "الخدمات والدعم"
     },
     "personal": {
       "title": "البيانات الشخصية",
@@ -751,6 +758,44 @@
         "unknown": "درجة غير محددة"
       }
     },
+    "bus": {
+      "subtitle": "بيانات اشتراك الطالب في باص المدرسة. الصفحة للعرض فقط.",
+      "loadError": "تعذر تحميل بيانات اشتراك الباص.",
+      "notSubscribed": "غير مشترك في الباص",
+      "academicYear": "العام الدراسي: {{year}}",
+      "academicYearLabel": "العام الدراسي",
+      "selectYear": "اختيار العام الدراسي",
+      "incomplete": "بيانات ناقصة",
+      "incompleteHint": "اشتراكك قيد الاستكمال، وقد تظهر بعض البيانات (مثل الباص أو المحطات) لاحقاً.",
+      "busTitle": "الباص",
+      "busNotAssigned": "لم يتم تخصيص باص بعد.",
+      "code": "كود الباص",
+      "plate": "رقم اللوحة",
+      "model": "الموديل",
+      "status": "حالة الباص",
+      "busStatuses": {
+        "inactive": "غير نشط",
+        "maintenance": "في الصيانة"
+      },
+      "supervisor": "مشرف الباص",
+      "supervisorName": "الاسم",
+      "supervisorPhone": "الهاتف",
+      "tripTitle": "الرحلة",
+      "pickup": "محطة الصعود",
+      "dropoff": "محطة النزول",
+      "notes": "ملاحظات",
+      "routesTitle": "خط السير",
+      "noRoutes": "لا توجد خطوط سير متاحة.",
+      "noStops": "لا توجد محطات لهذا الخط.",
+      "unnamedRoute": "خط السير",
+      "yourPickup": "محطتك (صعود)",
+      "yourDropoff": "محطتك (نزول)",
+      "directions": {
+        "to_school": "ذهاب",
+        "from_school": "عودة",
+        "round_trip": "ذهاب وعودة"
+      }
+    },
     "parentSummon": {
       "viewDetails": "عرض التفاصيل",
       "backToList": "العودة للقائمة",
@@ -842,6 +887,7 @@
       "noScores": "لا توجد درجات تفصيلية لهذا التقييم.",
       "absent": "غائب",
       "weekNumber": "الأسبوع {{n}}",
+      "unknownWeek": "أخرى",
       "weekDate": "تاريخ الأسبوع",
       "subjectSessions": "{{count}} تقييم",
       "summary": {
