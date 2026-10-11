@@ -14,7 +14,7 @@ import { getErrorMessage } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
-  code: z.string().regex(/^\d{9}$/),
+  code: z.string().regex(/^\d{14}$/),
   password: z.string().min(6),
 })
 
@@ -35,7 +35,7 @@ export function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      code: prefilledCode && /^\d{9}$/.test(prefilledCode) ? prefilledCode : '',
+      code: prefilledCode && /^\d{14}$/.test(prefilledCode) ? prefilledCode : '',
       password: '',
     },
   })
@@ -68,7 +68,7 @@ export function LoginPage() {
             id="code"
             inputMode="numeric"
             autoComplete="username"
-            maxLength={9}
+            maxLength={14}
             placeholder={t('login.codePlaceholder')}
             className={authFieldClass}
             {...register('code')}
