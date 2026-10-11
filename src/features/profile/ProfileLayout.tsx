@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import {
   BarChart3,
   Bell,
+  Bus,
   CalendarCheck2,
   CalendarDays,
   ClipboardList,
@@ -29,21 +30,42 @@ import { ProfileProvider, useProfile } from '@/features/profile/ProfileContext'
 import { getContactCompleteness } from '@/features/profile/profileData'
 import { cn } from '@/lib/utils'
 
-const mainLinks = [
-  { to: '/profile', key: 'personal', icon: UserRound, end: true },
-  { to: '/profile/introduction-card', key: 'introductionCard', icon: HeartHandshake },
-  { to: '/profile/notifications', key: 'notifications', icon: Bell },
-  { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
-  { to: '/profile/weekly-evaluations', key: 'weeklyEvaluations', icon: ListChecks },
-  { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },
-  { to: '/profile/schedule', key: 'schedule', icon: CalendarDays },
-  { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },
-  { to: '/profile/fees', key: 'fees', icon: Wallet },
-  { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
-  { to: '/profile/conduct', key: 'conduct', icon: ShieldAlert },
-  { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
-  { to: '/profile/groups', key: 'groups', icon: UsersRound },
-  { to: '/profile/complaint-tickets', key: 'complaintTickets', icon: MessageSquareWarning },
+const navGroups = [
+  {
+    key: 'account',
+    links: [
+      { to: '/profile', key: 'personal', icon: UserRound, end: true },
+      { to: '/profile/introduction-card', key: 'introductionCard', icon: HeartHandshake },
+      { to: '/profile/notifications', key: 'notifications', icon: Bell },
+    ],
+  },
+  {
+    key: 'academic',
+    links: [
+      { to: '/profile/schedule', key: 'schedule', icon: CalendarDays },
+      { to: '/profile/weekly-evaluations', key: 'weeklyEvaluations', icon: ListChecks },
+      { to: '/profile/monthly-evaluations', key: 'monthlyEvaluations', icon: ClipboardList },
+      { to: '/profile/certificate', key: 'certificate', icon: FileBadge },
+      { to: '/profile/statistics', key: 'statistics', icon: BarChart3 },
+    ],
+  },
+  {
+    key: 'behavior',
+    links: [
+      { to: '/profile/attendance', key: 'attendance', icon: CalendarCheck2 },
+      { to: '/profile/conduct', key: 'conduct', icon: ShieldAlert },
+      { to: '/profile/parent-summon', key: 'parentSummon', icon: Phone },
+    ],
+  },
+  {
+    key: 'services',
+    links: [
+      { to: '/profile/fees', key: 'fees', icon: Wallet },
+      { to: '/profile/bus', key: 'bus', icon: Bus },
+      { to: '/profile/groups', key: 'groups', icon: UsersRound },
+      { to: '/profile/complaint-tickets', key: 'complaintTickets', icon: MessageSquareWarning },
+    ],
+  },
 ] as const
 
 export function ProfileLayout() {
@@ -97,25 +119,32 @@ function ProfileLayoutContent() {
 
       <Separator className="mx-5 bg-brand-dark/10" />
 
-      <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto px-3 py-5">
-        {mainLinks.map((link) => (
-          <NavLink
-            key={link.key}
-            to={link.to}
-            end={'end' in link ? link.end : false}
-            onClick={() => setMobileOpen(false)}
-            className={({ isActive }) =>
-              cn(
-                'relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-white text-primary'
-                  : 'text-brand-dark hover:bg-white hover:text-brand-dark',
-              )
-            }
-          >
-            <link.icon className="size-4 shrink-0" aria-hidden />
-            <span>{t(`profile.nav.${link.key}`)}</span>
-          </NavLink>
+      <nav className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-5">
+        {navGroups.map((group) => (
+          <div key={group.key} className="flex flex-col gap-1">
+            <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-brand-dark/45">
+              {t(`profile.navGroups.${group.key}`)}
+            </p>
+            {group.links.map((link) => (
+              <NavLink
+                key={link.key}
+                to={link.to}
+                end={'end' in link ? link.end : false}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  cn(
+                    'relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-white text-primary'
+                      : 'text-brand-dark hover:bg-white hover:text-brand-dark',
+                  )
+                }
+              >
+                <link.icon className="size-4 shrink-0" aria-hidden />
+                <span>{t(`profile.nav.${link.key}`)}</span>
+              </NavLink>
+            ))}
+          </div>
         ))}
       </nav>
 
@@ -134,9 +163,9 @@ function ProfileLayoutContent() {
   )
 
   return (
-    <section className="bg-muted/40 px-4 py-8 sm:px-6 sm:py-10">
-      <div className="mx-auto flex min-h-[40rem] max-w-6xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_18px_50px_rgba(31,83,111,0.1)] lg:min-h-[44rem] lg:flex-row">
-        <div className="flex items-center justify-between border-b border-brand-dark/10 px-4 py-3 lg:hidden">
+    <section className="bg-muted/40 px-4 py-8 sm:px-6 sm:py-10 print:bg-white print:p-0">
+      <div className="mx-auto flex min-h-[40rem] max-w-6xl flex-col overflow-hidden rounded-[1.75rem] bg-white shadow-[0_18px_50px_rgba(31,83,111,0.1)] lg:min-h-[44rem] lg:flex-row print:min-h-0 print:max-w-none print:overflow-visible print:rounded-none print:shadow-none">
+        <div className="flex items-center justify-between border-b border-brand-dark/10 px-4 py-3 lg:hidden print:hidden">
           <p className="text-sm font-semibold text-brand-dark">{t('profile.title')}</p>
           <Button
             type="button"
@@ -150,9 +179,9 @@ function ProfileLayoutContent() {
           </Button>
         </div>
 
-        <div className={cn('lg:block', mobileOpen ? 'block' : 'hidden')}>{sidebar}</div>
+        <div className={cn('lg:block print:hidden', mobileOpen ? 'block' : 'hidden')}>{sidebar}</div>
 
-        <div className="min-w-0 flex-1 bg-white p-5 sm:p-8">
+        <div className="min-w-0 flex-1 bg-white p-5 sm:p-8 print:p-0">
           {mustCompleteProfile && !onPersonalPage ? <Navigate to="/profile" replace /> : <Outlet />}
         </div>
       </div>

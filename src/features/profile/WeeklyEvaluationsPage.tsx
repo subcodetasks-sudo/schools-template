@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ListChecks, Percent } from 'lucide-react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import {
   type StudentWeeklyAssessmentsQuery,
   type StudentWeeklyAssessmentTerm,
 } from '@/features/profile/studentProfileApi'
+import { MONTH_COLORS } from '@/features/profile/monthColors'
 import { cn } from '@/lib/utils'
 
 const FILTER_MONTHS: StudentWeeklyAssessmentMonth[] = [
@@ -161,7 +163,7 @@ function EntryCard({
           {scoreEntries.length === 0 ? (
             <p className="text-sm text-brand-dark/45">{t('profile.weeklyEvaluations.noScores')}</p>
           ) : (
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-2">
               {scoreEntries.map(([key, value]) => (
                 <li
                   key={key}
@@ -179,6 +181,55 @@ function EntryCard({
       ) : null}
     </article>
   )
+}
+
+type WeekGroup = {
+  key: string
+  week: number | null
+  term: string | null
+  month: string | null
+  weekDate: string | null
+  entries: StudentWeeklyAssessmentEntry[]
+}
+
+function groupEntriesByWeek(entries: StudentWeeklyAssessmentEntry[]): WeekGroup[] {
+  const map = new Map<string, WeekGroup>()
+  for (const entry of entries) {
+    const key = [entry.term ?? '', entry.month ?? '', entry.week ?? 'none'].join('|')
+    const group = map.get(key)
+    if (group) {
+      group.entries.push(entry)
+      if (!group.weekDate && entry.week_date) group.weekDate = entry.week_date
+    } else {
+      map.set(key, {
+        key,
+        week: entry.week ?? null,
+        term: entry.term ? String(entry.term) : null,
+        month: entry.month ? String(entry.month) : null,
+        weekDate: entry.week_date ?? null,
+        entries: [entry],
+      })
+    }
+  }
+  return Array.from(map.values()).sort((a, b) => {
+    if (a.weekDate && b.weekDate && a.weekDate !== b.weekDate) {
+      return a.weekDate.localeCompare(b.weekDate)
+    }
+    return (a.week ?? 0) - (b.week ?? 0)
+  })
+}
+
+type MonthGroup = { key: string; month: string | null; weeks: WeekGroup[] }
+
+function groupWeeksByMonth(weeks: WeekGroup[]): MonthGroup[] {
+  const map = new Map<string, MonthGroup>()
+  for (const week of weeks) {
+    const key = `${week.term ?? ''}|${week.month ?? ''}`
+    const group = map.get(key)
+    if (group) group.weeks.push(week)
+    else map.set(key, { key, month: week.month, weeks: [week] })
+  }
+  return Array.from(map.values())
 }
 
 function readQuery(searchParams: URLSearchParams): StudentWeeklyAssessmentsQuery {
@@ -206,6 +257,28 @@ export function WeeklyEvaluationsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+
+  const [activeMonth, setActiveMonth] = useState<string | null>(null)
+  const [activeWeek, setActiveWeek] = useState<string | null>(null)
+  const monthGroups = useMemo(
+    () => groupWeeksByMonth(groupEntriesByWeek(data?.entries ?? [])),
+    [data?.entries],
+  )
+  const currentMonthIndex = Math.max(
+    0,
+    monthGroups.findIndex((group) => group.key === activeMonth),
+  )
+  const currentMonth = monthGroups[currentMonthIndex]
+  const currentWeek =
+    currentMonth?.weeks.find((week) => week.key === activeWeek)?.key ??
+    currentMonth?.weeks[0]?.key ??
+    null
+  const monthColor = MONTH_COLORS[currentMonthIndex % MONTH_COLORS.length]
+
+  const monthLabel = (month: string | null) =>
+    month
+      ? t(`profile.weeklyEvaluations.months.${month}`)
+      : t('profile.weeklyEvaluations.unknownWeek')
 
   const loadAssessments = useCallback(async () => {
     setIsLoading(true)
@@ -473,7 +546,7 @@ export function WeeklyEvaluationsPage() {
               : t('profile.weeklyEvaluations.emptySubjects')}
           </p>
         ) : (
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {bySubject.map((item) => {
               const id = item.subject?.id
               const active = id != null && String(id) === selectedSubject
@@ -516,8 +589,8 @@ export function WeeklyEvaluationsPage() {
         )}
       </section>
 
-      <section className="mt-6 space-y-3">
-        <h2 className="text-lg font-bold text-brand-dark">
+      <section className="mt-6">
+        <h2 className="mb-3 text-lg font-bold text-brand-dark">
           {t('profile.weeklyEvaluations.entriesTitle')}
         </h2>
         {entries.length === 0 ? (
@@ -546,16 +619,84 @@ export function WeeklyEvaluationsPage() {
             ) : null}
           </div>
         ) : (
-          entries.map((entry) => (
-            <EntryCard
-              key={entry.id}
-              entry={entry}
-              expanded={expandedId === entry.id}
-              onToggle={() =>
-                setExpandedId((current) => (current === entry.id ? null : entry.id))
-              }
-            />
-          ))
+          <div className="space-y-4">
+            <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
+              {monthGroups.map((group, index) => {
+                const color = MONTH_COLORS[index % MONTH_COLORS.length]
+                const active = index === currentMonthIndex
+                return (
+                  <button
+                    key={group.key}
+                    type="button"
+                    onClick={() => {
+                      setActiveMonth(group.key)
+                      setActiveWeek(null)
+                    }}
+                    className={cn(
+                      'flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
+                      active ? color.active : color.tint,
+                    )}
+                  >
+                    {monthLabel(group.month)}
+                    <span
+                      className={cn(
+                        'rounded-full px-2 py-0.5 text-[11px]',
+                        active ? 'bg-white/25' : 'bg-white',
+                      )}
+                    >
+                      {group.weeks.length}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+
+            {currentMonth ? (
+              <Tabs
+                value={currentWeek}
+                onValueChange={(value) => setActiveWeek(String(value))}
+                className={cn('rounded-2xl border p-3 sm:p-4', monthColor.panel)}
+              >
+                <TabsList className="group-data-horizontal/tabs:h-auto w-full max-w-full flex-nowrap justify-start gap-2 overflow-x-auto rounded-none bg-transparent p-0 pb-2">
+                  {currentMonth.weeks.map((group) => (
+                    <TabsTrigger
+                      key={group.key}
+                      value={group.key}
+                      className={cn(
+                        'h-auto min-w-24 flex-none rounded-xl border-brand-dark/10 px-4 py-2 font-semibold text-brand-dark/70 after:hidden data-active:text-white data-active:shadow-sm',
+                        monthColor.week,
+                      )}
+                    >
+                      {group.week != null
+                        ? t('profile.weeklyEvaluations.weekNumber', { n: group.week })
+                        : t('profile.weeklyEvaluations.unknownWeek')}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+                {currentMonth.weeks.map((group) => (
+                  <TabsContent key={group.key} value={group.key} className="mt-3">
+                    {group.weekDate ? (
+                      <p className="mb-3 text-xs text-brand-dark/55">
+                        {t('profile.weeklyEvaluations.weekDate')}: {group.weekDate}
+                      </p>
+                    ) : null}
+                    <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2">
+                      {group.entries.map((entry) => (
+                        <EntryCard
+                          key={entry.id}
+                          entry={entry}
+                          expanded={expandedId === entry.id}
+                          onToggle={() =>
+                            setExpandedId((current) => (current === entry.id ? null : entry.id))
+                          }
+                        />
+                      ))}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+            ) : null}
+          </div>
         )}
       </section>
     </div>

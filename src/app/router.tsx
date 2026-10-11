@@ -25,6 +25,7 @@ import { StatisticsPage } from '@/features/profile/StatisticsPage'
 import { AttendancePage } from '@/features/profile/AttendancePage'
 import { FeesPage } from '@/features/profile/FeesPage'
 import { ConductPage } from '@/features/profile/ConductPage'
+import { BusPage } from '@/features/profile/BusPage'
 import { NotificationsPage } from '@/features/notifications/NotificationsPage'
 import { GroupsPage } from '@/features/groups/GroupsPage'
 import { GroupDetailPage } from '@/features/groups/GroupDetailPage'
@@ -95,6 +96,10 @@ export const router = createBrowserRouter([
               {
                 path: 'conduct',
                 element: <ConductPage />,
+              },
+              {
+                path: 'bus',
+                element: <BusPage />,
               },
               {
                 path: 'statistics',

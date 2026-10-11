@@ -378,9 +378,16 @@
       "fees": "المصروفات",
       "parentSummon": "إستدعاء ولي الأمر",
       "conduct": "المخالفات",
+      "bus": "اشتراك الباص",
       "statistics": "الإحصائيات",
       "groups": "الجماعات والأنشطة",
       "complaintTickets": "تذاكر الشكاوى"
+    },
+    "navGroups": {
+      "account": "الحساب",
+      "academic": "الأكاديمي",
+      "behavior": "الحضور والسلوك",
+      "services": "الخدمات والدعم"
     },
     "personal": {
       "title": "البيانات الشخصية",
@@ -543,26 +550,56 @@
       "unlocking": "جاري الفتح...",
       "loadError": "تعذر تحميل شهادة النجاح.",
       "academicYear": "العام الدراسي {{year}}",
+      "academicYearLabel": "العام الدراسي",
       "formTitle": "استمارة تقييم طالب وفقا للقرار الوزاري ١٣٦ لسنة ٢٠٢٤ الترم الأول للعام الدراسي ٢٠٢٥ / ٢٠٢٦",
+      "formTitleDynamic": "استمارة تقييم طالب — {{term}} — العام الدراسي {{year}}",
       "gradeLevel": "الصف الأول الابتدائي",
       "studentName": "اسم الطالب",
+      "nationalId": "الرقم القومي",
+      "studentCode": "كود الطالب",
+      "studentId": "معرّف الطالب",
       "seatNumber": "رقم الجلوس",
       "className": "الفصل",
+      "classroomSection": "الشعبة",
+      "classroomId": "معرّف الفصل",
+      "stage": "المرحلة",
+      "grade": "الصف",
+      "term": "الفصل الدراسي",
+      "attendanceRate": "نسبة الحضور",
+      "unlockedAt": "تاريخ الفتح",
       "basicTotal": "المجموع الأساسي",
       "grandTotal": "المجموع الكلي (بالمواد الإضافية)",
       "activitiesTitle": "الأنشطة",
+      "legendTitle": "دليل الألوان",
+      "noSubjects": "لا توجد مواد في شهادة النجاح حالياً.",
+      "print": "طباعة الشهادة",
       "summary": {
         "totalSubjects": "عدد المواد: {{count}}",
         "successSubjects": "عدد مواد النجاح: {{count}}",
-        "failureSubjects": "عدد مواد الرسوب: {{count}}"
+        "failureSubjects": "عدد مواد الرسوب: {{count}}",
+        "incompleteSubjects": "عدد المواد غير المكتملة: {{count}}"
       },
       "columns": {
         "subject": "المادة",
         "assessment": "درجة التقييمات",
         "written": "درجة التحريري",
         "final": "الدرجة النهائية",
+        "total": "المجموع",
+        "percentage": "النسبة",
         "color": "اللون",
-        "score": "الدرجة"
+        "score": "الدرجة",
+        "status": "الحالة",
+        "term": "الترم"
+      },
+      "status": {
+        "pass": "ناجح",
+        "fail": "راسب",
+        "incomplete": "غير مكتمل"
+      },
+      "componentStatus": {
+        "approved": "معتمد",
+        "auto": "تلقائي",
+        "pending": "قيد المراجعة"
       },
       "subjects": {
         "arabic": "اللغة العربية",
@@ -721,6 +758,44 @@
         "unknown": "درجة غير محددة"
       }
     },
+    "bus": {
+      "subtitle": "بيانات اشتراك الطالب في باص المدرسة. الصفحة للعرض فقط.",
+      "loadError": "تعذر تحميل بيانات اشتراك الباص.",
+      "notSubscribed": "غير مشترك في الباص",
+      "academicYear": "العام الدراسي: {{year}}",
+      "academicYearLabel": "العام الدراسي",
+      "selectYear": "اختيار العام الدراسي",
+      "incomplete": "بيانات ناقصة",
+      "incompleteHint": "اشتراكك قيد الاستكمال، وقد تظهر بعض البيانات (مثل الباص أو المحطات) لاحقاً.",
+      "busTitle": "الباص",
+      "busNotAssigned": "لم يتم تخصيص باص بعد.",
+      "code": "كود الباص",
+      "plate": "رقم اللوحة",
+      "model": "الموديل",
+      "status": "حالة الباص",
+      "busStatuses": {
+        "inactive": "غير نشط",
+        "maintenance": "في الصيانة"
+      },
+      "supervisor": "مشرف الباص",
+      "supervisorName": "الاسم",
+      "supervisorPhone": "الهاتف",
+      "tripTitle": "الرحلة",
+      "pickup": "محطة الصعود",
+      "dropoff": "محطة النزول",
+      "notes": "ملاحظات",
+      "routesTitle": "خط السير",
+      "noRoutes": "لا توجد خطوط سير متاحة.",
+      "noStops": "لا توجد محطات لهذا الخط.",
+      "unnamedRoute": "خط السير",
+      "yourPickup": "محطتك (صعود)",
+      "yourDropoff": "محطتك (نزول)",
+      "directions": {
+        "to_school": "ذهاب",
+        "from_school": "عودة",
+        "round_trip": "ذهاب وعودة"
+      }
+    },
     "parentSummon": {
       "viewDetails": "عرض التفاصيل",
       "backToList": "العودة للقائمة",
@@ -812,6 +887,7 @@
       "noScores": "لا توجد درجات تفصيلية لهذا التقييم.",
       "absent": "غائب",
       "weekNumber": "الأسبوع {{n}}",
+      "unknownWeek": "أخرى",
       "weekDate": "تاريخ الأسبوع",
       "subjectSessions": "{{count}} تقييم",
       "summary": {

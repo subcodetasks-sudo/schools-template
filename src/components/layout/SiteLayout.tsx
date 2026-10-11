@@ -23,7 +23,7 @@ export function SiteLayout() {
       )}
     >
       <SiteHeader />
-      <main className={cn('flex-1', !isHome && 'pt-24')}>
+      <main className={cn('flex-1', !isHome && 'pt-24', 'print:pt-0')}>
         <Outlet />
       </main>
       {!isAuth && !isProfile ? <SiteFooter /> : null}

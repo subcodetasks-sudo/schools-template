@@ -378,9 +378,16 @@
       "fees": "Fees",
       "parentSummon": "Parent summon",
       "conduct": "Conduct",
+      "bus": "Bus subscription",
       "statistics": "Statistics",
       "groups": "Groups & activities",
       "complaintTickets": "Complaint tickets"
+    },
+    "navGroups": {
+      "account": "Account",
+      "academic": "Academic",
+      "behavior": "Attendance & conduct",
+      "services": "Services & support"
     },
     "personal": {
       "title": "Personal information",
@@ -543,26 +550,56 @@
       "unlocking": "Unlocking...",
       "loadError": "Could not load the success certificate.",
       "academicYear": "Academic year {{year}}",
+      "academicYearLabel": "Academic year",
       "formTitle": "Student evaluation form according to Ministerial Decree 136 of 2024, first term for the academic year 2025/2026",
+      "formTitleDynamic": "Student evaluation form — {{term}} — academic year {{year}}",
       "gradeLevel": "First grade primary",
       "studentName": "Student name",
+      "nationalId": "National ID",
+      "studentCode": "Student code",
+      "studentId": "Student ID",
       "seatNumber": "Seat number",
       "className": "Class",
+      "classroomSection": "Section",
+      "classroomId": "Classroom ID",
+      "stage": "Stage",
+      "grade": "Grade",
+      "term": "Term",
+      "attendanceRate": "Attendance rate",
+      "unlockedAt": "Unlocked at",
       "basicTotal": "Basic total",
       "grandTotal": "Grand total (including additional subjects)",
       "activitiesTitle": "Activities",
+      "legendTitle": "Color legend",
+      "noSubjects": "No subjects available on this certificate yet.",
+      "print": "Print certificate",
       "summary": {
         "totalSubjects": "Number of subjects: {{count}}",
         "successSubjects": "Success subjects: {{count}}",
-        "failureSubjects": "Failure subjects: {{count}}"
+        "failureSubjects": "Failure subjects: {{count}}",
+        "incompleteSubjects": "Incomplete subjects: {{count}}"
       },
       "columns": {
         "subject": "Subject",
         "assessment": "Assessment grade",
         "written": "Written grade",
         "final": "Final grade",
+        "total": "Total",
+        "percentage": "Percentage",
         "color": "Color",
-        "score": "Score"
+        "score": "Score",
+        "status": "Status",
+        "term": "Term"
+      },
+      "status": {
+        "pass": "Pass",
+        "fail": "Fail",
+        "incomplete": "Incomplete"
+      },
+      "componentStatus": {
+        "approved": "Approved",
+        "auto": "Auto",
+        "pending": "Pending"
       },
       "subjects": {
         "arabic": "Arabic",
@@ -721,6 +758,44 @@
         "unknown": "Unspecified degree"
       }
     },
+    "bus": {
+      "subtitle": "The student's school bus subscription. This page is read-only.",
+      "loadError": "Could not load the bus subscription.",
+      "notSubscribed": "Not subscribed to school bus",
+      "academicYear": "Academic year: {{year}}",
+      "academicYearLabel": "Academic year",
+      "selectYear": "Select academic year",
+      "incomplete": "Incomplete details",
+      "incompleteHint": "Your subscription is still being completed; some details (such as the bus or stops) may appear later.",
+      "busTitle": "Bus",
+      "busNotAssigned": "No bus has been assigned yet.",
+      "code": "Bus code",
+      "plate": "Plate number",
+      "model": "Model",
+      "status": "Bus status",
+      "busStatuses": {
+        "inactive": "Inactive",
+        "maintenance": "In maintenance"
+      },
+      "supervisor": "Bus supervisor",
+      "supervisorName": "Name",
+      "supervisorPhone": "Phone",
+      "tripTitle": "Trip",
+      "pickup": "Pickup stop",
+      "dropoff": "Dropoff stop",
+      "notes": "Notes",
+      "routesTitle": "Route",
+      "noRoutes": "No routes available.",
+      "noStops": "This route has no stops.",
+      "unnamedRoute": "Route",
+      "yourPickup": "Your stop (pickup)",
+      "yourDropoff": "Your stop (dropoff)",
+      "directions": {
+        "to_school": "To school",
+        "from_school": "From school",
+        "round_trip": "Round trip"
+      }
+    },
     "parentSummon": {
       "viewDetails": "View details",
       "backToList": "Back to list",
@@ -812,6 +887,7 @@
       "noScores": "No detailed scores for this assessment.",
       "absent": "Absent",
       "weekNumber": "Week {{n}}",
+      "unknownWeek": "Other",
       "weekDate": "Week date",
       "subjectSessions": "{{count}} assessment(s)",
       "summary": {

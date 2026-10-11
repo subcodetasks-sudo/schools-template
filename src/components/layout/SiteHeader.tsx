@@ -216,7 +216,7 @@ export function SiteHeader() {
   return (
     <header
       className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300',
+        'fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,border-color] duration-300 print:hidden',
         scrolled || open
           ? 'border-b border-brand-muted/40 bg-brand-light/95 shadow-sm backdrop-blur-md'
           : 'border-b border-transparent bg-transparent',
