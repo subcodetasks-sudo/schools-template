@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, BookX, CalendarDays, CheckCircle2, Percent } from 'lucide-react'
-import {
-  getStudentLessonAbsences,
-  type StudentLessonAbsencesPayload,
-} from '@/features/profile/studentProfileApi'
+import { getStudentLessonAbsences } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
+import { useApiResource } from '@/lib/useApiResource'
 
 const lessonSummaryMeta = [
   {
@@ -71,27 +69,16 @@ function periodDisplay(
 
 export function AttendancePage() {
   const { t, i18n } = useTranslation()
-  const [lessons, setLessons] = useState<StudentLessonAbsencesPayload | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const loadAbsences = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      setLessons(await getStudentLessonAbsences())
-    } catch (err) {
-      setLessons(null)
-      setError(err instanceof Error ? err.message : t('profile.attendance.loadError'))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [t])
-
-  useEffect(() => {
-    void loadAbsences()
-  }, [loadAbsences])
+  const {
+    data: lessons,
+    isLoading,
+    error,
+    reload: loadAbsences,
+  } = useApiResource(
+    () => getStudentLessonAbsences(),
+    [t],
+    t('profile.attendance.loadError'),
+  )
 
   const lessonSummaryCards = useMemo(() => {
     const summary = lessons?.summary

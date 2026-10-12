@@ -1,4 +1,5 @@
 import { ApiError, apiGet, unwrapData } from '@/lib/api'
+import { toSafeHttpUrl } from '@/lib/sanitize'
 import type { MediaUrls } from '@/features/profile/mediaApi'
 
 const GROUPS_BASE = '/v1/auth/student/profile/groups'
@@ -373,17 +374,16 @@ export function getAttachmentKind(attachment: Pick<GroupTaskAttachment, 'fileNam
 }
 
 export function getAttachmentUrl(attachment: GroupTaskAttachment) {
-  return attachment.urls.original ?? attachment.urls.large ?? attachment.urls.medium ?? null
+  return toSafeHttpUrl(attachment.urls.original ?? attachment.urls.large ?? attachment.urls.medium)
 }
 
 export function getAttachmentPreviewUrl(attachment: GroupTaskAttachment) {
   if (getAttachmentKind(attachment) !== 'image') return null
-  return (
+  return toSafeHttpUrl(
     attachment.urls.thumb ??
-    attachment.urls.medium ??
-    attachment.urls.webp ??
-    attachment.urls.original ??
-    null
+      attachment.urls.medium ??
+      attachment.urls.webp ??
+      attachment.urls.original,
   )
 }
 

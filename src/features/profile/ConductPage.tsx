@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ShieldAlert, ShieldOff } from 'lucide-react'
-import { getErrorMessage } from '@/lib/api'
 import { GroupsPageTitle } from '@/features/groups/components/GroupsShared'
 import {
   getStudentConduct,
   type ConductDegree,
-  type StudentConductPayload,
   type StudentConductViolation,
 } from '@/features/profile/conductApi'
 import { cn } from '@/lib/utils'
+import { useApiResource } from '@/lib/useApiResource'
 
 function formatDate(value: string | null, language: string) {
   if (!value?.trim()) return null
@@ -127,26 +125,11 @@ function ViolationCard({ item }: { item: StudentConductViolation }) {
 
 export function ConductPage() {
   const { t } = useTranslation()
-  const [data, setData] = useState<StudentConductPayload | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const load = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      setData(await getStudentConduct())
-    } catch (err) {
-      setData(null)
-      setError(getErrorMessage(err, t('profile.conduct.loadError')))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [t])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+  const { data, isLoading, error, reload: load } = useApiResource(
+    () => getStudentConduct(),
+    [t],
+    t('profile.conduct.loadError'),
+  )
 
   if (isLoading) {
     return (

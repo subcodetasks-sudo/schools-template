@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react'
 import { PageBanner, type PageBreadcrumb } from '@/components/PageBanner'
 import { ImageWithFallback } from '@/components/ImageWithFallback'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { cn } from '@/lib/utils'
 
 export type DetailSection = {
   title: string
-  body: string
-  /** Render `body` as HTML (e.g. rich-text article content) instead of plain text. */
+  /** Plain text, or a node for structured content such as an image gallery. */
+  body: ReactNode
+  /** Treat string `body` as untrusted HTML (e.g. rich-text article content); it is sanitized before rendering. */
   html?: boolean
 }
 
@@ -70,15 +72,15 @@ export function DetailPageLayout({
                   <h3 className="border-s-4 border-brand-primary ps-3 text-lg font-bold leading-snug text-brand-dark sm:text-xl">
                     {section.title}
                   </h3>
-                  {section.html ? (
+                  {section.html && typeof section.body === 'string' ? (
                     <div
                       className="mt-3 space-y-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8 [&_a]:text-brand-primary [&_a]:underline [&_img]:my-4 [&_img]:rounded-xl"
-                      dangerouslySetInnerHTML={{ __html: section.body }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
                     />
                   ) : (
-                    <p className="mt-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8">
+                    <div className="mt-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8">
                       {section.body}
-                    </p>
+                    </div>
                   )}
                 </section>
               ))}

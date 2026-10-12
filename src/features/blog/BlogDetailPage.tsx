@@ -1,42 +1,19 @@
-import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { DetailPageLayout } from '@/components/DetailPageLayout'
+import { DetailPageLayout, type DetailSection } from '@/components/DetailPageLayout'
 import { ImageWithFallback } from '@/components/ImageWithFallback'
-import { formatPublishedDate, getBlogArticle, type BlogArticle } from '@/features/blog/blogApi'
-import { ApiError, getErrorMessage } from '@/lib/api'
+import { formatPublishedDate, getBlogArticle } from '@/features/blog/blogApi'
+import { useApiResource } from '@/lib/useApiResource'
 
 export function BlogDetailPage() {
   const { id = '' } = useParams()
   const { t, i18n } = useTranslation()
-  const [entry, setEntry] = useState<BlogArticle | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { data: entry, isLoading, error, errorStatus, reload } = useApiResource(
+    () => getBlogArticle(id),
+    [id],
+  )
 
-  const load = useCallback(() => {
-    setIsLoading(true)
-    setError(null)
-    setNotFound(false)
-
-    return getBlogArticle(id)
-      .then(setEntry)
-      .catch((err) => {
-        setEntry(null)
-        if (err instanceof ApiError && err.status === 404) {
-          setNotFound(true)
-        } else {
-          setError(getErrorMessage(err))
-        }
-      })
-      .finally(() => setIsLoading(false))
-  }, [id])
-
-  useEffect(() => {
-    void load()
-  }, [load])
-
-  if (notFound) {
+  if (errorStatus === 404) {
     return <Navigate to="/blog" replace />
   }
 
@@ -49,7 +26,7 @@ export function BlogDetailPage() {
         {error ? (
           <button
             type="button"
-            onClick={() => void load()}
+            onClick={() => void reload()}
             className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
           >
             {t('state.retry')}
@@ -62,16 +39,27 @@ export function BlogDetailPage() {
   const publishedLabel = formatPublishedDate(entry.published_at, i18n.language)
   const images = entry.image_urls ?? []
 
-  const sections = [{ title: t('detail.sections.overview'), body: entry.content, html: true }]
+  const sections: DetailSection[] = [
+    { title: t('detail.sections.overview'), body: entry.content, html: true },
+  ]
 
   if (images.length > 0) {
-    const galleryHtml = `<div class="grid grid-cols-2 gap-3 sm:grid-cols-3">${images
-      .map(
-        (src) =>
-          `<img src="${src}" alt="" loading="lazy" class="aspect-4/3 w-full rounded-xl object-cover" onerror="this.onerror=null;this.src='/logo.jpeg'" />`,
-      )
-      .join('')}</div>`
-    sections.push({ title: t('detail.sections.gallery'), body: galleryHtml, html: true })
+    sections.push({
+      title: t('detail.sections.gallery'),
+      body: (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {images.map((src, index) => (
+            <ImageWithFallback
+              key={`${src}-${index}`}
+              src={src}
+              alt=""
+              loading="lazy"
+              className="aspect-4/3 w-full rounded-xl object-cover"
+            />
+          ))}
+        </div>
+      ),
+    })
   }
 
   return (

@@ -1,14 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { CircleDollarSign, Receipt, Wallet } from 'lucide-react'
-import { getErrorMessage } from '@/lib/api'
 import {
   getStudentFees,
   readTuitionTotals,
-  type StudentFeesPayload,
   type StudentSeparateFeePayment,
 } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
+import { useApiResource } from '@/lib/useApiResource'
 
 const tuitionMeta = [
   {
@@ -59,29 +58,20 @@ function paymentAmount(payment: StudentSeparateFeePayment) {
 
 export function FeesPage() {
   const { t, i18n } = useTranslation()
-  const [data, setData] = useState<StudentFeesPayload | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  const loadFees = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      setData(await getStudentFees())
-    } catch (err) {
-      setData(null)
-      setError(getErrorMessage(err, t('profile.fees.loadError')))
-    } finally {
-      setIsLoading(false)
-    }
-  }, [t])
-
-  useEffect(() => {
-    void loadFees()
-  }, [loadFees])
+  const {
+    data,
+    isLoading,
+    error,
+    reload: loadFees,
+  } = useApiResource(
+    () => getStudentFees(),
+    [t],
+    t('profile.fees.loadError'),
+  )
 
   const tuition = useMemo(() => readTuitionTotals(data?.tuition), [data?.tuition])
-  const separatePayments = data?.separate?.payments ?? []
+  const payments = data?.separate?.payments
+  const separatePayments = useMemo(() => payments ?? [], [payments])
   const separateTotal = useMemo(() => {
     const listed = asListedTotal(separatePayments)
     const reported = Number(String(data?.separate?.paid_amount ?? '').replace(/,/g, ''))

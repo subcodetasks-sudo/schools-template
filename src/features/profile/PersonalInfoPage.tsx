@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { toSafeHttpUrl } from '@/lib/sanitize'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   AlertTriangle,
@@ -670,7 +671,7 @@ function DocumentList({ files }: { files: StudentDocumentFile[] }) {
   return (
     <ul className="mt-2 space-y-1.5">
       {files.map((file, index) => {
-        const href = file.urls?.original?.trim()
+        const href = toSafeHttpUrl(file.urls?.original)
         const name = file.fileName?.trim() || t('profile.personal.documents.unnamed')
         return (
           <li key={`${file.id ?? name}-${index}`}>

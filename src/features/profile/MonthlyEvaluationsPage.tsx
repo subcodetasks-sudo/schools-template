@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ClipboardList } from 'lucide-react'
 import {
@@ -12,11 +12,11 @@ import { useProfile } from '@/features/profile/ProfileContext'
 import {
   getStudentMonthlyAssessments,
   type StudentMonthlyAssessmentRow,
-  type StudentMonthlyAssessmentsPayload,
   type StudentWeeklyAssessmentTerm,
 } from '@/features/profile/studentProfileApi'
 import { BRAND_MONTH_COLORS, type MonthColor } from '@/features/profile/monthColors'
 import { cn } from '@/lib/utils'
+import { useApiResource } from '@/lib/useApiResource'
 
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
@@ -172,9 +172,6 @@ function MonthPanel({ section, color }: { section: MonthSection; color: MonthCol
 export function MonthlyEvaluationsPage() {
   const { t } = useTranslation()
   const { personalName, gradeLabel, profileData } = useProfile()
-  const [data, setData] = useState<StudentMonthlyAssessmentsPayload | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [selectedTerm, setSelectedTerm] = useState<StudentWeeklyAssessmentTerm | 'all'>('all')
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
 
@@ -182,25 +179,16 @@ export function MonthlyEvaluationsPage() {
   const studentGrade = gradeLabel || t('profile.studentGrade')
   const studentClass = profileData.classNumber || '—'
 
-  const load = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-    try {
-      const payload = await getStudentMonthlyAssessments(
-        selectedTerm === 'all' ? {} : { term: selectedTerm },
-      )
-      setData(payload)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('profile.monthlyEvaluations.loadError'))
-      setData(null)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [selectedTerm, t])
-
-  useEffect(() => {
-    void load()
-  }, [load])
+  const {
+    data,
+    isLoading,
+    error,
+    reload: load,
+  } = useApiResource(
+    () => getStudentMonthlyAssessments(selectedTerm === 'all' ? {} : { term: selectedTerm }),
+    [selectedTerm, t],
+    t('profile.monthlyEvaluations.loadError'),
+  )
 
   const monthSections = useMemo<MonthSection[]>(() => {
     const map = new Map<string, StudentMonthlyAssessmentRow[]>()

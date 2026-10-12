@@ -1,60 +1,33 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { SiteLayout } from '@/components/layout/SiteLayout'
 import { HomePage } from '@/features/home/HomePage'
-import { TopStudentsPage } from '@/features/top-students/TopStudentsPage'
-import { AchievementsPage } from '@/features/achievements/AchievementsPage'
-import { AchievementDetailPage } from '@/features/achievements/AchievementDetailPage'
-import { EventsPage } from '@/features/events/EventsPage'
-import { EventDetailPage } from '@/features/events/EventDetailPage'
-import { BlogPage } from '@/features/blog/BlogPage'
-import { BlogDetailPage } from '@/features/blog/BlogDetailPage'
-import { ContactPage } from '@/features/contact/ContactPage'
-import { LoginPage } from '@/features/auth/LoginPage'
-import { RegisterPage } from '@/features/auth/RegisterPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 import { GuestRoute } from '@/features/auth/GuestRoute'
-import { TermsOfApplyingPage } from '@/features/terms/TermsOfApplyingPage'
 import { ProfileLayout } from '@/features/profile/ProfileLayout'
-import { PersonalInfoPage } from '@/features/profile/PersonalInfoPage'
-import { CertificatePage } from '@/features/profile/CertificatePage'
-import { MonthlyEvaluationsPage } from '@/features/profile/MonthlyEvaluationsPage'
-import { WeeklyEvaluationsPage } from '@/features/profile/WeeklyEvaluationsPage'
-import { SchedulePage } from '@/features/profile/SchedulePage'
-import { ParentSummonPage } from '@/features/profile/ParentSummonPage'
-import { StatisticsPage } from '@/features/profile/StatisticsPage'
-import { AttendancePage } from '@/features/profile/AttendancePage'
-import { FeesPage } from '@/features/profile/FeesPage'
-import { ConductPage } from '@/features/profile/ConductPage'
-import { BusPage } from '@/features/profile/BusPage'
-import { NotificationsPage } from '@/features/notifications/NotificationsPage'
-import { GroupsPage } from '@/features/groups/GroupsPage'
-import { GroupDetailPage } from '@/features/groups/GroupDetailPage'
-import { GroupTaskDetailPage } from '@/features/groups/GroupTaskDetailPage'
-import { IntroductionCardPage } from '@/features/introduction-card/IntroductionCardPage'
-import { ComplaintTicketsPage } from '@/features/complaint-tickets/ComplaintTicketsPage'
-import { ComplaintTicketDetailPage } from '@/features/complaint-tickets/ComplaintTicketDetailPage'
 import { NotFoundPage } from '@/features/not-found/NotFoundPage'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <SiteLayout />,
+    // Routes are lazy-loaded; render nothing (rather than warn) while the first chunk loads.
+    HydrateFallback: () => null,
     children: [
       { index: true, element: <HomePage /> },
-      { path: 'top-students', element: <TopStudentsPage /> },
-      { path: 'achievements', element: <AchievementsPage /> },
-      { path: 'achievements/:id', element: <AchievementDetailPage /> },
-      { path: 'events', element: <EventsPage /> },
-      { path: 'events/:id', element: <EventDetailPage /> },
-      { path: 'blog', element: <BlogPage /> },
-      { path: 'blog/:id', element: <BlogDetailPage /> },
-      { path: 'contact', element: <ContactPage /> },
-      { path: 'terms-of-applying', element: <TermsOfApplyingPage /> },
+      { path: 'top-students', lazy: () => import('@/features/top-students/TopStudentsPage').then((m) => ({ Component: m.TopStudentsPage })) },
+      { path: 'achievements', lazy: () => import('@/features/achievements/AchievementsPage').then((m) => ({ Component: m.AchievementsPage })) },
+      { path: 'achievements/:id', lazy: () => import('@/features/achievements/AchievementDetailPage').then((m) => ({ Component: m.AchievementDetailPage })) },
+      { path: 'events', lazy: () => import('@/features/events/EventsPage').then((m) => ({ Component: m.EventsPage })) },
+      { path: 'events/:id', lazy: () => import('@/features/events/EventDetailPage').then((m) => ({ Component: m.EventDetailPage })) },
+      { path: 'blog', lazy: () => import('@/features/blog/BlogPage').then((m) => ({ Component: m.BlogPage })) },
+      { path: 'blog/:id', lazy: () => import('@/features/blog/BlogDetailPage').then((m) => ({ Component: m.BlogDetailPage })) },
+      { path: 'contact', lazy: () => import('@/features/contact/ContactPage').then((m) => ({ Component: m.ContactPage })) },
+      { path: 'terms-of-applying', lazy: () => import('@/features/terms/TermsOfApplyingPage').then((m) => ({ Component: m.TermsOfApplyingPage })) },
       {
         element: <GuestRoute />,
         children: [
-          { path: 'login', element: <LoginPage /> },
-          { path: 'register', element: <RegisterPage /> },
+          { path: 'login', lazy: () => import('@/features/auth/LoginPage').then((m) => ({ Component: m.LoginPage })) },
+          { path: 'register', lazy: () => import('@/features/auth/RegisterPage').then((m) => ({ Component: m.RegisterPage })) },
         ],
       },
       {
@@ -64,74 +37,74 @@ export const router = createBrowserRouter([
           {
             element: <ProfileLayout />,
             children: [
-              { index: true, element: <PersonalInfoPage /> },
+              { index: true, lazy: () => import('@/features/profile/PersonalInfoPage').then((m) => ({ Component: m.PersonalInfoPage })) },
               {
                 path: 'certificate',
-                element: <CertificatePage />,
+                lazy: () => import('@/features/profile/CertificatePage').then((m) => ({ Component: m.CertificatePage })),
               },
               {
                 path: 'monthly-evaluations',
-                element: <MonthlyEvaluationsPage />,
+                lazy: () => import('@/features/profile/MonthlyEvaluationsPage').then((m) => ({ Component: m.MonthlyEvaluationsPage })),
               },
               {
                 path: 'weekly-evaluations',
-                element: <WeeklyEvaluationsPage />,
+                lazy: () => import('@/features/profile/WeeklyEvaluationsPage').then((m) => ({ Component: m.WeeklyEvaluationsPage })),
               },
               {
                 path: 'schedule',
-                element: <SchedulePage />,
+                lazy: () => import('@/features/profile/SchedulePage').then((m) => ({ Component: m.SchedulePage })),
               },
               {
                 path: 'attendance',
-                element: <AttendancePage />,
+                lazy: () => import('@/features/profile/AttendancePage').then((m) => ({ Component: m.AttendancePage })),
               },
               {
                 path: 'fees',
-                element: <FeesPage />,
+                lazy: () => import('@/features/profile/FeesPage').then((m) => ({ Component: m.FeesPage })),
               },
               {
                 path: 'parent-summon',
-                element: <ParentSummonPage />,
+                lazy: () => import('@/features/profile/ParentSummonPage').then((m) => ({ Component: m.ParentSummonPage })),
               },
               {
                 path: 'conduct',
-                element: <ConductPage />,
+                lazy: () => import('@/features/profile/ConductPage').then((m) => ({ Component: m.ConductPage })),
               },
               {
                 path: 'bus',
-                element: <BusPage />,
+                lazy: () => import('@/features/profile/BusPage').then((m) => ({ Component: m.BusPage })),
               },
               {
                 path: 'statistics',
-                element: <StatisticsPage />,
+                lazy: () => import('@/features/profile/StatisticsPage').then((m) => ({ Component: m.StatisticsPage })),
               },
               {
                 path: 'notifications',
-                element: <NotificationsPage />,
+                lazy: () => import('@/features/notifications/NotificationsPage').then((m) => ({ Component: m.NotificationsPage })),
               },
               {
                 path: 'groups',
-                element: <GroupsPage />,
+                lazy: () => import('@/features/groups/GroupsPage').then((m) => ({ Component: m.GroupsPage })),
               },
               {
                 path: 'groups/:groupId',
-                element: <GroupDetailPage />,
+                lazy: () => import('@/features/groups/GroupDetailPage').then((m) => ({ Component: m.GroupDetailPage })),
               },
               {
                 path: 'groups/:groupId/tasks/:taskId',
-                element: <GroupTaskDetailPage />,
+                lazy: () => import('@/features/groups/GroupTaskDetailPage').then((m) => ({ Component: m.GroupTaskDetailPage })),
               },
               {
                 path: 'introduction-card',
-                element: <IntroductionCardPage />,
+                lazy: () => import('@/features/introduction-card/IntroductionCardPage').then((m) => ({ Component: m.IntroductionCardPage })),
               },
               {
                 path: 'complaint-tickets',
-                element: <ComplaintTicketsPage />,
+                lazy: () => import('@/features/complaint-tickets/ComplaintTicketsPage').then((m) => ({ Component: m.ComplaintTicketsPage })),
               },
               {
                 path: 'complaint-tickets/:ticketId',
-                element: <ComplaintTicketDetailPage />,
+                lazy: () => import('@/features/complaint-tickets/ComplaintTicketDetailPage').then((m) => ({ Component: m.ComplaintTicketDetailPage })),
               },
               { path: '*', element: <Navigate to="/404" replace /> },
             ],

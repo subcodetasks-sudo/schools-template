@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, UserRound, UsersRound } from 'lucide-react'
-import { getErrorMessage } from '@/lib/api'
 import { getMyGroups, type SchoolGroup } from '@/features/groups/groupsApi'
 import {
   GroupsEmptyState,
@@ -10,8 +8,7 @@ import {
   GroupsLoadingState,
   GroupsPageTitle,
 } from '@/features/groups/components/GroupsShared'
-
-type LoadResult = { groups: SchoolGroup[] | null; error: string | null }
+import { useApiResource } from '@/lib/useApiResource'
 
 function groupPath(id: string) {
   return `/profile/groups/${encodeURIComponent(id)}`
@@ -88,39 +85,16 @@ function GroupCard({ group }: { group: SchoolGroup }) {
 
 export function GroupsPage() {
   const { t, i18n } = useTranslation()
-  const [groups, setGroups] = useState<SchoolGroup[] | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [reloadKey, setReloadKey] = useState(0)
-
-  /** Pure fetch: resolves to the next state instead of setting it, so the effect owns all updates. */
-  const loadGroups = useCallback(async (): Promise<LoadResult> => {
-    try {
-      return { groups: await getMyGroups(), error: null }
-    } catch (err) {
-      return { groups: null, error: getErrorMessage(err, t('profile.groups.list.loadError')) }
-    }
-  }, [t])
-
-  useEffect(() => {
-    // Ignore responses that arrive after unmount or after a newer request (retry / language change).
-    let ignore = false
-    void loadGroups().then((result) => {
-      if (ignore) return
-      setGroups(result.groups)
-      setError(result.error)
-      setIsLoading(false)
-    })
-    return () => {
-      ignore = true
-    }
-  }, [loadGroups, reloadKey])
-
-  const retry = () => {
-    setIsLoading(true)
-    setError(null)
-    setReloadKey((key) => key + 1)
-  }
+  const {
+    data: groups,
+    isLoading,
+    error,
+    reload: retry,
+  } = useApiResource(
+    () => getMyGroups(),
+    [t],
+    t('profile.groups.list.loadError'),
+  )
 
   const header = (
     <div className="flex flex-wrap items-end justify-between gap-3">
@@ -152,7 +126,7 @@ export function GroupsPage() {
       <div className="w-full">
         {header}
         <div className="mt-8">
-          <GroupsErrorState kind="generic" message={error} onRetry={retry} />
+          <GroupsErrorState kind="generic" message={error} onRetry={() => void retry()} />
         </div>
       </div>
     )

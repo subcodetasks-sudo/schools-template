@@ -1,42 +1,19 @@
-import { useCallback, useEffect, useState } from 'react'
 import { CalendarDays } from 'lucide-react'
 import { Navigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DetailPageLayout } from '@/components/DetailPageLayout'
-import { formatEventDate, getEvent, type SchoolEventEntry } from '@/features/events/eventsApi'
-import { ApiError, getErrorMessage } from '@/lib/api'
+import { formatEventDate, getEvent } from '@/features/events/eventsApi'
+import { useApiResource } from '@/lib/useApiResource'
 
 export function EventDetailPage() {
   const { id = '' } = useParams()
   const { t, i18n } = useTranslation()
-  const [entry, setEntry] = useState<SchoolEventEntry | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const { data: entry, isLoading, error, errorStatus, reload } = useApiResource(
+    () => getEvent(id),
+    [id],
+  )
 
-  const load = useCallback(() => {
-    setIsLoading(true)
-    setError(null)
-    setNotFound(false)
-
-    return getEvent(id)
-      .then(setEntry)
-      .catch((err) => {
-        setEntry(null)
-        if (err instanceof ApiError && err.status === 404) {
-          setNotFound(true)
-        } else {
-          setError(getErrorMessage(err))
-        }
-      })
-      .finally(() => setIsLoading(false))
-  }, [id])
-
-  useEffect(() => {
-    void load()
-  }, [load])
-
-  if (notFound) {
+  if (errorStatus === 404) {
     return <Navigate to="/events" replace />
   }
 
@@ -49,7 +26,7 @@ export function EventDetailPage() {
         {error ? (
           <button
             type="button"
-            onClick={() => void load()}
+            onClick={() => void reload()}
             className="rounded-xl border border-brand-dark/15 px-4 py-2 text-sm"
           >
             {t('state.retry')}

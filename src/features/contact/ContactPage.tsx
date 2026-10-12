@@ -77,9 +77,12 @@ export function ContactPage() {
     info?.working_hours ? { icon: Clock3, label: info.working_hours } : null,
   ].filter((item): item is NonNullable<typeof item> => item !== null)
 
-  const mapSrc = info?.location
-    ? `https://maps.google.com/maps?q=${info.location.lat},${info.location.lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`
-    : 'https://maps.google.com/maps?q=Mansoura%2C%20Egypt&t=&z=13&ie=UTF8&iwloc=&output=embed'
+  const lat = Number(info?.location?.lat)
+  const lng = Number(info?.location?.lng)
+  const mapSrc =
+    info?.location && Number.isFinite(lat) && Number.isFinite(lng)
+      ? `https://maps.google.com/maps?q=${lat},${lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`
+      : 'https://maps.google.com/maps?q=Mansoura%2C%20Egypt&t=&z=13&ie=UTF8&iwloc=&output=embed'
 
   return (
     <section className="bg-background pb-16">
