@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, ListChecks, Percent } from 'lucide-react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ListChecks, Percent } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -11,14 +10,14 @@ import {
 } from '@/components/ui/select'
 import {
   getStudentWeeklyAssessments,
-  type StudentWeeklyAssessmentEntry,
+  type StudentWeeklyAssessmentComponentSummary,
   type StudentWeeklyAssessmentMonth,
   type StudentWeeklyAssessmentSubject,
   type StudentWeeklyAssessmentsPayload,
   type StudentWeeklyAssessmentsQuery,
   type StudentWeeklyAssessmentTerm,
 } from '@/features/profile/studentProfileApi'
-import { MONTH_COLORS } from '@/features/profile/monthColors'
+import { WeeklyAssessmentsTable } from '@/features/profile/WeeklyAssessmentsTable'
 import { cn } from '@/lib/utils'
 
 const FILTER_MONTHS: StudentWeeklyAssessmentMonth[] = [
@@ -74,15 +73,6 @@ function ProgressBar({ percentage }: { percentage: number | null | undefined }) 
   )
 }
 
-function scoreColumnLabel(
-  key: string,
-  t: (key: string, options?: Record<string, unknown>) => string,
-) {
-  const translationKey = `profile.weeklyEvaluations.scoreColumns.${key}`
-  const translated = t(translationKey)
-  return translated === translationKey ? key : translated
-}
-
 function mergeSubjects(
   current: StudentWeeklyAssessmentSubject[],
   incoming: StudentWeeklyAssessmentSubject[],
@@ -93,143 +83,36 @@ function mergeSubjects(
   return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name, 'ar'))
 }
 
-function EntryCard({
-  entry,
-  expanded,
-  onToggle,
+function componentTitle(
+  component: { key: string; name: string; name_en?: string | null },
+  isEnglish: boolean,
+) {
+  return (isEnglish && component.name_en?.trim()) || component.name || component.key
+}
+
+function ComponentSummaryCard({
+  item,
+  isEnglish,
 }: {
-  entry: StudentWeeklyAssessmentEntry
-  expanded: boolean
-  onToggle: () => void
+  item: StudentWeeklyAssessmentComponentSummary
+  isEnglish: boolean
 }) {
   const { t } = useTranslation()
-  const termKey = entry.term ? `profile.weeklyEvaluations.terms.${entry.term}` : null
-  const monthKey = entry.month ? `profile.weeklyEvaluations.months.${entry.month}` : null
-  const termLabel = termKey ? (t(termKey) === termKey ? String(entry.term) : t(termKey)) : null
-  const monthLabel = monthKey
-    ? t(monthKey) === monthKey
-      ? String(entry.month)
-      : t(monthKey)
-    : null
-  const weekLabel =
-    entry.week != null ? t('profile.weeklyEvaluations.weekNumber', { n: entry.week }) : null
-  const meta = [termLabel, monthLabel, weekLabel].filter(Boolean).join(' · ')
-  const scoreEntries = Object.entries(entry.scores ?? {})
-
   return (
-    <article className="overflow-hidden rounded-xl border border-brand-dark/10 bg-white shadow-sm">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center justify-between gap-4 px-4 py-3.5 text-start transition-colors hover:bg-muted/30"
-      >
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="font-semibold text-brand-dark">{entry.subject?.name || '—'}</p>
-            {entry.is_absent ? (
-              <span className="rounded-lg bg-rose-500/10 px-2 py-0.5 text-[11px] font-semibold text-rose-700">
-                {t('profile.weeklyEvaluations.absent')}
-              </span>
-            ) : null}
-          </div>
-          {meta ? <p className="mt-1 text-xs text-brand-dark/55 sm:text-sm">{meta}</p> : null}
-          {entry.week_date ? (
-            <p className="mt-1 text-xs text-brand-dark/45">
-              {t('profile.weeklyEvaluations.weekDate')}: {entry.week_date}
-            </p>
-          ) : null}
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="text-end">
-            <p className="text-sm font-bold text-brand-primary">
-              {formatPercentage(entry.percentage)}
-            </p>
-            <p className="mt-0.5 text-xs text-brand-dark/55">
-              {formatScorePair(entry.total, entry.max_total)}
-            </p>
-          </div>
-          <ChevronDown
-            className={cn(
-              'size-4 text-brand-dark/45 transition-transform',
-              expanded && 'rotate-180',
-            )}
-            aria-hidden
-          />
-        </div>
-      </button>
-
-      {expanded ? (
-        <div className="border-t border-brand-dark/10 bg-muted/20 px-4 py-3">
-          {scoreEntries.length === 0 ? (
-            <p className="text-sm text-brand-dark/45">{t('profile.weeklyEvaluations.noScores')}</p>
-          ) : (
-            <ul className="grid grid-cols-1 gap-2">
-              {scoreEntries.map(([key, value]) => (
-                <li
-                  key={key}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-brand-dark/10 bg-white px-3 py-2 text-sm"
-                >
-                  <span className="text-brand-dark/70">{scoreColumnLabel(key, t)}</span>
-                  <span className="font-semibold text-brand-dark">
-                    {value === null || value === undefined ? '—' : value}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ) : null}
-    </article>
+    <li className="rounded-xl border border-brand-dark/10 px-3 py-3">
+      <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+        <span className="font-semibold text-brand-dark">{componentTitle(item, isEnglish)}</span>
+        <span className="font-semibold text-brand-primary">
+          {formatPercentage(item.percentage)}
+        </span>
+      </div>
+      <ProgressBar percentage={item.percentage} />
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-brand-dark/55">
+        <span>{t('profile.weeklyEvaluations.componentWeeks', { count: item.weeks })}</span>
+        <span>{formatScorePair(item.score, item.max)}</span>
+      </div>
+    </li>
   )
-}
-
-type WeekGroup = {
-  key: string
-  week: number | null
-  term: string | null
-  month: string | null
-  weekDate: string | null
-  entries: StudentWeeklyAssessmentEntry[]
-}
-
-function groupEntriesByWeek(entries: StudentWeeklyAssessmentEntry[]): WeekGroup[] {
-  const map = new Map<string, WeekGroup>()
-  for (const entry of entries) {
-    const key = [entry.term ?? '', entry.month ?? '', entry.week ?? 'none'].join('|')
-    const group = map.get(key)
-    if (group) {
-      group.entries.push(entry)
-      if (!group.weekDate && entry.week_date) group.weekDate = entry.week_date
-    } else {
-      map.set(key, {
-        key,
-        week: entry.week ?? null,
-        term: entry.term ? String(entry.term) : null,
-        month: entry.month ? String(entry.month) : null,
-        weekDate: entry.week_date ?? null,
-        entries: [entry],
-      })
-    }
-  }
-  return Array.from(map.values()).sort((a, b) => {
-    if (a.weekDate && b.weekDate && a.weekDate !== b.weekDate) {
-      return a.weekDate.localeCompare(b.weekDate)
-    }
-    return (a.week ?? 0) - (b.week ?? 0)
-  })
-}
-
-type MonthGroup = { key: string; month: string | null; weeks: WeekGroup[] }
-
-function groupWeeksByMonth(weeks: WeekGroup[]): MonthGroup[] {
-  const map = new Map<string, MonthGroup>()
-  for (const week of weeks) {
-    const key = `${week.term ?? ''}|${week.month ?? ''}`
-    const group = map.get(key)
-    if (group) group.weeks.push(week)
-    else map.set(key, { key, month: week.month, weeks: [week] })
-  }
-  return Array.from(map.values())
 }
 
 function readQuery(searchParams: URLSearchParams): StudentWeeklyAssessmentsQuery {
@@ -247,7 +130,8 @@ function hasActiveFilters(query: StudentWeeklyAssessmentsQuery) {
 }
 
 export function WeeklyEvaluationsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isEnglish = i18n.language.startsWith('en')
   const [searchParams, setSearchParams] = useSearchParams()
   const query = useMemo(() => readQuery(searchParams), [searchParams])
   const filtersActive = hasActiveFilters(query)
@@ -256,29 +140,6 @@ export function WeeklyEvaluationsPage() {
   const [subjectOptions, setSubjectOptions] = useState<StudentWeeklyAssessmentSubject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-
-  const [activeMonth, setActiveMonth] = useState<string | null>(null)
-  const [activeWeek, setActiveWeek] = useState<string | null>(null)
-  const monthGroups = useMemo(
-    () => groupWeeksByMonth(groupEntriesByWeek(data?.entries ?? [])),
-    [data?.entries],
-  )
-  const currentMonthIndex = Math.max(
-    0,
-    monthGroups.findIndex((group) => group.key === activeMonth),
-  )
-  const currentMonth = monthGroups[currentMonthIndex]
-  const currentWeek =
-    currentMonth?.weeks.find((week) => week.key === activeWeek)?.key ??
-    currentMonth?.weeks[0]?.key ??
-    null
-  const monthColor = MONTH_COLORS[currentMonthIndex % MONTH_COLORS.length]
-
-  const monthLabel = (month: string | null) =>
-    month
-      ? t(`profile.weeklyEvaluations.months.${month}`)
-      : t('profile.weeklyEvaluations.unknownWeek')
 
   const loadAssessments = useCallback(async () => {
     setIsLoading(true)
@@ -316,12 +177,10 @@ export function WeeklyEvaluationsPage() {
     const normalized = value == null ? '' : String(value)
     if (!normalized || normalized === 'all') next.delete(key)
     else next.set(key, normalized)
-    setExpandedId(null)
     setSearchParams(next, { replace: true })
   }
 
   const clearFilters = () => {
-    setExpandedId(null)
     setSearchParams({}, { replace: true })
   }
 
@@ -329,6 +188,7 @@ export function WeeklyEvaluationsPage() {
   const summary = data?.summary
   const entries = data?.entries ?? []
   const bySubject = summary?.by_subject ?? []
+  const byComponent = summary?.by_component ?? []
 
   const studentName = student?.name?.trim() || '—'
   const studentGrade = student?.grade?.name?.trim() || '—'
@@ -589,6 +449,19 @@ export function WeeklyEvaluationsPage() {
         )}
       </section>
 
+      {byComponent.length > 0 ? (
+        <section className="mt-6 rounded-2xl border border-brand-dark/10 bg-white p-4 shadow-sm sm:p-5">
+          <h2 className="text-lg font-bold text-brand-dark">
+            {t('profile.weeklyEvaluations.byComponentTitle')}
+          </h2>
+          <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {byComponent.map((item) => (
+              <ComponentSummaryCard key={item.key} item={item} isEnglish={isEnglish} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="mt-6">
         <h2 className="mb-3 text-lg font-bold text-brand-dark">
           {t('profile.weeklyEvaluations.entriesTitle')}
@@ -619,84 +492,7 @@ export function WeeklyEvaluationsPage() {
             ) : null}
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
-              {monthGroups.map((group, index) => {
-                const color = MONTH_COLORS[index % MONTH_COLORS.length]
-                const active = index === currentMonthIndex
-                return (
-                  <button
-                    key={group.key}
-                    type="button"
-                    onClick={() => {
-                      setActiveMonth(group.key)
-                      setActiveWeek(null)
-                    }}
-                    className={cn(
-                      'flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors',
-                      active ? color.active : color.tint,
-                    )}
-                  >
-                    {monthLabel(group.month)}
-                    <span
-                      className={cn(
-                        'rounded-full px-2 py-0.5 text-[11px]',
-                        active ? 'bg-white/25' : 'bg-white',
-                      )}
-                    >
-                      {group.weeks.length}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            {currentMonth ? (
-              <Tabs
-                value={currentWeek}
-                onValueChange={(value) => setActiveWeek(String(value))}
-                className={cn('rounded-2xl border p-3 sm:p-4', monthColor.panel)}
-              >
-                <TabsList className="group-data-horizontal/tabs:h-auto w-full max-w-full flex-nowrap justify-start gap-2 overflow-x-auto rounded-none bg-transparent p-0 pb-2">
-                  {currentMonth.weeks.map((group) => (
-                    <TabsTrigger
-                      key={group.key}
-                      value={group.key}
-                      className={cn(
-                        'h-auto min-w-24 flex-none rounded-xl border-brand-dark/10 px-4 py-2 font-semibold text-brand-dark/70 after:hidden data-active:text-white data-active:shadow-sm',
-                        monthColor.week,
-                      )}
-                    >
-                      {group.week != null
-                        ? t('profile.weeklyEvaluations.weekNumber', { n: group.week })
-                        : t('profile.weeklyEvaluations.unknownWeek')}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-                {currentMonth.weeks.map((group) => (
-                  <TabsContent key={group.key} value={group.key} className="mt-3">
-                    {group.weekDate ? (
-                      <p className="mb-3 text-xs text-brand-dark/55">
-                        {t('profile.weeklyEvaluations.weekDate')}: {group.weekDate}
-                      </p>
-                    ) : null}
-                    <div className="grid grid-cols-1 items-start gap-3 md:grid-cols-2">
-                      {group.entries.map((entry) => (
-                        <EntryCard
-                          key={entry.id}
-                          entry={entry}
-                          expanded={expandedId === entry.id}
-                          onToggle={() =>
-                            setExpandedId((current) => (current === entry.id ? null : entry.id))
-                          }
-                        />
-                      ))}
-                    </div>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            ) : null}
-          </div>
+          <WeeklyAssessmentsTable entries={entries} />
         )}
       </section>
     </div>

@@ -879,6 +879,15 @@
       "className": "Class",
       "loadError": "Could not load weekly assessments.",
       "academicYear": "Academic year {{year}}",
+      "byComponentTitle": "By component",
+      "componentWeeks": "{{count}} weeks",
+      "table": {
+        "caption": "Weekly assessments by subject",
+        "weekColumn": "Week",
+        "total": "Total",
+        "subjectPicker": "Choose subject",
+        "notRecorded": "Not recorded"
+      },
       "bySubjectTitle": "By subject",
       "entriesTitle": "Assessments",
       "emptyTitle": "No weekly assessments recorded",

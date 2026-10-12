@@ -469,6 +469,27 @@ export type StudentWeeklyAssessmentBucket = {
   percentage: number | null
 }
 
+export type StudentWeeklyAssessmentComponent = {
+  key: string
+  name: string
+  name_en?: string | null
+  /** `null` when the component wasn't entered that week (or the student was absent). */
+  score: number | null
+  /** `null` for a legacy component the current distribution no longer has. */
+  max: number | null
+  percentage: number | null
+}
+
+export type StudentWeeklyAssessmentComponentSummary = {
+  key: string
+  name: string
+  name_en?: string | null
+  weeks: number
+  score: number
+  max: number
+  percentage: number | null
+}
+
 export type StudentWeeklyAssessmentEntry = {
   id: string
   session_id?: string
@@ -483,6 +504,8 @@ export type StudentWeeklyAssessmentEntry = {
   total: number
   max_total: number
   percentage: number | null
+  /** One line per component, already in display order. */
+  components?: StudentWeeklyAssessmentComponent[] | null
 }
 
 export type StudentWeeklyAssessmentsPayload = {
@@ -509,6 +532,7 @@ export type StudentWeeklyAssessmentsPayload = {
     percentage: number | null
     by_subject: StudentWeeklyAssessmentBucket[]
     by_term: StudentWeeklyAssessmentBucket[]
+    by_component?: StudentWeeklyAssessmentComponentSummary[] | null
   }
   entries: StudentWeeklyAssessmentEntry[]
 }

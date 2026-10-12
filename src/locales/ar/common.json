@@ -879,6 +879,15 @@
       "className": "الفصل الدراسي",
       "loadError": "تعذر تحميل التقييمات الأسبوعية.",
       "academicYear": "العام الدراسي {{year}}",
+      "byComponentTitle": "حسب المكوّن",
+      "componentWeeks": "{{count}} أسبوع",
+      "table": {
+        "caption": "جدول التقييمات الأسبوعية لكل مادة",
+        "weekColumn": "الأسبوع",
+        "total": "المجموع",
+        "subjectPicker": "اختيار المادة",
+        "notRecorded": "غير مسجّل"
+      },
       "bySubjectTitle": "حسب المادة",
       "entriesTitle": "التقييمات",
       "emptyTitle": "لا توجد تقييمات أسبوعية مسجّلة",
