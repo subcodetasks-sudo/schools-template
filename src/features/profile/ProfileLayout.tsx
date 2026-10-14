@@ -15,6 +15,7 @@ import {
   Menu,
   MessageSquareWarning,
   Phone,
+  Send,
   ShieldAlert,
   UserRound,
   UsersRound,
@@ -37,6 +38,7 @@ const navGroups = [
       { to: '/profile', key: 'personal', icon: UserRound, end: true },
       { to: '/profile/introduction-card', key: 'introductionCard', icon: HeartHandshake },
       { to: '/profile/notifications', key: 'notifications', icon: Bell },
+      { to: '/profile/telegram', key: 'telegram', icon: Send },
     ],
   },
   {
