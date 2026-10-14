@@ -75,6 +75,10 @@ export const router = createBrowserRouter([
                 lazy: () => import('@/features/profile/BusPage').then((m) => ({ Component: m.BusPage })),
               },
               {
+                path: 'telegram',
+                lazy: () => import('@/features/profile/TelegramFollowUpPage').then((m) => ({ Component: m.TelegramFollowUpPage })),
+              },
+              {
                 path: 'statistics',
                 lazy: () => import('@/features/profile/StatisticsPage').then((m) => ({ Component: m.StatisticsPage })),
               },
