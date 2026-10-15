@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   BellOff,
-  BellRing,
   Check,
   CircleAlert,
   Clock,
@@ -390,15 +389,6 @@ export function TelegramFollowUpPage() {
       <div className="space-y-5">
         <Panel icon={Send} title={t('profile.telegram.connectTitle')}>
           <p className="text-sm leading-relaxed text-brand-dark/70">{t('profile.telegram.connectHint')}</p>
-
-          <ul className="mt-4 space-y-2">
-            {(['absence', 'classChange'] as const).map((key) => (
-              <li key={key} className="flex items-start gap-2 text-sm text-brand-dark">
-                <BellRing className="mt-0.5 size-4 shrink-0 text-brand-primary" aria-hidden />
-                {t(`profile.telegram.alerts.${key}`)}
-              </li>
-            ))}
-          </ul>
 
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:items-center">
             <Button

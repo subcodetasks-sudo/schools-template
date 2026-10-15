@@ -798,7 +798,7 @@
       }
     },
     "telegram": {
-      "subtitle": "Let a parent follow the student on Telegram and receive absence and classroom-change alerts.",
+      "subtitle": "Parents receive alerts for absences (including excused absences and absences after the first period), absence-day totals every 10 days, class changes, approved violations, and registered excuses.",
       "loadError": "Could not load Telegram follow-up.",
       "studentNotFound": "The student record linked to this account was not found.",
       "forbidden": "Telegram follow-up is only available for student accounts.",
@@ -806,10 +806,6 @@
       "unavailableHint": "Telegram follow-up is not enabled right now. Please try again later.",
       "connectTitle": "Follow your child on Telegram",
       "connectHint": "Create a one-time link and open it on the parent's phone. After the parent taps Start in Telegram, alerts begin.",
-      "alerts": {
-        "absence": "Absence alerts: when the student is recorded absent in a lesson, in the lesson day register, or in the daily school attendance.",
-        "classChange": "Classroom change: when the school moves the student to another classroom."
-      },
       "connect": "Connect Telegram",
       "newLink": "Create a new link",
       "creating": "Creating link...",
