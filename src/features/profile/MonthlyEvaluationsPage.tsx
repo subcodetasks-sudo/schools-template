@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ClipboardList } from 'lucide-react'
+import { ClipboardList, Lock } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -8,6 +8,12 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import {
+  HiddenResultState,
+  HiddenTermsNotice,
+  TermSelectItem,
+} from '@/features/profile/HiddenResultState'
+import { guardHiddenTerm, lockedTerms } from '@/features/profile/hiddenResults'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
   getStudentMonthlyAssessments,
@@ -183,9 +189,16 @@ export function MonthlyEvaluationsPage() {
     data,
     isLoading,
     error,
+    hidden,
     reload: load,
   } = useApiResource(
-    () => getStudentMonthlyAssessments(selectedTerm === 'all' ? {} : { term: selectedTerm }),
+    () =>
+      guardHiddenTerm(
+        'monthly_assessments',
+        undefined,
+        selectedTerm === 'all' ? undefined : selectedTerm,
+        () => getStudentMonthlyAssessments(selectedTerm === 'all' ? {} : { term: selectedTerm }),
+      ),
     [selectedTerm, t],
     t('profile.monthlyEvaluations.loadError'),
   )
@@ -209,6 +222,11 @@ export function MonthlyEvaluationsPage() {
     monthSections.findIndex((section) => section.key === selectedMonth),
   )
   const activeSection = monthSections[activeIndex]
+
+  // Terms the school closed. Read at render: every answer that changes them also sets state.
+  const closedTerms = lockedTerms('monthly_assessments', undefined)
+  const allTermsClosed = closedTerms.length === 2
+  const isTermClosed = (term: string) => (closedTerms as readonly string[]).includes(term)
 
   const termLabel =
     selectedTerm === 'all'
@@ -235,6 +253,7 @@ export function MonthlyEvaluationsPage() {
           </svg>
         </h1>
 
+        {allTermsClosed ? null : (
         <div className="flex flex-wrap gap-2">
           <Select
             value={selectedTerm}
@@ -246,15 +265,25 @@ export function MonthlyEvaluationsPage() {
               aria-label={t('profile.monthlyEvaluations.selectTerm')}
               className="h-11 rounded-xl border-brand-primary bg-brand-primary px-4 font-medium text-white shadow-sm hover:bg-brand-dark data-[size=default]:h-11 [&_svg]:text-white"
             >
-              <span className="flex-1 text-start">{termLabel}</span>
+              <span className="flex flex-1 items-center gap-2 text-start">
+                {termLabel}
+                {isTermClosed(selectedTerm) ? (
+                  <Lock className="size-3.5 shrink-0" aria-label={t('profile.hidden.unavailable')} />
+                ) : null}
+              </span>
             </SelectTrigger>
             <SelectContent className="rounded-2xl border-brand-dark/10 shadow-lg">
               <SelectItem value="all">{t('profile.monthlyEvaluations.allTerms')}</SelectItem>
-              <SelectItem value="first">{t('profile.weeklyEvaluations.terms.first')}</SelectItem>
-              <SelectItem value="second">{t('profile.weeklyEvaluations.terms.second')}</SelectItem>
+              <TermSelectItem value="first" locked={isTermClosed('first')}>
+                {t('profile.weeklyEvaluations.terms.first')}
+              </TermSelectItem>
+              <TermSelectItem value="second" locked={isTermClosed('second')}>
+                {t('profile.weeklyEvaluations.terms.second')}
+              </TermSelectItem>
             </SelectContent>
           </Select>
         </div>
+        )}
       </div>
 
       <div className="mt-8 flex flex-col gap-6">
@@ -265,6 +294,12 @@ export function MonthlyEvaluationsPage() {
             <InfoField label={t('profile.monthlyEvaluations.className')} value={studentClass} />
           </div>
         </div>
+
+        {hidden || allTermsClosed ? (
+          <HiddenResultState message={hidden?.message} />
+        ) : (
+          <HiddenTermsNotice terms={closedTerms} />
+        )}
 
         {data?.summary ? (
           <div className="flex flex-wrap gap-3 text-sm">
@@ -282,7 +317,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {isLoading ? (
+        {isLoading && !hidden ? (
           <p className="text-sm text-brand-dark/55">{t('profile.loading')}</p>
         ) : null}
 
@@ -300,7 +335,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !error && monthSections.length === 0 ? (
+        {!isLoading && !error && !hidden && monthSections.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-dark/15 bg-muted/20 px-6 py-16 text-center">
             <div className="mb-4 inline-flex size-14 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary">
               <ClipboardList className="size-6" aria-hidden />
@@ -314,7 +349,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !error && activeSection ? (
+        {!isLoading && !error && !hidden && activeSection ? (
           <div className="space-y-5">
             <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1">
               {monthSections.map((section, index) => {

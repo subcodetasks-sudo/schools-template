@@ -6,6 +6,13 @@ import { PrintPdfDocument } from '@/components/pdf/PrintPdfDocument'
 import { authFieldClass } from '@/features/auth/AuthShell'
 import { isSchoolFinalCertificateBlocked } from '@/features/final-results/finalCertificateSheet'
 import { useProfile } from '@/features/profile/ProfileContext'
+import { HiddenResultState } from '@/features/profile/HiddenResultState'
+import {
+  clearHidden,
+  isMarkedHidden,
+  markHidden,
+  hiddenScope,
+} from '@/features/profile/hiddenResults'
 import { SuccessCertificatePdf } from '@/features/profile/SuccessCertificatePdf'
 import {
   collectComponentColumns,
@@ -19,10 +26,13 @@ import {
   type SuccessCertificateSubjectRow,
   type SuccessCertificateTerm,
 } from '@/features/profile/successCertificateApi'
-import { getErrorMessage } from '@/lib/api'
+import appI18n from '@/lib/i18n'
+import { getErrorMessage, getHiddenInfo, type HiddenInfo } from '@/lib/api'
 import { cn } from '@/lib/utils'
 
 const CERTIFICATE_QR_STORAGE_KEY = 'school-frontend:success-certificate-qr'
+/** The certificate is requested for the current term/year, so one scope covers it. */
+const RESULTS_SCOPE = hiddenScope(undefined)
 
 const EVALUATION_TONES: Record<
   string,
@@ -48,6 +58,10 @@ const EVALUATION_TONES: Record<
     chip: 'bg-rose-600 text-white',
     swatch: 'bg-rose-600',
   },
+}
+
+function currentLang() {
+  return appI18n.language?.startsWith('ar') ? 'ar' : 'en'
 }
 
 function readSavedQrToken() {
@@ -198,6 +212,15 @@ export function CertificatePage() {
   /** In-memory only for this visit — never persisted to web storage. */
   const [sessionUnlocked, setSessionUnlocked] = useState(false)
   const [payload, setPayload] = useState<SuccessCertificatePayload | null>(null)
+  /**
+   * The school closed the results (403 `data.hidden`). This wins over an unlocked QR:
+   * unlocking never bypasses a closed result.
+   */
+  const [hidden, setHidden] = useState<(HiddenInfo & { lang: string }) | null>(() =>
+    isMarkedHidden('results', RESULTS_SCOPE)
+      ? { message: '', resource: 'results', lang: currentLang() }
+      : null,
+  )
   const [isPrinting, setIsPrinting] = useState(false)
   const autoUnlockAttempted = useRef(false)
   const handlePrintDone = useCallback(() => setIsPrinting(false), [])
@@ -226,21 +249,37 @@ export function CertificatePage() {
     setIsUnlocking(true)
     setError(null)
 
+    let codeAccepted = false
     try {
       const unlocked = await unlockSuccessCertificate(normalizedToken)
+      codeAccepted = true
       const data = unlocked.certificate
         ? unlocked
         : await getSuccessCertificate()
 
       applyUnlockedPayload(data)
+      clearHidden('results', RESULTS_SCOPE)
+      setHidden(null)
 
       saveQrToken(extractQrToken(normalizedToken))
       setQrToken('')
       if (showToast) toast.success(t('profile.certificate.unlockSuccess'))
     } catch (err) {
-      clearSavedQrToken()
       setPayload(null)
       setSessionUnlocked(false)
+
+      const hiddenInfo = getHiddenInfo(err)
+      if (hiddenInfo) {
+        // Closed by the school: not an error, so no toast. If the code was accepted, keep it
+        // so a later visit shows the locked state without asking for the QR again.
+        if (codeAccepted) saveQrToken(extractQrToken(normalizedToken))
+        setQrToken('')
+        markHidden('results', RESULTS_SCOPE, hiddenInfo.message)
+        setHidden({ ...hiddenInfo, lang: currentLang() })
+        return
+      }
+
+      clearSavedQrToken()
       const message = getErrorMessage(err, t('profile.certificate.unlockError'))
       setError(message)
       if (showToast) toast.error(message)
@@ -257,6 +296,9 @@ export function CertificatePage() {
   useEffect(() => {
     if (autoUnlockAttempted.current) return
     autoUnlockAttempted.current = true
+
+    // Already known to be closed this session: nothing to unlock.
+    if (isMarkedHidden('results', RESULTS_SCOPE)) return
 
     const savedToken = readSavedQrToken()
     if (savedToken) void unlockCertificate(savedToken, false)
@@ -345,6 +387,12 @@ export function CertificatePage() {
         <p className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-6 text-sm leading-relaxed text-amber-900">
           {t('finalResults.ministryManagedHint')}
         </p>
+      ) : hidden ? (
+        <HiddenResultState
+          className="mt-8"
+          // The API text is in the language of the request; after a switch use the app copy.
+          message={hidden.lang === currentLang() ? hidden.message : ''}
+        />
       ) : !showCertificate ? (
         <form onSubmit={handleUnlock} className="mt-8 w-full max-w-2xl">
           <p className="text-sm leading-relaxed text-brand-dark/65">
