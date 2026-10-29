@@ -361,6 +361,11 @@
     "title": "Student profile",
     "loading": "Loading profile...",
     "retry": "Try again",
+    "hidden": {
+      "message": "This data is currently unavailable from the school administration.",
+      "unavailable": "Currently unavailable",
+      "partial": "Results for {{terms}} are currently unavailable."
+    },
     "toggleMenu": "Toggle menu",
     "studentName": "Mahdi Saeed",
     "studentInitials": "MS",

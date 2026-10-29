@@ -1,13 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ListChecks, Percent } from 'lucide-react'
+import { ListChecks, Lock, Percent } from 'lucide-react'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
+import {
+  HiddenResultState,
+  HiddenTermsNotice,
+  TermSelectItem,
+} from '@/features/profile/HiddenResultState'
+import { guardHiddenTerm, lockedTerms } from '@/features/profile/hiddenResults'
+import { getHiddenInfo, type HiddenInfo } from '@/lib/api'
 import {
   getStudentWeeklyAssessments,
   type StudentWeeklyAssessmentComponentSummary,
@@ -140,14 +147,27 @@ export function WeeklyEvaluationsPage() {
   const [subjectOptions, setSubjectOptions] = useState<StudentWeeklyAssessmentSubject[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  /** The school closed what was asked for (403 `data.hidden`): a locked state, not an error. */
+  const [hidden, setHidden] = useState<HiddenInfo | null>(null)
+  const latestRequest = useRef(0)
 
   const loadAssessments = useCallback(async () => {
+    const requestId = ++latestRequest.current
+    const isCurrent = () => requestId === latestRequest.current
+
     setIsLoading(true)
     setError(null)
 
     try {
-      const payload = await getStudentWeeklyAssessments(query)
+      const payload = await guardHiddenTerm(
+        'weekly_assessments',
+        query.academic_year,
+        query.term,
+        () => getStudentWeeklyAssessments(query),
+      )
+      if (!isCurrent()) return
       setData(payload)
+      setHidden(null)
 
       const fromSummary =
         payload.summary?.by_subject
@@ -162,14 +182,28 @@ export function WeeklyEvaluationsPage() {
 
       setSubjectOptions((current) => mergeSubjects(current, [...fromSummary, ...fromEntries]))
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('profile.weeklyEvaluations.loadError'))
+      if (!isCurrent()) return
+      const hiddenInfo = getHiddenInfo(err)
+      if (hiddenInfo) {
+        // Never keep showing the previous term's numbers next to a locked state.
+        setData(null)
+        setHidden(hiddenInfo)
+      } else {
+        setHidden(null)
+        setError(err instanceof Error ? err.message : t('profile.weeklyEvaluations.loadError'))
+      }
     } finally {
-      setIsLoading(false)
+      if (isCurrent()) setIsLoading(false)
     }
   }, [query, t])
 
   useEffect(() => {
+    const requests = latestRequest
     void loadAssessments()
+    // Ignore the answer of a request that is superseded or outlives the page.
+    return () => {
+      requests.current++
+    }
   }, [loadAssessments])
 
   const updateFilter = (key: keyof StudentWeeklyAssessmentsQuery, value: string | null) => {
@@ -208,13 +242,17 @@ export function WeeklyEvaluationsPage() {
   const selectedYear = query.academic_year || data?.filters?.academic_year || ''
 
   const termOptions: Array<'all' | StudentWeeklyAssessmentTerm> = ['all', 'first', 'second']
+  // Terms the school closed. Read at render: every answer that changes them also sets state.
+  const closedTerms = lockedTerms('weekly_assessments', query.academic_year)
+  const allTermsClosed = closedTerms.length === 2
+  const isTermClosed = (term: string) => (closedTerms as readonly string[]).includes(term)
   const monthOptions = ['all', ...FILTER_MONTHS] as const
 
   const selectedSubjectName =
     subjectOptions.find((subject) => String(subject.id) === selectedSubject)?.name ||
     bySubject.find((item) => String(item.subject?.id) === selectedSubject)?.subject?.name
 
-  if (isLoading && !data) {
+  if (isLoading && !data && !hidden) {
     return (
       <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
         {t('profile.loading')}
@@ -263,6 +301,12 @@ export function WeeklyEvaluationsPage() {
         ) : null}
       </div>
 
+      {allTermsClosed ? (
+        <HiddenResultState className="mt-8" message={hidden?.message} />
+      ) : (
+        <>
+      {hidden ? null : (
+        <>
       <div className="mt-8 space-y-4">
         <InfoField label={t('profile.weeklyEvaluations.studentName')} value={studentName} />
         <div className="flex flex-col gap-4 sm:flex-row">
@@ -270,6 +314,8 @@ export function WeeklyEvaluationsPage() {
           <InfoField label={t('profile.weeklyEvaluations.className')} value={classroomDisplay} />
         </div>
       </div>
+
+      <HiddenTermsNotice terms={closedTerms} />
 
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <article className="rounded-xl border border-brand-dark/10 bg-white px-4 py-4 shadow-sm">
@@ -307,6 +353,8 @@ export function WeeklyEvaluationsPage() {
           </p>
         </article>
       </div>
+        </>
+      )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <Select
@@ -314,20 +362,35 @@ export function WeeklyEvaluationsPage() {
           onValueChange={(value) => updateFilter('term', value == null ? 'all' : String(value))}
         >
           <SelectTrigger className="h-11 w-full rounded-xl border-brand-dark/15 bg-white data-[size=default]:h-11 sm:w-44">
-            <span className="flex-1 text-start">
+            <span className="flex flex-1 items-center gap-2 text-start">
               {selectedTerm === 'all'
                 ? t('profile.weeklyEvaluations.filters.allTerms')
                 : t(`profile.weeklyEvaluations.terms.${selectedTerm}`)}
+              {isTermClosed(selectedTerm) ? (
+                <Lock
+                  className="size-3.5 shrink-0 text-brand-dark/60"
+                  aria-label={t('profile.hidden.unavailable')}
+                />
+              ) : null}
             </span>
           </SelectTrigger>
           <SelectContent className="rounded-xl border-brand-dark/10 shadow-lg">
-            {termOptions.map((term) => (
-              <SelectItem key={term} value={term} className="rounded-lg">
-                {term === 'all'
-                  ? t('profile.weeklyEvaluations.filters.allTerms')
-                  : t(`profile.weeklyEvaluations.terms.${term}`)}
-              </SelectItem>
-            ))}
+            {termOptions.map((term) =>
+              term === 'all' ? (
+                <SelectItem key={term} value={term} className="rounded-lg">
+                  {t('profile.weeklyEvaluations.filters.allTerms')}
+                </SelectItem>
+              ) : (
+                <TermSelectItem
+                  key={term}
+                  value={term}
+                  locked={isTermClosed(term)}
+                  className="rounded-lg"
+                >
+                  {t(`profile.weeklyEvaluations.terms.${term}`)}
+                </TermSelectItem>
+              ),
+            )}
           </SelectContent>
         </Select>
 
@@ -395,6 +458,10 @@ export function WeeklyEvaluationsPage() {
 
       {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
 
+      {hidden ? (
+        <HiddenResultState className="mt-6" message={hidden.message} />
+      ) : (
+        <>
       <section className="mt-6 rounded-2xl border border-brand-dark/10 bg-white p-4 shadow-sm sm:p-5">
         <h2 className="text-lg font-bold text-brand-dark">
           {t('profile.weeklyEvaluations.bySubjectTitle')}
@@ -495,6 +562,10 @@ export function WeeklyEvaluationsPage() {
           <WeeklyAssessmentsTable entries={entries} />
         )}
       </section>
+        </>
+      )}
+        </>
+      )}
     </div>
   )
 }
