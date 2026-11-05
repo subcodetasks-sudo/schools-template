@@ -19,8 +19,8 @@ export const router = createBrowserRouter([
       { path: 'achievements/:id', lazy: () => import('@/features/achievements/AchievementDetailPage').then((m) => ({ Component: m.AchievementDetailPage })) },
       { path: 'events', lazy: () => import('@/features/events/EventsPage').then((m) => ({ Component: m.EventsPage })) },
       { path: 'events/:id', lazy: () => import('@/features/events/EventDetailPage').then((m) => ({ Component: m.EventDetailPage })) },
-      { path: 'blog', lazy: () => import('@/features/blog/BlogPage').then((m) => ({ Component: m.BlogPage })) },
-      { path: 'blog/:id', lazy: () => import('@/features/blog/BlogDetailPage').then((m) => ({ Component: m.BlogDetailPage })) },
+      // TEMP-HIDDEN-BLOG: { path: 'blog', lazy: () => import('@/features/blog/BlogPage').then((m) => ({ Component: m.BlogPage })) },
+      // TEMP-HIDDEN-BLOG: { path: 'blog/:id', lazy: () => import('@/features/blog/BlogDetailPage').then((m) => ({ Component: m.BlogDetailPage })) },
       { path: 'contact', lazy: () => import('@/features/contact/ContactPage').then((m) => ({ Component: m.ContactPage })) },
       { path: 'terms-of-applying', lazy: () => import('@/features/terms/TermsOfApplyingPage').then((m) => ({ Component: m.TermsOfApplyingPage })) },
       {

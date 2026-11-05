@@ -64,7 +64,7 @@ const importantLinks = [
   // { to: '/top-students', key: 'topStudents' },
   { to: '/achievements', key: 'achievements' },
   { to: '/events', key: 'events' },
-  { to: '/blog', key: 'blog' },
+  // TEMP-HIDDEN-BLOG: { to: '/blog', key: 'blog' },
   { to: '/contact', key: 'contact' },
   { to: '/terms-of-applying', key: 'termsOfApplying' },
 ] as const

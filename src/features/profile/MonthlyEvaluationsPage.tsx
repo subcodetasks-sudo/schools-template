@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ClipboardList, EyeOff } from 'lucide-react'
+import { ClipboardList, Lock } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -8,11 +8,15 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
+import {
+  HiddenResultState,
+  HiddenTermsNotice,
+  TermSelectItem,
+} from '@/features/profile/HiddenResultState'
+import { guardHiddenTerm, lockedTerms } from '@/features/profile/hiddenResults'
 import { useProfile } from '@/features/profile/ProfileContext'
 import {
   getStudentMonthlyAssessments,
-  isHiddenResourceError,
-  type StudentMonthlyAssessmentsPayload,
   type StudentWeeklyAssessmentTerm,
 } from '@/features/profile/studentProfileApi'
 import {
@@ -27,11 +31,6 @@ import { cn } from '@/lib/utils'
 import { useApiResource } from '@/lib/useApiResource'
 
 type Translate = (key: string, options?: Record<string, unknown>) => string
-
-/** The endpoint answers 403 `{ hidden: true }` when the school closed the requested term. */
-type MonthlyResult =
-  | { hidden: false; payload: StudentMonthlyAssessmentsPayload }
-  | { hidden: true }
 
 function InfoField({ label, value }: { label: string; value: string }) {
   return (
@@ -83,27 +82,6 @@ function testMark(test: MonthlyTestView, t: Translate) {
         max: formatNumber(test.max),
       })
     : formatNumber(test.score)
-}
-
-function HiddenMessage({ className }: { className?: string }) {
-  const { t } = useTranslation()
-  return (
-    <div
-      role="status"
-      className={cn(
-        'flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-dark/15 bg-muted/20 px-6 py-14 text-center',
-        className,
-      )}
-    >
-      <div className="mb-4 inline-flex size-14 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary">
-        <EyeOff className="size-6" aria-hidden />
-      </div>
-      <p className="text-lg font-bold text-brand-dark">{t('profile.monthlyEvaluations.hidden')}</p>
-      <p className="mt-2 max-w-md text-sm text-brand-dark/55">
-        {t('profile.monthlyEvaluations.hiddenDescription')}
-      </p>
-    </div>
-  )
 }
 
 function SubjectRows({ rows, showTestColumn }: { rows: MonthlySubjectRowView[]; showTestColumn: boolean }) {
@@ -235,30 +213,31 @@ export function MonthlyEvaluationsPage() {
   const studentClass = profileData.classNumber || '—'
 
   const {
-    data: result,
+    data,
     isLoading,
     error,
+    hidden,
     reload: load,
-  } = useApiResource<MonthlyResult>(
-    async () => {
-      try {
-        const payload = await getStudentMonthlyAssessments(
-          selectedTerm === 'all' ? {} : { term: selectedTerm },
-        )
-        return { hidden: false, payload }
-      } catch (err) {
-        // The school closed this term: show the hidden message, not an error.
-        if (isHiddenResourceError(err)) return { hidden: true }
-        throw err
-      }
-    },
+  } = useApiResource(
+    () =>
+      guardHiddenTerm(
+        'monthly_assessments',
+        undefined,
+        selectedTerm === 'all' ? undefined : selectedTerm,
+        () => getStudentMonthlyAssessments(selectedTerm === 'all' ? {} : { term: selectedTerm }),
+      ),
     [selectedTerm, t],
     t('profile.monthlyEvaluations.loadError'),
   )
 
-  const hidden = result?.hidden === true
-  const data = result && !result.hidden ? result.payload : null
   const view = useMemo(() => buildMonthlyAssessmentsView(data), [data])
+
+  // Terms the school closed. Read at render: every answer that changes them also sets state.
+  const closedTerms = lockedTerms('monthly_assessments', undefined)
+  const allTermsClosed = closedTerms.length === 2
+  const isTermClosed = (term: string) => (closedTerms as readonly string[]).includes(term)
+  // Nothing of the report may show while it is closed, even if stale data is still around.
+  const isClosed = Boolean(hidden) || allTermsClosed
 
   const termSelectLabel =
     selectedTerm === 'all'
@@ -296,26 +275,37 @@ export function MonthlyEvaluationsPage() {
           </svg>
         </h1>
 
-        <div className="flex flex-wrap gap-2">
-          <Select
-            value={selectedTerm}
-            onValueChange={(value) =>
-              setSelectedTerm((value as StudentWeeklyAssessmentTerm | 'all') || 'all')
-            }
-          >
-            <SelectTrigger
-              aria-label={t('profile.monthlyEvaluations.selectTerm')}
-              className="h-11 rounded-xl border-brand-primary bg-brand-primary px-4 font-medium text-white shadow-sm hover:bg-brand-dark data-[size=default]:h-11 [&_svg]:text-white"
+        {allTermsClosed ? null : (
+          <div className="flex flex-wrap gap-2">
+            <Select
+              value={selectedTerm}
+              onValueChange={(value) =>
+                setSelectedTerm((value as StudentWeeklyAssessmentTerm | 'all') || 'all')
+              }
             >
-              <span className="flex-1 text-start">{termSelectLabel}</span>
-            </SelectTrigger>
-            <SelectContent className="rounded-2xl border-brand-dark/10 shadow-lg">
-              <SelectItem value="all">{t('profile.monthlyEvaluations.allTerms')}</SelectItem>
-              <SelectItem value="first">{t('profile.weeklyEvaluations.terms.first')}</SelectItem>
-              <SelectItem value="second">{t('profile.weeklyEvaluations.terms.second')}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+              <SelectTrigger
+                aria-label={t('profile.monthlyEvaluations.selectTerm')}
+                className="h-11 rounded-xl border-brand-primary bg-brand-primary px-4 font-medium text-white shadow-sm hover:bg-brand-dark data-[size=default]:h-11 [&_svg]:text-white"
+              >
+                <span className="flex flex-1 items-center gap-2 text-start">
+                  {termSelectLabel}
+                  {isTermClosed(selectedTerm) ? (
+                    <Lock className="size-3.5 shrink-0" aria-label={t('profile.hidden.unavailable')} />
+                  ) : null}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-brand-dark/10 shadow-lg">
+                <SelectItem value="all">{t('profile.monthlyEvaluations.allTerms')}</SelectItem>
+                <TermSelectItem value="first" locked={isTermClosed('first')}>
+                  {t('profile.weeklyEvaluations.terms.first')}
+                </TermSelectItem>
+                <TermSelectItem value="second" locked={isTermClosed('second')}>
+                  {t('profile.weeklyEvaluations.terms.second')}
+                </TermSelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <div className="mt-8 flex flex-col gap-6">
@@ -327,7 +317,13 @@ export function MonthlyEvaluationsPage() {
           </div>
         </div>
 
-        {data?.summary && !isLoading && !view.isEmpty ? (
+        {isClosed ? (
+          <HiddenResultState message={hidden?.message} />
+        ) : (
+          <HiddenTermsNotice terms={closedTerms} />
+        )}
+
+        {!isClosed && data?.summary && !isLoading && !view.isEmpty ? (
           <div className="flex flex-wrap gap-3 text-sm">
             <span className="rounded-xl bg-brand-primary/10 px-4 py-2 font-medium text-brand-primary">
               {t('profile.monthlyEvaluations.summary.percentage', {
@@ -343,7 +339,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {isLoading ? (
+        {isLoading && !hidden ? (
           <p role="status" className="text-sm text-brand-dark/55">
             {t('profile.loading')}
           </p>
@@ -363,9 +359,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !error && hidden ? <HiddenMessage /> : null}
-
-        {!isLoading && !error && !hidden && view.isEmpty ? (
+        {!isLoading && !error && !isClosed && view.isEmpty ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-dark/15 bg-muted/20 px-6 py-16 text-center">
             <div className="mb-4 inline-flex size-14 items-center justify-center rounded-xl bg-brand-primary/10 text-brand-primary">
               <ClipboardList className="size-6" aria-hidden />
@@ -379,7 +373,7 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !error && !hidden
+        {!isLoading && !error && !isClosed
           ? view.groups.map((group) => (
               <section key={group.id} className="space-y-5">
                 <h2 className="border-b border-brand-dark/10 pb-2 text-xl font-bold text-brand-dark">
@@ -403,7 +397,7 @@ export function MonthlyEvaluationsPage() {
             ))
           : null}
 
-        {!isLoading && !error && !hidden && view.unplacedTests.length > 0 ? (
+        {!isLoading && !error && !isClosed && view.unplacedTests.length > 0 ? (
           <section className="space-y-3 rounded-2xl border border-brand-dark/10 bg-muted/20 p-4 sm:p-5">
             <h2 className="text-lg font-bold text-brand-dark">
               {t('profile.monthlyEvaluations.unplacedTitle')}

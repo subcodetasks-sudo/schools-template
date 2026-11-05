@@ -15,7 +15,7 @@ const links = [
   // { to: '/top-students', key: 'topStudents' },
   { to: '/achievements', key: 'achievements' },
   { to: '/events', key: 'events' },
-  { to: '/blog', key: 'blog' },
+  // TEMP-HIDDEN-BLOG: { to: '/blog', key: 'blog' },
 ] as const
 
 function ProfileMenuDropdown({

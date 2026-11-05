@@ -42,12 +42,12 @@ export function DetailPageLayout({
       <PageBanner title={bannerTitle} breadcrumbs={breadcrumbs} />
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="relative mt-6 overflow-hidden rounded-t-[1.75rem] lg:mt-8 lg:w-[calc(100%-8rem)] w-full ">
-          <div className="relative max-h-[500px] w-full">
+        <div className="relative mt-6 overflow-hidden rounded-3xl bg-brand-secondary/20 ring-1 ring-brand-dark/5 lg:mt-8 w-full">
+          <div className="relative h-64 w-full sm:h-80 lg:h-[28rem]">
             <ImageWithFallback
               src={image}
               alt={imageAlt}
-              className="size-full object-cover"
+              className="size-full object-contain"
             />
             {imageBadge ? (
               <div className="absolute inset-e-3 bottom-3 sm:inset-e-5 sm:bottom-5">
@@ -57,9 +57,10 @@ export function DetailPageLayout({
           </div>
         </div>
 
-        <article className="relative z-10 -mt-16 rounded-[1.75rem] bg-white px-6 py-8 border-8 border-brand-secondary/50 sm:-mt-24 sm:rounded-[2.5rem] sm:px-8 sm:py-10 lg:-mt-28 lg:px-12 lg:py-12">
+        <article className="relative z-10 mt-6 rounded-3xl bg-white px-6 py-8 shadow-lg shadow-brand-dark/5 ring-1 ring-brand-dark/10 sm:mt-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-            <aside className="lg:col-span-4">
+            <aside className="lg:col-span-4 lg:border-e lg:border-brand-dark/10 lg:pe-8">
+              <span className="mb-4 block h-1.5 w-12 rounded-full bg-brand-primary" />
               <h2 className="text-2xl font-bold leading-snug text-brand-dark sm:text-3xl lg:text-[2rem]">
                 {title}
               </h2>
@@ -74,7 +75,7 @@ export function DetailPageLayout({
                   </h3>
                   {section.html && typeof section.body === 'string' ? (
                     <div
-                      className="mt-3 space-y-3 text-[15px] leading-8 text-brand-dark/60 sm:text-base sm:leading-8 [&_a]:text-brand-primary [&_a]:underline [&_img]:my-4 [&_img]:rounded-xl"
+                      className="mt-3 space-y-3 text-[15px] leading-8 text-brand-dark/75 sm:text-base sm:leading-8 [&_a]:text-brand-primary [&_a]:underline [&_img]:my-4 [&_img]:rounded-xl"
                       dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body) }}
                     />
                   ) : (

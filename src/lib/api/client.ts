@@ -131,7 +131,11 @@ api.interceptors.response.use(
 
     const { status, config, data } = error.response
     const body = data as ApiErrorBody | undefined
-    const message = body?.message || error.message || 'Request failed'
+    // A "hidden by the school" 403 without a message must not surface axios' English
+    // "status code 403" text; the UI falls back to its own localized copy instead.
+    const isHidden =
+      status === 403 && (body?.data as { hidden?: unknown } | null | undefined)?.hidden === true
+    const message = body?.message || (isHidden ? '' : error.message || 'Request failed')
     const publicPath = isPublicApiPath(config?.url)
 
     // Only end the session this request was sent with, so a late 401 from an

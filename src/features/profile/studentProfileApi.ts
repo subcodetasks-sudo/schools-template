@@ -1,4 +1,4 @@
-import { ApiError, apiGet, apiPost, apiUpload, unwrapData } from '@/lib/api'
+import { apiGet, apiPost, apiUpload, unwrapData } from '@/lib/api'
 import type { AuthUser } from '@/features/auth/authApi'
 import {
   defaultProfileData,
@@ -659,19 +659,6 @@ export type StudentAnnualReportPayload = {
     subjects?: StudentAnnualSubjectRow[] | null
   } | null
   summary?: StudentAnnualSummary
-}
-
-/**
- * The 403 body the API sends when a whole resource is switched off for the student:
- * `{ hidden: true, resource: 'annual_report' }`.
- */
-export function isHiddenResourceError(error: unknown, resource?: string) {
-  if (!(error instanceof ApiError) || error.status !== 403) return false
-  const data = error.data
-  if (!data || typeof data !== 'object') return false
-  const body = data as { hidden?: unknown; resource?: unknown }
-  if (body.hidden !== true) return false
-  return resource === undefined || body.resource === resource
 }
 
 export async function getStudentAnnualReport(academicYear?: string) {

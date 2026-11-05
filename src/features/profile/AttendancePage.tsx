@@ -1,6 +1,8 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BookOpen, BookX, CalendarDays, CheckCircle2, Percent } from 'lucide-react'
+import { HiddenResultState } from '@/features/profile/HiddenResultState'
+import { guardHidden, hiddenScope } from '@/features/profile/hiddenResults'
 import { getStudentLessonAbsences } from '@/features/profile/studentProfileApi'
 import { cn } from '@/lib/utils'
 import { useApiResource } from '@/lib/useApiResource'
@@ -73,9 +75,12 @@ export function AttendancePage() {
     data: lessons,
     isLoading,
     error,
+    hidden,
     reload: loadAbsences,
   } = useApiResource(
-    () => getStudentLessonAbsences(),
+    // Built on the annual report: when the school closes it, the whole screen is locked
+    // and nothing is rebuilt from other endpoints.
+    () => guardHidden('annual_report', hiddenScope(undefined), () => getStudentLessonAbsences()),
     [t],
     t('profile.attendance.loadError'),
   )
@@ -99,6 +104,30 @@ export function AttendancePage() {
     return (
       <div className="flex min-h-64 items-center justify-center text-sm text-brand-dark/55">
         {t('profile.loading')}
+      </div>
+    )
+  }
+
+  if (hidden) {
+    return (
+      <div className="w-full">
+        <h1 className="relative inline-block pb-3 text-2xl font-bold text-brand-dark sm:text-3xl">
+          {t('profile.nav.attendance')}
+          <svg
+            className="absolute -bottom-0.5 inset-s-0 h-2.5 w-24 text-brand-secondary"
+            viewBox="0 0 120 12"
+            fill="none"
+            aria-hidden
+          >
+            <path
+              d="M2 8C20 2 40 10 58 6C76 2 96 10 118 4"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            />
+          </svg>
+        </h1>
+        <HiddenResultState className="mt-8" message={hidden.message} />
       </div>
     )
   }

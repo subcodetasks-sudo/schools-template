@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { EyeOff, Lock, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { HiddenResultState } from '@/features/profile/HiddenResultState'
+import { guardHidden, hiddenScope } from '@/features/profile/hiddenResults'
 import {
   getStudentAnnualReport,
-  isHiddenResourceError,
   type StudentAnnualReportPayload,
 } from '@/features/profile/studentProfileApi'
 import {
@@ -21,11 +22,6 @@ import { cn } from '@/lib/utils'
 import { useApiResource } from '@/lib/useApiResource'
 
 type Translate = (key: string, options?: Record<string, unknown>) => string
-
-/** The whole report can be switched off: 403 `{ hidden: true, resource: 'annual_report' }`. */
-type AnnualReportResult =
-  | { hidden: false; report: StudentAnnualReportPayload }
-  | { hidden: true }
 
 function formatNumber(value: number | null | undefined) {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—'
@@ -424,19 +420,14 @@ export function AnnualReportPage() {
   const { t } = useTranslation()
 
   const {
-    data: result,
+    data: report,
     isLoading,
     error,
+    hidden,
     reload,
-  } = useApiResource<AnnualReportResult>(
-    async () => {
-      try {
-        return { hidden: false, report: await getStudentAnnualReport() }
-      } catch (err) {
-        if (isHiddenResourceError(err, 'annual_report')) return { hidden: true }
-        throw err
-      }
-    },
+  } = useApiResource(
+    // Shared with the attendance page: once the school closes the report, neither asks again.
+    () => guardHidden('annual_report', hiddenScope(undefined), () => getStudentAnnualReport()),
     [t],
     t('profile.annualReport.loadError'),
   )
@@ -450,8 +441,6 @@ export function AnnualReportPage() {
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
   }, [reload])
-
-  const report = result && !result.hidden ? result.report : null
 
   return (
     <div className="w-full">
@@ -492,7 +481,7 @@ export function AnnualReportPage() {
       </div>
 
       <div className="mt-8">
-        {isLoading && !result ? (
+        {isLoading && !report && !hidden ? (
           <p role="status" className="py-16 text-center text-sm text-brand-dark/55">
             {t('profile.loading')}
           </p>
@@ -507,14 +496,9 @@ export function AnnualReportPage() {
           </div>
         ) : null}
 
-        {!error && result?.hidden ? (
-          <HiddenMessage
-            title={t('profile.annualReport.hidden.report')}
-            description={t('profile.annualReport.hidden.reportDescription')}
-          />
-        ) : null}
+        {!error && hidden ? <HiddenResultState message={hidden.message} /> : null}
 
-        {!error && report ? <AnnualReportContent report={report} /> : null}
+        {!error && !hidden && report ? <AnnualReportContent report={report} /> : null}
       </div>
     </div>
   )

@@ -364,6 +364,11 @@
     "title": "Student profile",
     "loading": "Loading profile...",
     "retry": "Try again",
+    "hidden": {
+      "message": "This data is currently unavailable from the school administration.",
+      "unavailable": "Currently unavailable",
+      "partial": "Results for {{terms}} are currently unavailable."
+    },
     "toggleMenu": "Toggle menu",
     "studentName": "Mahdi Saeed",
     "studentInitials": "MS",
@@ -924,8 +929,6 @@
         "participation": "Participation",
         "behavior": "Attendance and behavior"
       },
-      "hidden": "This section is not available right now",
-      "hiddenDescription": "The school has temporarily hidden this section. Contact the administration for details.",
       "monthAverage": "Month average",
       "noWeeklySheets": "No weekly assessments",
       "testsTitle": "Tests this month",
@@ -1281,8 +1284,6 @@
       "hidden": {
         "section": "This section is not available right now",
         "sectionDescription": "The school has temporarily hidden this section.",
-        "report": "The annual report is not available right now",
-        "reportDescription": "The school has temporarily hidden the annual report. Contact the administration for details.",
         "otherTerm": "{{term}} is not available right now"
       },
       "locked": {
