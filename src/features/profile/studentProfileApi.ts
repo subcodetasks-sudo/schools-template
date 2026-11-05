@@ -497,7 +497,12 @@ export type StudentWeeklyAssessmentEntry = {
   academic_year?: string | null
   term?: StudentWeeklyAssessmentTerm | string | null
   month?: StudentWeeklyAssessmentMonth | string | null
+  /** Week of the month. Not unique: group by `term_week` / `week_starts_on` instead. */
   week?: number | null
+  /** Week number counted from the start of the term. */
+  term_week?: number | null
+  /** Date (YYYY-MM-DD) the week starts on. */
+  week_starts_on?: string | null
   week_date?: string | null
   is_absent?: boolean
   scores: Record<string, number | null>

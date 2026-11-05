@@ -131,14 +131,18 @@ describe('weekly assessments', () => {
     expect(container.textContent).toContain(MESSAGE)
   })
 
-  it('without a term shows only the open term and marks the other as unavailable', async () => {
+  it('without a term loads the backend-picked term, sends no term, and locks nothing', async () => {
     mocks.weekly.mockResolvedValue(weeklyPayload('second'))
     await render(<WeeklyEvaluationsPage />)
 
+    expect(mocks.weekly).toHaveBeenCalledWith({})
     expect(container.textContent).not.toContain(MESSAGE)
-    expect(container.textContent).toContain(i18n.t('profile.hidden.partial', {
+    expect(container.textContent).not.toContain(i18n.t('profile.hidden.partial', {
       terms: i18n.t('profile.weeklyEvaluations.terms.first'),
     }))
+    // Tab and heading follow filters.term, not "all terms".
+    expect(container.textContent).toContain(i18n.t('profile.weeklyEvaluations.terms.second'))
+    expect(container.textContent).not.toContain(i18n.t('profile.weeklyEvaluations.filters.allTerms'))
   })
 
   it('locks the whole screen when both terms are closed', async () => {

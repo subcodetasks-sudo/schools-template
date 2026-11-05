@@ -107,8 +107,9 @@ export function lockedTerms(resource: HiddenResource, year: string | null | unde
 /**
  * Like `guardHidden`, for the endpoints that take `?term=first|second`.
  * - `term` given: that term alone is remembered as hidden on a 403.
- * - no `term`: a 403 means both terms are hidden; a response that carries `filters.term`
- *   means only that term was open, so the other one is locked.
+ * - no `term`: a 403 means both terms are hidden. A response carries `filters.term` (the
+ *   term the backend picked); that says nothing about the other term, which is only found
+ *   closed when the student asks for it and gets a 403.
  */
 export async function guardHiddenTerm<T extends { filters?: { term?: string | null } | null }>(
   resource: HiddenResource,
@@ -130,11 +131,10 @@ export async function guardHiddenTerm<T extends { filters?: { term?: string | nu
 
   try {
     const result = await request()
+    // The backend opens on one term (the running one) even when both are visible, so the
+    // other term is NOT known to be closed. Only the term that answered is known to be open.
     const returned = result?.filters?.term
-    for (const value of HIDDEN_TERMS) {
-      if (isTerm(returned) && value !== returned) markHidden(resource, termScope(value))
-      else clearHidden(resource, termScope(value))
-    }
+    if (isTerm(returned)) clearHidden(resource, termScope(returned))
     return result
   } catch (error) {
     const info = getHiddenInfo(error)

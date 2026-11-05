@@ -4,7 +4,6 @@ import { ClipboardList, Lock } from 'lucide-react'
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
@@ -185,7 +184,8 @@ function MonthTable({ card }: { card: MonthCardView }) {
 export function MonthlyEvaluationsPage() {
   const { t } = useTranslation()
   const { personalName, gradeLabel, profileData } = useProfile()
-  const [selectedTerm, setSelectedTerm] = useState<StudentWeeklyAssessmentTerm | 'all'>('all')
+  // `null` = the student has not picked: ask without a term and let the backend choose.
+  const [chosenTerm, setChosenTerm] = useState<StudentWeeklyAssessmentTerm | null>(null)
 
   const studentName = personalName || t('profile.studentName')
   const studentGrade = gradeLabel || t('profile.studentGrade')
@@ -202,10 +202,10 @@ export function MonthlyEvaluationsPage() {
       guardHiddenTerm(
         'monthly_assessments',
         undefined,
-        selectedTerm === 'all' ? undefined : selectedTerm,
-        () => getStudentMonthlyAssessments(selectedTerm === 'all' ? {} : { term: selectedTerm }),
+        chosenTerm ?? undefined,
+        () => getStudentMonthlyAssessments(chosenTerm ? { term: chosenTerm } : {}),
       ),
-    [selectedTerm, t],
+    [chosenTerm, t],
     t('profile.monthlyEvaluations.loadError'),
   )
 
@@ -218,10 +218,13 @@ export function MonthlyEvaluationsPage() {
   // Nothing of the report may show while it is closed, even if stale data is still around.
   const isClosed = Boolean(hidden) || allTermsClosed
 
-  const termSelectLabel =
-    selectedTerm === 'all'
-      ? t('profile.monthlyEvaluations.allTerms')
-      : t(`profile.weeklyEvaluations.terms.${selectedTerm}`)
+  // The tab follows the term the backend actually loaded (`filters.term`).
+  const loadedTerm = data?.filters?.term
+  const selectedTerm: StudentWeeklyAssessmentTerm | null =
+    chosenTerm ?? (loadedTerm === 'first' || loadedTerm === 'second' ? loadedTerm : null)
+  const termSelectLabel = selectedTerm
+    ? t(`profile.weeklyEvaluations.terms.${selectedTerm}`)
+    : ''
 
   return (
     <div className="w-full">
@@ -246,9 +249,9 @@ export function MonthlyEvaluationsPage() {
         {allTermsClosed ? null : (
           <div className="flex flex-wrap gap-2">
             <Select
-              value={selectedTerm}
+              value={selectedTerm ?? ''}
               onValueChange={(value) =>
-                setSelectedTerm((value as StudentWeeklyAssessmentTerm | 'all') || 'all')
+                setChosenTerm(value === 'first' || value === 'second' ? value : null)
               }
             >
               <SelectTrigger
@@ -257,13 +260,12 @@ export function MonthlyEvaluationsPage() {
               >
                 <span className="flex flex-1 items-center gap-2 text-start">
                   {termSelectLabel}
-                  {isTermClosed(selectedTerm) ? (
+                  {selectedTerm && isTermClosed(selectedTerm) ? (
                     <Lock className="size-3.5 shrink-0" aria-label={t('profile.hidden.unavailable')} />
                   ) : null}
                 </span>
               </SelectTrigger>
               <SelectContent className="rounded-2xl border-brand-dark/10 shadow-lg">
-                <SelectItem value="all">{t('profile.monthlyEvaluations.allTerms')}</SelectItem>
                 <TermSelectItem value="first" locked={isTermClosed('first')}>
                   {t('profile.weeklyEvaluations.terms.first')}
                 </TermSelectItem>

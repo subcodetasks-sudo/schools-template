@@ -47,15 +47,6 @@ export type WeeklyTableModel = {
 
 const UNKNOWN_SUBJECT_ID = 'unknown'
 
-function round(value: number) {
-  return Math.round(value * 100) / 100
-}
-
-function addNullable(a: number | null, b: number | null) {
-  if (a === null && b === null) return null
-  return round((a ?? 0) + (b ?? 0))
-}
-
 function toNumberOrNull(value: unknown) {
   if (value === null || value === undefined || value === '') return null
   const parsed = typeof value === 'number' ? value : Number(value)
@@ -109,31 +100,13 @@ function entryToCell(
 }
 
 /**
- * Two entries landing in the same subject/week cell (e.g. two sessions in one
- * week) are combined rather than one silently hiding the other.
+ * One cell is one subject x one week, so a second entry for it is a duplicate, not extra
+ * marks: summing them is what produced cells like 40/20. Keep the first real entry (an
+ * absence never hides recorded marks).
  */
 function mergeCells(current: WeeklyTableCell, incoming: WeeklyTableCell): WeeklyTableCell {
-  if (current.absent && incoming.absent) return current
-  if (current.absent) return incoming
-  if (incoming.absent) return current
-
-  const components: Record<string, WeeklyTableComponentValue> = { ...current.components }
-  for (const [key, value] of Object.entries(incoming.components)) {
-    const existing = components[key]
-    components[key] = existing
-      ? {
-          score: addNullable(existing.score, value.score),
-          max: addNullable(existing.max, value.max),
-        }
-      : value
-  }
-
-  return {
-    absent: false,
-    components,
-    total: addNullable(current.total, incoming.total),
-    maxTotal: addNullable(current.maxTotal, incoming.maxTotal),
-  }
+  if (current.absent && !incoming.absent) return incoming
+  return current
 }
 
 function termRank(term: string | null) {
@@ -194,10 +167,12 @@ export function buildWeeklyTable(
       monthMap.set(monthKey, monthBlock)
     }
 
-    const week = entry.week ?? null
-    const weekDate = entry.week_date ?? null
-    // Without a week number the date is the only thing telling two rows apart.
-    const rowKey = `${monthKey}|${week ?? `d:${weekDate ?? ''}`}`
+    // `week` is the week of the month, so "week 4" can exist in two months and in two
+    // places of one month. The week from the term start (or its start date) is unique.
+    const week = entry.term_week ?? entry.week ?? null
+    const weekDate = entry.week_starts_on ?? entry.week_date ?? null
+    const weekId = entry.term_week ?? entry.week_starts_on ?? entry.week_date ?? entry.week
+    const rowKey = `${monthKey}|${weekId ?? 'unknown'}`
     let row = rowMap.get(rowKey)
     if (!row) {
       row = { key: rowKey, week, weekDate, cells: {} }
@@ -228,8 +203,8 @@ export function buildWeeklyTable(
   for (const block of months) {
     block.rows.sort(
       (a, b) =>
-        compareNullableNumber(a.week, b.week) ||
-        (a.weekDate ?? '').localeCompare(b.weekDate ?? ''),
+        (a.weekDate ?? '￿').localeCompare(b.weekDate ?? '￿') ||
+        compareNullableNumber(a.week, b.week),
     )
   }
 

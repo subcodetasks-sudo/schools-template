@@ -104,24 +104,28 @@ describe('guardHiddenTerm', () => {
     expect(request).toHaveBeenCalledTimes(1)
   })
 
-  it('infers the closed term from filters.term when none was asked for', async () => {
+  it('does not lock the other term just because the backend picked one', async () => {
     const request = vi.fn().mockResolvedValue({ filters: { term: 'second' } } satisfies Payload)
     await guardHiddenTerm('weekly_assessments', undefined, undefined, request)
-    expect(lockedTerms('weekly_assessments', undefined)).toEqual(['first'])
+    expect(lockedTerms('weekly_assessments', undefined)).toEqual([])
 
-    // Still asks the server without a term while only one term is closed.
     await guardHiddenTerm('weekly_assessments', undefined, undefined, request)
     expect(request).toHaveBeenCalledTimes(2)
   })
 
-  it('unlocks terms when a later response carries both', async () => {
+  it('keeps a term found closed locked, and unlocks the one that answered', async () => {
+    await expect(
+      guardHiddenTerm('weekly_assessments', undefined, 'first', async () => {
+        throw hiddenError()
+      }),
+    ).rejects.toBeDefined()
     await guardHiddenTerm('weekly_assessments', undefined, undefined, async () => ({
-      filters: { term: 'first' },
+      filters: { term: 'second' },
     }))
-    expect(lockedTerms('weekly_assessments', undefined)).toEqual(['second'])
+    expect(lockedTerms('weekly_assessments', undefined)).toEqual(['first'])
 
     await guardHiddenTerm('weekly_assessments', undefined, undefined, async () => ({
-      filters: { term: null },
+      filters: { term: 'first' },
     }))
     expect(lockedTerms('weekly_assessments', undefined)).toEqual([])
   })

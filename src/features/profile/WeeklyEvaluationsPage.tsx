@@ -236,12 +236,23 @@ export function WeeklyEvaluationsPage() {
       ? '—'
       : t('profile.parentSummon.classroomSection', { section: studentClass })
 
-  const selectedTerm = query.term || 'all'
+  // The backend picks the term when none is asked for; `filters.term` says which one it was.
+  // Only a past year (explicit `academic_year`) can show every term together.
+  const loadedTerm = data?.filters?.term
+  const resolvedTerm =
+    query.term || (loadedTerm === 'first' || loadedTerm === 'second' ? loadedTerm : '')
+  const selectedTerm = resolvedTerm || (query.academic_year ? 'all' : '')
   const selectedMonth = query.month || 'all'
   const selectedSubject = query.subject_id ? String(query.subject_id) : 'all'
   const selectedYear = query.academic_year || data?.filters?.academic_year || ''
 
-  const termOptions: Array<'all' | StudentWeeklyAssessmentTerm> = ['all', 'first', 'second']
+  const termOptions: Array<'all' | StudentWeeklyAssessmentTerm> = query.academic_year
+    ? ['all', 'first', 'second']
+    : ['first', 'second']
+  const termLabel =
+    selectedTerm === 'first' || selectedTerm === 'second'
+      ? t(`profile.weeklyEvaluations.terms.${selectedTerm}`)
+      : null
   // Terms the school closed. Read at render: every answer that changes them also sets state.
   const closedTerms = lockedTerms('weekly_assessments', query.academic_year)
   const allTermsClosed = closedTerms.length === 2
@@ -294,9 +305,14 @@ export function WeeklyEvaluationsPage() {
             />
           </svg>
         </h1>
-        {selectedYear ? (
+        {selectedYear || termLabel ? (
           <p className="text-sm font-medium text-brand-dark/55">
-            {t('profile.weeklyEvaluations.academicYear', { year: selectedYear })}
+            {[
+              selectedYear ? t('profile.weeklyEvaluations.academicYear', { year: selectedYear }) : null,
+              termLabel,
+            ]
+              .filter(Boolean)
+              .join(' · ')}
           </p>
         ) : null}
       </div>
@@ -365,7 +381,7 @@ export function WeeklyEvaluationsPage() {
             <span className="flex flex-1 items-center gap-2 text-start">
               {selectedTerm === 'all'
                 ? t('profile.weeklyEvaluations.filters.allTerms')
-                : t(`profile.weeklyEvaluations.terms.${selectedTerm}`)}
+                : termLabel}
               {isTermClosed(selectedTerm) ? (
                 <Lock
                   className="size-3.5 shrink-0 text-brand-dark/60"
