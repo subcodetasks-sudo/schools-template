@@ -902,7 +902,39 @@ export type StudentUnplacedTest = StudentMonthlyTestEntry & {
   term?: StudentWeeklyAssessmentTerm | string | null
 }
 
+export type StudentMonthFileComponent = {
+  key?: string | null
+  name?: string | null
+  max?: number | string | null
+  average?: number | string | null
+}
+
+export type StudentMonthFileSubject = {
+  subject?: { id?: number | string | null; name?: string | null; code?: string | null } | null
+  weeks_counted?: number | null
+  components?: StudentMonthFileComponent[] | null
+  weekly_total?: number | string | null
+  weekly_max?: number | string | null
+  monthly_test?: { key?: string | null; score?: number | string | null; max?: number | string | null } | null
+  total?: number | string | null
+  max?: number | string | null
+}
+
+/** "ملف الشهر" — one month, all subjects, for this student. */
+export type StudentMonthFile = {
+  month?: StudentWeeklyAssessmentMonth | string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
+  summary?: {
+    total?: number | string | null
+    max?: number | string | null
+    percentage?: number | string | null
+  } | null
+  subjects?: StudentMonthFileSubject[] | null
+}
+
 export type StudentMonthlyAssessmentsPayload = {
+  /** Missing in old responses — treat as `[]`. */
+  month_files?: StudentMonthFile[] | null
   student?: StudentWeeklyAssessmentsPayload['student']
   filters?: {
     academic_year?: string | null

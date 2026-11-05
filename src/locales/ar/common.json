@@ -931,6 +931,16 @@
         "participation": "مشاركة",
         "behavior": "المواظبة والسلوك"
       },
+      "monthFile": {
+        "weeklyTotal": "مجموع الأسابيع",
+        "subjectTotal": "مجموع المادة",
+        "parts": {
+          "homework": "الواجب",
+          "notebook": "الكراسة",
+          "weekly": "التقييم الأسبوعي",
+          "behavior": "المواظبة والسلوك"
+        }
+      },
       "monthAverage": "متوسط الشهر",
       "noWeeklySheets": "لا توجد تقييمات أسبوعية",
       "testsTitle": "اختبارات الشهر",

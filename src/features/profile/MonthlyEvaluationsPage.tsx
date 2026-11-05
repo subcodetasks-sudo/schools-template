@@ -21,6 +21,8 @@ import {
 import {
   buildMonthlyAssessmentsView,
   monthlyTestKeyNumber,
+  buildMonthFiles,
+  type MonthFileView,
   type MonthCardView,
   type MonthlyTestView,
 } from '@/features/profile/monthlyAssessmentsModel'
@@ -78,6 +80,92 @@ function testMark(test: MonthlyTestView, t: Translate) {
         max: formatNumber(test.max),
       })
     : formatNumber(test.score)
+}
+
+function fraction(value: number | null, max: number | null) {
+  if (value === null) return '—'
+  return max !== null ? `${formatNumber(value)} / ${formatNumber(max)}` : formatNumber(value)
+}
+
+function MonthFileCard({ file }: { file: MonthFileView }) {
+  const { t } = useTranslation()
+  const columnLabel = (col: { key: string; name: string }) => {
+    const key = `profile.monthlyEvaluations.monthFile.parts.${col.key}`
+    const translated = t(key)
+    return translated !== key ? translated : col.name || col.key
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-brand-dark/10">
+      <table className="w-full min-w-[40rem] border-collapse text-sm">
+        <caption className="bg-brand-primary px-4 py-3 text-start text-white">
+          <span className="text-lg font-bold">{monthLabel(file.month, t)}</span>
+          <span className="ms-3 text-sm font-medium">
+            <bdi>{fraction(file.total, file.max)}</bdi>
+            {file.percentage !== null ? (
+              <>
+                {' · '}
+                <bdi>{formatPercentage(file.percentage)}</bdi>
+              </>
+            ) : null}
+          </span>
+        </caption>
+        <thead className="bg-muted/50 text-brand-dark/70">
+          <tr>
+            <th scope="col" className="px-3 py-2 text-start font-semibold">
+              {t('profile.monthlyEvaluations.columns.subject')}
+            </th>
+            {file.columns.map((col) => (
+              <th key={col.key} scope="col" className="px-3 py-2 text-start font-semibold">
+                {columnLabel(col)}
+              </th>
+            ))}
+            <th scope="col" className="px-3 py-2 text-start font-semibold">
+              {t('profile.monthlyEvaluations.monthFile.weeklyTotal')}
+            </th>
+            <th scope="col" className="px-3 py-2 text-start font-semibold">
+              {t('profile.monthlyEvaluations.columns.test')}
+            </th>
+            <th scope="col" className="px-3 py-2 text-start font-semibold">
+              {t('profile.monthlyEvaluations.monthFile.subjectTotal')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {file.subjects.map((row) => (
+            <tr key={row.id} className="border-t border-brand-dark/8">
+              <th scope="row" className="px-3 py-2.5 text-start font-bold text-brand-dark">
+                {row.subjectName || '—'}
+              </th>
+              {file.columns.map((col) => {
+                const cell = row.cells[col.key]
+                return (
+                  <td key={col.key} className="px-3 py-2.5">
+                    <bdi>{cell ? fraction(cell.average, cell.max) : '—'}</bdi>
+                  </td>
+                )
+              })}
+              <td className="px-3 py-2.5">
+                <bdi>{fraction(row.weeklyTotal, row.weeklyMax)}</bdi>
+              </td>
+              <td className="px-3 py-2.5">
+                {row.test ? (
+                  <bdi className="font-bold text-brand-primary">
+                    {fraction(row.test.score, row.test.max)}
+                  </bdi>
+                ) : (
+                  <span className="text-brand-dark/35">—</span>
+                )}
+              </td>
+              <td className="px-3 py-2.5 font-bold text-brand-dark">
+                <bdi>{fraction(row.total, row.max)}</bdi>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
 }
 
 function MonthTable({ card }: { card: MonthCardView }) {
@@ -210,6 +298,7 @@ export function MonthlyEvaluationsPage() {
   )
 
   const view = useMemo(() => buildMonthlyAssessmentsView(data), [data])
+  const monthFiles = useMemo(() => buildMonthFiles(data), [data])
 
   // Terms the school closed. Read at render: every answer that changes them also sets state.
   const closedTerms = lockedTerms('monthly_assessments', undefined)
@@ -343,7 +432,15 @@ export function MonthlyEvaluationsPage() {
           </div>
         ) : null}
 
-        {!isLoading && !error && !isClosed
+        {!isLoading && !error && !isClosed && monthFiles.length > 0 ? (
+          <div className="space-y-8">
+            {monthFiles.map((file) => (
+              <MonthFileCard key={file.id} file={file} />
+            ))}
+          </div>
+        ) : null}
+
+        {!isLoading && !error && !isClosed && monthFiles.length === 0
           ? view.groups.map((group) => (
               <section key={group.id} className="space-y-5">
                 <h2 className="border-b border-brand-dark/10 pb-2 text-xl font-bold text-brand-dark">

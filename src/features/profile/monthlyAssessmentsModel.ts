@@ -302,8 +302,88 @@ export function buildMonthlyAssessmentsView(
     groups,
     unplacedTests,
     multipleYears: years.size > 1,
-    isEmpty: cards.length === 0 && unplacedTests.length === 0,
+    isEmpty:
+      cards.length === 0 && unplacedTests.length === 0 && asArray(payload?.month_files).length === 0,
   }
+}
+
+/** Weekly parts in rubric order; columns are placed by `key`, never by array position. */
+const COMPONENT_ORDER = ['homework', 'notebook', 'weekly', 'behavior']
+
+export type MonthFileCell = { average: number | null; max: number | null }
+
+export type MonthFileSubjectView = {
+  id: string
+  subjectName: string
+  cells: Record<string, MonthFileCell>
+  weeklyTotal: number | null
+  weeklyMax: number | null
+  test: { score: number | null; max: number | null } | null
+  total: number | null
+  max: number | null
+}
+
+export type MonthFileView = {
+  id: string
+  month: string
+  term: string
+  total: number | null
+  max: number | null
+  percentage: number | null
+  /** Columns present in this month: key + API name (may be empty). */
+  columns: { key: string; name: string }[]
+  subjects: MonthFileSubjectView[]
+}
+
+export function buildMonthFiles(
+  payload: Partial<StudentMonthlyAssessmentsPayload> | null | undefined,
+): MonthFileView[] {
+  const files = asArray(payload?.month_files)
+  const views: MonthFileView[] = []
+  files.forEach((file, index) => {
+    const month = normalizeMonth(file?.month)
+    if (!month) return
+    const names = new Map<string, string>()
+    const subjects: MonthFileSubjectView[] = asArray(file.subjects).map((s, i) => {
+      const cells: Record<string, MonthFileCell> = {}
+      for (const c of asArray(s.components)) {
+        const key = cleanString(c?.key)
+        if (!key) continue
+        cells[key] = { average: toNumber(c.average), max: toNumber(c.max) }
+        if (!names.has(key) || !names.get(key)) names.set(key, cleanString(c.name))
+      }
+      const mt = s.monthly_test
+      return {
+        id: `${s.subject?.id ?? s.subject?.name ?? 'subject'}-${i}`,
+        subjectName: cleanString(s.subject?.name),
+        cells,
+        weeklyTotal: toNumber(s.weekly_total),
+        weeklyMax: toNumber(s.weekly_max),
+        test: mt && typeof mt === 'object' ? { score: toNumber(mt.score), max: toNumber(mt.max) } : null,
+        total: toNumber(s.total),
+        max: toNumber(s.max),
+      }
+    })
+    const rank = (k: string) => {
+      const r = COMPONENT_ORDER.indexOf(k)
+      return r === -1 ? COMPONENT_ORDER.length : r
+    }
+    const columns = [...names.entries()]
+      .map(([key, name]) => ({ key, name }))
+      .sort((a, b) => rank(a.key) - rank(b.key))
+    const term = normalizeTerm(file.term)
+    views.push({
+      id: `${term}|${month}|${index}`,
+      month,
+      term,
+      total: toNumber(file.summary?.total),
+      max: toNumber(file.summary?.max),
+      percentage: toNumber(file.summary?.percentage),
+      columns,
+      subjects,
+    })
+  })
+  return views.sort((a, b) => termRank(a.term) - termRank(b.term) || monthRank(a.month) - monthRank(b.month))
 }
 
 /** Test label: the API name, else a translated name for `monthly_1` / `monthly_2`, else the raw key. */

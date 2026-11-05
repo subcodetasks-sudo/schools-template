@@ -931,6 +931,16 @@
         "participation": "Participation",
         "behavior": "Attendance and behavior"
       },
+      "monthFile": {
+        "weeklyTotal": "Weeks total",
+        "subjectTotal": "Subject total",
+        "parts": {
+          "homework": "Homework",
+          "notebook": "Notebook",
+          "weekly": "Weekly assessment",
+          "behavior": "Attendance and behavior"
+        }
+      },
       "monthAverage": "Month average",
       "noWeeklySheets": "No weekly assessments",
       "testsTitle": "Tests this month",
