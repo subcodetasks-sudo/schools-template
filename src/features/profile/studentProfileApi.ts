@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiUpload, unwrapData } from '@/lib/api'
+import { ApiError, apiGet, apiPost, apiUpload, unwrapData } from '@/lib/api'
 import type { AuthUser } from '@/features/auth/authApi'
 import {
   defaultProfileData,
@@ -600,12 +600,78 @@ export type StudentLessonAbsencesPayload = {
   by_month: StudentLessonAbsencesByMonth[]
 }
 
+/** Terms the school keeps open for this student, per part of the results. */
+export type StudentAssessmentVisibility = {
+  weekly_assessments?: Array<StudentWeeklyAssessmentTerm | string> | null
+  monthly_assessments?: Array<StudentWeeklyAssessmentTerm | string> | null
+  results?: Array<StudentWeeklyAssessmentTerm | string> | null
+}
+
+/** One row of the weekly sheets rolled up per month (shape follows the monthly switch). */
+export type StudentAnnualWeeklyMonthRow = {
+  month?: StudentWeeklyAssessmentMonth | string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
+  academic_year?: string | null
+  subject?: StudentWeeklyAssessmentSubject | null
+  sessions?: number | null
+  score?: number | null
+  max?: number | null
+  percentage?: number | null
+  average_percentage?: number | null
+}
+
+export type StudentAnnualWeekly = Partial<StudentWeeklyAssessmentsPayload> & {
+  /** `true` when no term of the weekly sheets is open for this student. */
+  hidden?: boolean | null
+  by_month?: StudentAnnualWeeklyMonthRow[] | null
+}
+
+export type StudentAnnualSubjectRow = {
+  term?: StudentWeeklyAssessmentTerm | string | null
+  subject?: { id?: number | string; name?: string | null; code?: string | null } | null
+  year_work?: { score?: number | null; max?: number | null } | null
+  final_exam?: { score?: number | null; max?: number | null } | null
+  total?: number | null
+  total_max?: number | null
+  percentage?: number | null
+  status?: string | null
+}
+
+export type StudentAnnualSummary = {
+  subjects_count?: number | null
+  subjects_passed?: number | null
+  subjects_failed?: number | null
+  subjects_incomplete?: number | null
+} | null
+
 export type StudentAnnualReportPayload = {
+  student?: StudentWeeklyAssessmentsPayload['student']
   academic_year?: string | null
   attendance?: {
     daily?: StudentAbsencesPayload | null
     lessons?: StudentLessonAbsencesPayload | null
   } | null
+  assessments?: {
+    /** Student view only. A missing value (staff view, old cache) means everything is open. */
+    visibility?: StudentAssessmentVisibility | null
+    weekly?: StudentAnnualWeekly | null
+    subjects_locked?: boolean | null
+    subjects?: StudentAnnualSubjectRow[] | null
+  } | null
+  summary?: StudentAnnualSummary
+}
+
+/**
+ * The 403 body the API sends when a whole resource is switched off for the student:
+ * `{ hidden: true, resource: 'annual_report' }`.
+ */
+export function isHiddenResourceError(error: unknown, resource?: string) {
+  if (!(error instanceof ApiError) || error.status !== 403) return false
+  const data = error.data
+  if (!data || typeof data !== 'object') return false
+  const body = data as { hidden?: unknown; resource?: unknown }
+  if (body.hidden !== true) return false
+  return resource === undefined || body.resource === resource
 }
 
 export async function getStudentAnnualReport(academicYear?: string) {
@@ -795,6 +861,15 @@ export async function getStudentWeeklyAssessments(query: StudentWeeklyAssessment
   return unwrapData(response)
 }
 
+/** The monthly test tied to one month for one subject. Absent (`null`) when it has no saved mark. */
+export type StudentMonthlyTest = {
+  /** `monthly_1` or `monthly_2`. */
+  key?: string | null
+  name?: string | null
+  score?: number | null
+  max?: number | null
+}
+
 export type StudentMonthlyAssessmentRow = {
   month?: StudentWeeklyAssessmentMonth | string | null
   term?: StudentWeeklyAssessmentTerm | string | null
@@ -803,10 +878,36 @@ export type StudentMonthlyAssessmentRow = {
   sessions?: number
   score?: number
   max?: number
+  /** Legacy fields kept for older payloads. */
   scores?: Record<string, number | null> | null
   total?: number | null
   max_total?: number | null
   percentage?: number | null
+  /** Weekly average of the subject in this month. `null` when the month has no weekly sheets. */
+  average_percentage?: number | null
+  monthly_test?: StudentMonthlyTest | null
+}
+
+export type StudentMonthlyTestEntry = StudentMonthlyTest & {
+  subject?: StudentWeeklyAssessmentSubject | null
+}
+
+/** One month (and term) averaged over all subjects, with every test held in it. */
+export type StudentMonthlyByMonth = {
+  month?: StudentWeeklyAssessmentMonth | string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
+  academic_year?: string | null
+  sessions?: number | null
+  score?: number | null
+  max?: number | null
+  average_percentage?: number | null
+  tests?: StudentMonthlyTestEntry[] | null
+}
+
+/** A test whose month the admin hasn't set yet. */
+export type StudentUnplacedTest = StudentMonthlyTestEntry & {
+  academic_year?: string | null
+  term?: StudentWeeklyAssessmentTerm | string | null
 }
 
 export type StudentMonthlyAssessmentsPayload = {
@@ -826,6 +927,10 @@ export type StudentMonthlyAssessmentsPayload = {
     by_month?: StudentWeeklyAssessmentBucket[]
   }
   months: StudentMonthlyAssessmentRow[]
+  /** Missing in old or cached responses — treat as `[]`. */
+  by_month?: StudentMonthlyByMonth[] | null
+  /** Missing in old or cached responses — treat as `[]`. */
+  unplaced_tests?: StudentUnplacedTest[] | null
 }
 
 export type StudentMonthlyAssessmentsQuery = {

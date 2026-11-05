@@ -226,6 +226,7 @@
     "password": "الرقم السري",
     "passwordPlaceholder": "الرقم السري الخاص بك",
     "showPassword": "إظهار كلمة المرور",
+    "passwordRequired": "أدخل الرقم السري",
     "hidePassword": "إخفاء كلمة المرور",
     "submit": "تسجيل الدخول",
     "noAccount": "ليس لديك حساب؟",
@@ -334,6 +335,14 @@
     "passwordPlaceholder": "XXXXXXXXXX",
     "confirmPassword": "تأكيد الرقم السري",
     "confirmPasswordPlaceholder": "XXXXXXXXXX",
+    "passwordHint": "أرقام فقط، 4 أرقام على الأقل",
+    "passwordErrors": {
+      "required": "أدخل الرقم السري",
+      "tooShort": "يجب ألا يقل الرقم السري عن 4 أرقام",
+      "tooLong": "يجب ألا يزيد الرقم السري عن 100 رقم",
+      "digitsOnly": "يجب أن يحتوي الرقم السري على أرقام فقط",
+      "mismatch": "رقما السر غير متطابقين"
+    },
     "passwordMismatch": "رقما السر غير متطابقين",
     "next": "التالي",
     "back": "رجوع",
@@ -349,13 +358,7 @@
     "phoneNoLeadingZero": "لا يمكنك إضافة 0 بعد الكود",
     "phoneInvalid": "أدخل رقم هاتف صحيح",
     "agreePrefix": "بتسجيلك فإنك توافق على",
-    "agreeLink": "شروط الاستخدام وسياسة الخصوصية",
-    "checks": {
-      "strong": "حالة كلمة المرور: قوية",
-      "noPersonal": "لا تحتوي على اسمك الصريح أو بريدك",
-      "minLength": "8 حروف على الأقل",
-      "uppercase": "تحتوي على حرف كبير"
-    }
+    "agreeLink": "شروط الاستخدام وسياسة الخصوصية"
   },
   "profile": {
     "title": "ملف الطالب",
@@ -382,7 +385,8 @@
       "bus": "اشتراك الباص",
       "statistics": "الإحصائيات",
       "groups": "الجماعات والأنشطة",
-      "complaintTickets": "تذاكر الشكاوى"
+      "complaintTickets": "تذاكر الشكاوى",
+      "annualReport": "التقرير السنوي"
     },
     "navGroups": {
       "account": "الحساب",
@@ -565,7 +569,7 @@
       "classroomId": "معرّف الفصل",
       "stage": "المرحلة",
       "grade": "الصف",
-      "term": "الفصل الدراسي",
+      "term": "الترم",
       "attendanceRate": "نسبة الحضور",
       "unlockedAt": "تاريخ الفتح",
       "basicTotal": "المجموع الأساسي",
@@ -882,9 +886,9 @@
     },
     "monthlyEvaluations": {
       "selectMonth": "اختر الشهر",
-      "selectTerm": "اختر الفصل",
+      "selectTerm": "اختر الترم",
       "allMonths": "كل الشهور",
-      "allTerms": "كل الفصول",
+      "allTerms": "كل الترمات",
       "studentName": "اسم الطالب",
       "grade": "الصف الدراسي",
       "className": "الفصل الدراسي",
@@ -919,7 +923,22 @@
         "homework": "واجب",
         "participation": "مشاركة",
         "behavior": "المواظبة والسلوك"
-      }
+      },
+      "hidden": "هذا القسم غير متاح حاليًا",
+      "hiddenDescription": "قامت المدرسة بإخفاء هذا القسم مؤقتًا. تواصل مع الإدارة لمزيد من التفاصيل.",
+      "monthAverage": "متوسط الشهر",
+      "noWeeklySheets": "لا توجد تقييمات أسبوعية",
+      "testsTitle": "اختبارات الشهر",
+      "testFallback": "اختبار شهري",
+      "testFallbackNumbered": "اختبار شهري {{n}}",
+      "testMarkInline": "{{score}} / {{max}}",
+      "unplacedTitle": "اختبارات لم يُحدد شهرها",
+      "unplacedDescription": "لم تحدد الإدارة شهر هذه الاختبارات بعد، لذلك لا تظهر ضمن أي شهر.",
+      "termHeadingYear": "{{term}} — {{year}}",
+      "unknownTerm": "ترم غير محدد",
+      "unknownMonth": "شهر غير محدد",
+      "columnAverage": "المتوسط الأسبوعي",
+      "columnTest": "الاختبار الشهري"
     },
     "weeklyEvaluations": {
       "studentName": "اسم الطالب",
@@ -953,7 +972,7 @@
         "totalScore": "مجموع الدرجات"
       },
       "filters": {
-        "allTerms": "كل الفصول",
+        "allTerms": "كل الترمات",
         "allMonths": "كل الشهور",
         "allSubjects": "كل المواد",
         "clear": "مسح الفلاتر"
@@ -961,8 +980,8 @@
       "emptyFilteredTitle": "لا توجد نتائج لهذا الفلتر",
       "emptyFiltered": "جرّب تغيير الفلتر أو مسح الفلاتر لعرض كل التقييمات.",
       "terms": {
-        "first": "الفصل الأول",
-        "second": "الفصل الثاني"
+        "first": "الترم الأول",
+        "second": "الترم الثاني"
       },
       "months": {
         "january": "يناير",
@@ -1252,6 +1271,67 @@
         "forbiddenDescription": "هذه التذكرة لا تخص الطالب صاحب هذا الحساب.",
         "notFoundTitle": "التذكرة غير موجودة",
         "notFoundDescription": "ربما تكون هذه التذكرة غير موجودة أو أن الرابط غير صحيح."
+      }
+    },
+    "annualReport": {
+      "title": "التقرير السنوي",
+      "loadError": "تعذر تحميل التقرير السنوي.",
+      "academicYear": "العام الدراسي {{year}}",
+      "refresh": "تحديث",
+      "hidden": {
+        "section": "هذا القسم غير متاح حاليًا",
+        "sectionDescription": "قامت المدرسة بإخفاء هذا القسم مؤقتًا.",
+        "report": "التقرير السنوي غير متاح حاليًا",
+        "reportDescription": "قامت المدرسة بإخفاء التقرير السنوي مؤقتًا. تواصل مع الإدارة لمزيد من التفاصيل.",
+        "otherTerm": "{{term}} غير متاح حاليًا"
+      },
+      "locked": {
+        "title": "النتائج مقفلة",
+        "description": "تظهر نتائج المواد بعد فتح شهادة النجاح."
+      },
+      "empty": {
+        "weekly": "لا توجد تقييمات أسبوعية مسجلة.",
+        "monthly": "لا توجد بيانات شهرية مسجلة.",
+        "results": "لا توجد نتائج مسجلة."
+      },
+      "sections": {
+        "summary": "ملخص النتائج",
+        "weekly": "التقييمات الأسبوعية",
+        "weeklyTotals": "إجمالي التقييمات الأسبوعية",
+        "monthly": "الملخص الشهري",
+        "results": "نتائج المواد"
+      },
+      "tabs": {
+        "label": "اختر الترم",
+        "all": "كل الترمات"
+      },
+      "summary": {
+        "subjectsCount": "عدد المواد",
+        "subjectsPassed": "مواد ناجحة",
+        "subjectsFailed": "مواد راسبة",
+        "subjectsIncomplete": "مواد غير مكتملة"
+      },
+      "totals": {
+        "percentage": "النسبة",
+        "sessions": "عدد التقييمات",
+        "score": "الدرجة"
+      },
+      "columns": {
+        "month": "الشهر",
+        "term": "الترم",
+        "sessions": "التقييمات",
+        "score": "الدرجة",
+        "percentage": "النسبة",
+        "subject": "المادة",
+        "yearWork": "أعمال السنة",
+        "finalExam": "الاختبار النهائي",
+        "total": "المجموع",
+        "status": "الحالة"
+      },
+      "status": {
+        "pass": "ناجح",
+        "fail": "راسب",
+        "incomplete": "غير مكتمل"
       }
     }
   }

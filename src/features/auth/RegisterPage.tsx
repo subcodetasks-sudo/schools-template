@@ -1,14 +1,18 @@
 import type { ReactNode } from 'react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useForm, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { AuthShell, authFieldClass } from '@/features/auth/AuthShell'
+import { StudentPasswordInput } from '@/features/auth/StudentPasswordInput'
+import {
+  sanitizeStudentPassword,
+  validateStudentPassword,
+} from '@/features/auth/studentPassword'
 import {
   registerStep1,
   registerStep2,
@@ -67,12 +71,21 @@ const stepTwoSchema = z
       .min(9)
       .max(11)
       .regex(/^[1-9]\d*$/, 'leadingZero'),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    password: z.string(),
+    confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'mismatch',
+  .superRefine((data, ctx) => {
+    // Messages are i18n keys under `register.passwordErrors`.
+    const issue = validateStudentPassword(data.password)
+    if (issue) {
+      ctx.addIssue({ code: 'custom', path: ['password'], message: issue })
+    }
+
+    if (data.confirmPassword.length === 0) {
+      ctx.addIssue({ code: 'custom', path: ['confirmPassword'], message: 'required' })
+    } else if (data.password !== data.confirmPassword) {
+      ctx.addIssue({ code: 'custom', path: ['confirmPassword'], message: 'mismatch' })
+    }
   })
 
 type StepOneForm = z.infer<typeof stepOneSchema>
@@ -85,8 +98,6 @@ export function RegisterPage() {
   const [step, setStep] = useState<1 | 2>(1)
   const [registrationToken, setRegistrationToken] = useState<string | null>(null)
   const [studentCode, setStudentCode] = useState<string | null>(null)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const stepOneForm = useForm<StepOneForm>({
     resolver: zodResolver(stepOneSchema),
@@ -105,26 +116,15 @@ export function RegisterPage() {
 
   const identityType =
     useWatch({ control: stepOneForm.control, name: 'identityType' }) ?? 'egyptian'
-  const password = useWatch({ control: stepTwoForm.control, name: 'password' }) ?? ''
 
-  const passwordChecks = useMemo(() => {
-    const hasMinLength = password.length >= 8
-    const hasUppercase = /[A-Z]/.test(password)
-    const hasNoPersonalInfo = !/(name|email|admin)/i.test(password)
-    const isStrong =
-      hasMinLength && hasUppercase && /[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)
-
-    return [
-      { key: 'strong', met: isStrong, label: t('register.checks.strong') },
-      {
-        key: 'noPersonal',
-        met: hasNoPersonalInfo && password.length > 0,
-        label: t('register.checks.noPersonal'),
-      },
-      { key: 'minLength', met: hasMinLength, label: t('register.checks.minLength') },
-      { key: 'uppercase', met: hasUppercase, label: t('register.checks.uppercase') },
-    ] as const
-  }, [password, t])
+  /** Server errors are shown as sent; client errors are translated from their key. */
+  const passwordErrorText = (error?: { type?: string; message?: string }) => {
+    if (!error) return undefined
+    if (error.type === 'server') return error.message
+    return t(`register.passwordErrors.${error.message}`, {
+      defaultValue: t('register.passwordErrors.digitsOnly'),
+    })
+  }
 
   const phoneRegister = stepTwoForm.register('phone')
 
@@ -171,11 +171,12 @@ export function RegisterPage() {
     }
 
     try {
+      // Always a string, never a number: leading zeros must survive.
       await registerStep2({
         token: registrationToken,
         phone: toE164EgyptPhone(data.phone),
-        password: data.password,
-        confirm_password: data.confirmPassword,
+        password: sanitizeStudentPassword(data.password),
+        confirm_password: sanitizeStudentPassword(data.confirmPassword),
       })
 
       toast.success(t('register.success'))
@@ -196,7 +197,9 @@ export function RegisterPage() {
         const message = firstFieldError(error, field)
         if (message) stepTwoForm.setError(field, { type: 'server', message })
       }
-      const confirmMessage = firstFieldError(error, 'confirm_password')
+      const confirmMessage =
+        firstFieldError(error, 'confirm_password') ??
+        firstFieldError(error, 'password_confirmation')
       if (confirmMessage) {
         stepTwoForm.setError('confirmPassword', { type: 'server', message: confirmMessage })
       }
@@ -369,72 +372,39 @@ export function RegisterPage() {
           <Field
             id="password"
             label={t('register.password')}
-            error={stepTwoForm.formState.errors.password?.message}
+            hint={t('register.passwordHint')}
+            error={passwordErrorText(stepTwoForm.formState.errors.password)}
           >
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                placeholder={t('register.passwordPlaceholder')}
-                className={cn(authFieldClass, 'pe-11 shadow-sm')}
-                {...stepTwoForm.register('password')}
-              />
-              <TogglePassword
-                show={showPassword}
-                onToggle={() => setShowPassword((prev) => !prev)}
-                showLabel={t('login.showPassword')}
-                hideLabel={t('login.hidePassword')}
-              />
-            </div>
+            <StudentPasswordInput
+              id="password"
+              registration={stepTwoForm.register('password', {
+                // Once the user has tried to submit, keep the confirmation error in sync.
+                deps: stepTwoForm.formState.isSubmitted ? ['confirmPassword'] : [],
+              })}
+              placeholder={t('register.passwordPlaceholder')}
+              showLabel={t('login.showPassword')}
+              hideLabel={t('login.hidePassword')}
+              invalid={!!stepTwoForm.formState.errors.password}
+              describedBy="password-hint"
+            />
           </Field>
 
           <Field
             id="confirmPassword"
             label={t('register.confirmPassword')}
-            error={
-              stepTwoForm.formState.errors.confirmPassword?.type === 'server'
-                ? stepTwoForm.formState.errors.confirmPassword.message
-                : stepTwoForm.formState.errors.confirmPassword
-                  ? t('register.passwordMismatch')
-                  : undefined
-            }
+            hint={t('register.passwordHint')}
+            error={passwordErrorText(stepTwoForm.formState.errors.confirmPassword)}
           >
-            <div className="relative">
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                autoComplete="new-password"
-                placeholder={t('register.confirmPasswordPlaceholder')}
-                className={cn(authFieldClass, 'pe-11 shadow-sm')}
-                {...stepTwoForm.register('confirmPassword')}
-              />
-              <TogglePassword
-                show={showConfirmPassword}
-                onToggle={() => setShowConfirmPassword((prev) => !prev)}
-                showLabel={t('login.showPassword')}
-                hideLabel={t('login.hidePassword')}
-              />
-            </div>
+            <StudentPasswordInput
+              id="confirmPassword"
+              registration={stepTwoForm.register('confirmPassword')}
+              placeholder={t('register.confirmPasswordPlaceholder')}
+              showLabel={t('login.showPassword')}
+              hideLabel={t('login.hidePassword')}
+              invalid={!!stepTwoForm.formState.errors.confirmPassword}
+              describedBy="confirmPassword-hint"
+            />
           </Field>
-
-          <ul className="space-y-2.5">
-            {passwordChecks.map((check) => (
-              <li key={check.key} className="flex items-center gap-2 text-sm">
-                <span
-                  className={cn(
-                    'inline-flex size-5 items-center justify-center rounded-full',
-                    check.met ? 'bg-brand-primary text-white' : 'bg-brand-dark/8 text-brand-dark/30',
-                  )}
-                >
-                  <Check className="size-3.5" aria-hidden />
-                </span>
-                <span className={cn(check.met ? 'text-brand-dark/80' : 'text-brand-dark/45')}>
-                  {check.label}
-                </span>
-              </li>
-            ))}
-          </ul>
 
           <Button
             type="submit"
@@ -493,12 +463,14 @@ function Field({
   id,
   label,
   error,
+  hint,
   children,
   labelClassName,
 }: {
   id: string
   label: string
   error?: string
+  hint?: string
   children: ReactNode
   labelClassName?: string
 }) {
@@ -511,30 +483,16 @@ function Field({
         {label}
       </label>
       {children}
-      {error ? <p className="mt-1.5 text-xs text-destructive">{error}</p> : null}
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-xs text-brand-dark/55">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p role="alert" className="mt-1.5 text-xs text-destructive">
+          {error}
+        </p>
+      ) : null}
     </div>
-  )
-}
-
-function TogglePassword({
-  show,
-  onToggle,
-  showLabel,
-  hideLabel,
-}: {
-  show: boolean
-  onToggle: () => void
-  showLabel: string
-  hideLabel: string
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="absolute inset-e-3 top-1/2 inline-flex -translate-y-1/2 text-brand-dark/45 transition-colors hover:text-brand-primary"
-      aria-label={show ? hideLabel : showLabel}
-    >
-      {show ? <EyeOff className="size-4" aria-hidden /> : <Eye className="size-4" aria-hidden />}
-    </button>
   )
 }

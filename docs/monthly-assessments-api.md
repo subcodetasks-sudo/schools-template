@@ -114,3 +114,27 @@ Accept: application/json
 - Field-level detail per week (individual rubric columns, week dates) is not
   included here — that's [`GET /profile/weekly-assessments`](./student-profile-api.md#6-weekly-assessments--get-profileweekly-assessments),
   which this endpoint sums on top of.
+
+---
+
+## 4. Monthly average + monthly test per month (frontend contract)
+
+`months[]` rows now also carry `average_percentage` (weekly average of the subject in that
+month; `null` when the month has no weekly sheets — then `sessions: 0`) and `monthly_test`
+(`{ key: "monthly_1" | "monthly_2", name, score, max }`, or `null` when the month has no test
+**or the teacher has not saved its mark**). New top-level arrays:
+
+- `by_month[]` — one entry per month and term: `average_percentage` over all subjects
+  (`null` without weekly sheets) and `tests[]` (one per subject). Cards are built from this.
+- `unplaced_tests[]` — tests whose month is not set yet.
+
+Frontend rules (implemented in `src/features/profile/monthlyAssessmentsModel.ts`):
+
+- Averages are used as sent — never recomputed. `percentage` is only a fallback when
+  `average_percentage` is absent from a row (an explicit `null` is *not* replaced).
+- A test appears only in its own month; a test without a mark is never shown as `0`.
+- A month with a test but no weekly sheets still gets a card (dash / "لا توجد تقييمات أسبوعية").
+- Missing `by_month` / `unplaced_tests` (old or cached responses) are treated as `[]`; months
+  still listed in `months[]` get a card without an average.
+- Cards are grouped by term (and labelled by year when more than one year is present).
+- A `403` with `data.hidden: true` (term closed by the school) shows the hidden-section message.

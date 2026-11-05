@@ -15,7 +15,9 @@ import { cn } from '@/lib/utils'
 
 const loginSchema = z.object({
   code: z.string().regex(/^\d{14}$/),
-  password: z.string().min(6),
+  // Never enforce a password format here: older student passwords may contain letters
+  // or be shorter/longer than today's rules. Only require that something was typed.
+  password: z.string().min(1),
 })
 
 type LoginForm = z.infer<typeof loginSchema>
@@ -105,7 +107,7 @@ export function LoginPage() {
             </button>
           </div>
           {errors.password ? (
-            <p className="mt-1 text-xs text-destructive">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-destructive">{t('login.passwordRequired')}</p>
           ) : null}
         </div>
 

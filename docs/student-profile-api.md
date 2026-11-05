@@ -535,3 +535,19 @@ Notes:
   sections above if a combined card is needed.
 - `403` / `404` same as `/profile` (not a student account / no linked student row).
 
+
+### Annual report — visibility switches (frontend contract)
+
+The student view adds `data.assessments.visibility` = `{ weekly_assessments, monthly_assessments, results }`,
+each a list of the **open** terms (`first`/`second`); an empty list hides that part for every term.
+The staff view has no `visibility` (treated as everything open). Implemented in
+`src/features/profile/annualReportModel.ts` and rendered by `AnnualReportPage` (`/profile/annual-report`):
+
+- Weekly hidden = `weekly.hidden === true` **or** empty `weekly_assessments`; monthly roll-up (`weekly.by_month`)
+  follows `monthly_assessments`; `subjects` follows `results`. Hidden parts show a message — never zeros.
+- Term tabs are built from each part's open terms (an "all" tab only when two are open); a one-term part shows
+  a note that the other term is unavailable.
+- Totals are shown as sent (`weekly.summary`, or its `by_term` bucket for a term tab) — nothing is summed client-side.
+- `summary` counts that are `null` (hidden or locked results) render as a dash.
+- Hidden terms are never fetched from the dedicated endpoints (they refuse with 403). The report is not cached
+  and refetches when the tab regains focus. A `403` with `data.resource: "annual_report"` shows the report-hidden message.

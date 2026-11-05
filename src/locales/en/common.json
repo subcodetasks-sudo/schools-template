@@ -226,6 +226,7 @@
     "password": "Password",
     "passwordPlaceholder": "Your password",
     "showPassword": "Show password",
+    "passwordRequired": "Enter your password",
     "hidePassword": "Hide password",
     "submit": "Log in",
     "noAccount": "Don't have an account?",
@@ -334,6 +335,14 @@
     "passwordPlaceholder": "XXXXXXXXXX",
     "confirmPassword": "Confirm password",
     "confirmPasswordPlaceholder": "XXXXXXXXXX",
+    "passwordHint": "Digits only, at least 4",
+    "passwordErrors": {
+      "required": "Enter a password",
+      "tooShort": "The password must be at least 4 digits",
+      "tooLong": "The password must be at most 100 digits",
+      "digitsOnly": "The password must contain digits only",
+      "mismatch": "Passwords do not match"
+    },
     "passwordMismatch": "Passwords do not match",
     "next": "Next",
     "back": "Back",
@@ -349,13 +358,7 @@
     "phoneNoLeadingZero": "You cannot add 0 after the country code",
     "phoneInvalid": "Enter a valid phone number",
     "agreePrefix": "By registering, you agree to the",
-    "agreeLink": "Terms of use and privacy policy",
-    "checks": {
-      "strong": "Password status: Strong",
-      "noPersonal": "Does not contain your name or email",
-      "minLength": "At least 8 characters",
-      "uppercase": "Contains an uppercase letter"
-    }
+    "agreeLink": "Terms of use and privacy policy"
   },
   "profile": {
     "title": "Student profile",
@@ -382,7 +385,8 @@
       "bus": "Bus subscription",
       "statistics": "Statistics",
       "groups": "Groups & activities",
-      "complaintTickets": "Complaint tickets"
+      "complaintTickets": "Complaint tickets",
+      "annualReport": "Annual report"
     },
     "navGroups": {
       "account": "Account",
@@ -919,7 +923,22 @@
         "homework": "Homework",
         "participation": "Participation",
         "behavior": "Attendance and behavior"
-      }
+      },
+      "hidden": "This section is not available right now",
+      "hiddenDescription": "The school has temporarily hidden this section. Contact the administration for details.",
+      "monthAverage": "Month average",
+      "noWeeklySheets": "No weekly assessments",
+      "testsTitle": "Tests this month",
+      "testFallback": "Monthly test",
+      "testFallbackNumbered": "Monthly test {{n}}",
+      "testMarkInline": "{{score}} / {{max}}",
+      "unplacedTitle": "Tests without a month",
+      "unplacedDescription": "The administration has not set the month of these tests yet, so they do not appear under any month.",
+      "termHeadingYear": "{{term}} — {{year}}",
+      "unknownTerm": "Unspecified term",
+      "unknownMonth": "Unspecified month",
+      "columnAverage": "Weekly average",
+      "columnTest": "Monthly test"
     },
     "weeklyEvaluations": {
       "studentName": "Student name",
@@ -1252,6 +1271,67 @@
         "forbiddenDescription": "This ticket does not belong to the student on this account.",
         "notFoundTitle": "Ticket not found",
         "notFoundDescription": "This ticket may not exist, or the link is incorrect."
+      }
+    },
+    "annualReport": {
+      "title": "Annual report",
+      "loadError": "Could not load the annual report.",
+      "academicYear": "Academic year {{year}}",
+      "refresh": "Refresh",
+      "hidden": {
+        "section": "This section is not available right now",
+        "sectionDescription": "The school has temporarily hidden this section.",
+        "report": "The annual report is not available right now",
+        "reportDescription": "The school has temporarily hidden the annual report. Contact the administration for details.",
+        "otherTerm": "{{term}} is not available right now"
+      },
+      "locked": {
+        "title": "Results are locked",
+        "description": "Subject results appear after the success certificate is unlocked."
+      },
+      "empty": {
+        "weekly": "No weekly assessments recorded.",
+        "monthly": "No monthly data recorded.",
+        "results": "No results recorded."
+      },
+      "sections": {
+        "summary": "Results summary",
+        "weekly": "Weekly assessments",
+        "weeklyTotals": "Weekly assessment totals",
+        "monthly": "Monthly roll-up",
+        "results": "Subject results"
+      },
+      "tabs": {
+        "label": "Choose term",
+        "all": "All terms"
+      },
+      "summary": {
+        "subjectsCount": "Subjects",
+        "subjectsPassed": "Passed",
+        "subjectsFailed": "Failed",
+        "subjectsIncomplete": "Incomplete"
+      },
+      "totals": {
+        "percentage": "Percentage",
+        "sessions": "Assessments",
+        "score": "Score"
+      },
+      "columns": {
+        "month": "Month",
+        "term": "Term",
+        "sessions": "Assessments",
+        "score": "Score",
+        "percentage": "Percentage",
+        "subject": "Subject",
+        "yearWork": "Year work",
+        "finalExam": "Final exam",
+        "total": "Total",
+        "status": "Status"
+      },
+      "status": {
+        "pass": "Passed",
+        "fail": "Failed",
+        "incomplete": "Incomplete"
       }
     }
   }
