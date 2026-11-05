@@ -915,7 +915,9 @@
         "score": "Score",
         "max": "Max",
         "total": "Total",
-        "percentage": "Percentage"
+        "percentage": "Percentage",
+        "average": "Weekly average",
+        "test": "Monthly test"
       },
       "scoreColumns": {
         "performanceTasks": "Performance tasks",

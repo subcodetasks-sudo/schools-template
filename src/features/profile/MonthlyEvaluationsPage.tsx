@@ -24,10 +24,7 @@ import {
   monthlyTestKeyNumber,
   type MonthCardView,
   type MonthlyTestView,
-  type MonthlySubjectRowView,
 } from '@/features/profile/monthlyAssessmentsModel'
-import { BRAND_MONTH_COLORS, type MonthColor } from '@/features/profile/monthColors'
-import { cn } from '@/lib/utils'
 import { useApiResource } from '@/lib/useApiResource'
 
 type Translate = (key: string, options?: Record<string, unknown>) => string
@@ -84,12 +81,19 @@ function testMark(test: MonthlyTestView, t: Translate) {
     : formatNumber(test.score)
 }
 
-function SubjectRows({ rows, showTestColumn }: { rows: MonthlySubjectRowView[]; showTestColumn: boolean }) {
+function MonthTable({ card }: { card: MonthCardView }) {
   const { t } = useTranslation()
+  const showTestColumn = card.rows.some((row) => row.test !== null)
+  // Tests the API sent for the month that no subject row carries (e.g. old responses).
+  const looseTests = card.rows.some((row) => row.test !== null) ? [] : card.tests
+  const colCount = showTestColumn ? 3 : 2
+
   return (
     <div className="overflow-x-auto rounded-xl border border-brand-dark/10">
       <table className="w-full min-w-[18rem] border-collapse text-sm">
-        <caption className="sr-only">{t('profile.monthlyEvaluations.columns.subject')}</caption>
+        <caption className="bg-brand-primary px-4 py-3 text-start text-lg font-bold text-white">
+          {monthLabel(card.month, t)}
+        </caption>
         <thead className="bg-muted/50 text-brand-dark/70">
           <tr>
             <th scope="col" className="px-3 py-2 text-start font-semibold">
@@ -106,21 +110,25 @@ function SubjectRows({ rows, showTestColumn }: { rows: MonthlySubjectRowView[]; 
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
+          {card.rows.map((row) => (
             <tr key={row.id} className="border-t border-brand-dark/8 align-top">
               <th scope="row" className="px-3 py-2.5 text-start font-bold text-brand-dark">
                 {row.subjectName || '—'}
               </th>
               <td className="px-3 py-2.5">
                 {row.average !== null ? (
-                  <>
-                    <span className="font-bold text-brand-dark">{formatPercentage(row.average)}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="font-bold text-brand-dark">
+                      <bdi>{formatPercentage(row.average)}</bdi>
+                    </span>
                     {row.score !== null && row.max !== null && row.max > 0 ? (
-                      <span className="ms-2 text-xs text-brand-dark/55">
-                        {formatNumber(row.score)} / {formatNumber(row.max)}
+                      <span className="text-xs text-brand-dark/55">
+                        <bdi>
+                          {formatNumber(row.score)} / {formatNumber(row.max)}
+                        </bdi>
                       </span>
                     ) : null}
-                  </>
+                  </div>
                 ) : (
                   <span className="text-xs text-brand-dark/55">
                     {row.hasWeeklySheets ? '—' : t('profile.monthlyEvaluations.noWeeklySheets')}
@@ -131,7 +139,7 @@ function SubjectRows({ rows, showTestColumn }: { rows: MonthlySubjectRowView[]; 
                 <td className="px-3 py-2.5">
                   {row.test ? (
                     <span className="inline-flex flex-wrap items-baseline gap-x-2">
-                      <span className="font-bold text-brand-dark">{testMark(row.test, t)}</span>
+                      <span className="font-bold text-brand-primary">{testMark(row.test, t)}</span>
                       <span className="text-xs text-brand-dark/55">{testName(row.test, t)}</span>
                     </span>
                   ) : (
@@ -141,65 +149,36 @@ function SubjectRows({ rows, showTestColumn }: { rows: MonthlySubjectRowView[]; 
               ) : null}
             </tr>
           ))}
+          {looseTests.map((test, index) => (
+            <tr key={`${test.key}-${test.subjectName}-${index}`} className="border-t border-brand-dark/8">
+              <th scope="row" className="px-3 py-2.5 text-start font-bold text-brand-dark">
+                {test.subjectName || '—'}
+              </th>
+              <td colSpan={colCount - 1} className="px-3 py-2.5">
+                <span className="text-xs text-brand-dark/55">{testName(test, t)}: </span>
+                <span className="font-bold text-brand-primary">{testMark(test, t)}</span>
+              </td>
+            </tr>
+          ))}
         </tbody>
+        <tfoot className="border-t-2 border-brand-dark/15 bg-brand-primary/10">
+          <tr>
+            <th scope="row" className="px-3 py-3 text-start font-bold text-brand-dark">
+              {t('profile.monthlyEvaluations.monthAverage')}
+            </th>
+            <td colSpan={colCount - 1} className="px-3 py-3">
+              {card.average !== null ? (
+                <span className="font-bold text-brand-primary">{formatPercentage(card.average)}</span>
+              ) : (
+                <span className="text-xs text-brand-dark/55">
+                  {t('profile.monthlyEvaluations.noWeeklySheets')}
+                </span>
+              )}
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
-  )
-}
-
-function MonthCard({ card, color }: { card: MonthCardView; color: MonthColor }) {
-  const { t } = useTranslation()
-  const showTestColumn = card.rows.some((row) => row.test !== null)
-
-  return (
-    <article className="space-y-4">
-      <header
-        className={cn(
-          'flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gradient-to-l px-5 py-4 text-white shadow-sm',
-          color.header,
-        )}
-      >
-        <div>
-          <h3 className="text-lg font-bold sm:text-xl">{monthLabel(card.month, t)}</h3>
-          <p className="mt-0.5 text-sm text-white/80">{t('profile.monthlyEvaluations.monthAverage')}</p>
-        </div>
-        <div className="rounded-xl bg-white px-4 py-2 text-center">
-          {card.average !== null ? (
-            <p className={cn('text-xl font-bold leading-none', color.text)}>
-              {formatPercentage(card.average)}
-            </p>
-          ) : (
-            <p className="text-sm font-semibold leading-snug text-brand-dark/70">
-              {t('profile.monthlyEvaluations.noWeeklySheets')}
-            </p>
-          )}
-        </div>
-      </header>
-
-      {card.tests.length > 0 ? (
-        <section aria-label={t('profile.monthlyEvaluations.testsTitle')}>
-          <ul className="flex flex-wrap gap-2">
-            {card.tests.map((test, index) => (
-              <li
-                key={`${test.key}-${test.subjectName}-${index}`}
-                className={cn(
-                  'flex flex-wrap items-center gap-x-2 rounded-xl border px-3 py-1.5 text-sm',
-                  color.tint,
-                )}
-              >
-                <span className="font-semibold">{testName(test, t)}:</span>
-                <span className="font-bold">{testMark(test, t)}</span>
-                {test.subjectName ? (
-                  <span className="text-xs opacity-70">({test.subjectName})</span>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {card.rows.length > 0 ? <SubjectRows rows={card.rows} showTestColumn={showTestColumn} /> : null}
-    </article>
   )
 }
 
@@ -243,17 +222,6 @@ export function MonthlyEvaluationsPage() {
     selectedTerm === 'all'
       ? t('profile.monthlyEvaluations.allTerms')
       : t(`profile.weeklyEvaluations.terms.${selectedTerm}`)
-
-  // One colour per month card across the whole page, so a card keeps its colour on re-render.
-  const colorByCard = useMemo(() => {
-    const map = new Map<string, MonthColor>()
-    view.groups
-      .flatMap((group) => group.cards)
-      .forEach((card, index) => {
-        map.set(card.id, BRAND_MONTH_COLORS[index % BRAND_MONTH_COLORS.length])
-      })
-    return map
-  }, [view])
 
   return (
     <div className="w-full">
@@ -386,11 +354,7 @@ export function MonthlyEvaluationsPage() {
                 </h2>
                 <div className="space-y-8">
                   {group.cards.map((card) => (
-                    <MonthCard
-                      key={card.id}
-                      card={card}
-                      color={colorByCard.get(card.id) ?? BRAND_MONTH_COLORS[0]}
-                    />
+                    <MonthTable key={card.id} card={card} />
                   ))}
                 </div>
               </section>

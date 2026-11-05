@@ -915,7 +915,9 @@
         "score": "الدرجة",
         "max": "من",
         "total": "المجموع الكلي",
-        "percentage": "النسبة"
+        "percentage": "النسبة",
+        "average": "المتوسط الأسبوعي",
+        "test": "الاختبار الشهري"
       },
       "scoreColumns": {
         "performanceTasks": "المهام الأدائية",
